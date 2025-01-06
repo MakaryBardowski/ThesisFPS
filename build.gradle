@@ -1,0 +1,130 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group 'com.mygame'
+version '0.0.88'
+
+mainClassName = "client.Main"
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+project.ext {
+    jmeVer = '3.6.0-stable'
+}
+
+project(":assets") {
+    apply plugin: "java"
+
+    buildDir = rootProject.file("build/assets")
+
+    sourceSets {
+        main {
+            resources {
+                srcDir '.'
+            }
+        }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+}
+
+dependencies {
+    implementation  ('org.example:McCurryRandom:0.1') {
+        version {
+            branch = "master"
+        }
+    }
+    implementation 'org.lz4:lz4-java:1.8.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation "org.jmonkeyengine:jme3-core:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-desktop:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-jogg:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-plugins:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-niftygui:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-networking:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-effects:$jmeVer"
+    implementation "com.github.stephengold:Heart:8.6.0"
+    implementation "com.epagagames:particlemonkey:1.1.0"
+    implementation "com.simsilica:lemur:1.16.0"
+    implementation 'org.codehaus.groovy:groovy-all:3.0.21'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    runtimeOnly project(':assets')
+}
+
+tasks.named('distZip') {
+    dependsOn shadowJar, copyResourceFile
+    from(shadowJar.archiveFile)
+    from("$buildDir/libs/Maps") {
+        into('Maps')
+    }
+}
+
+tasks.named('distTar') {
+    dependsOn shadowJar, copyResourceFile
+    from(shadowJar.archiveFile)
+    from("$buildDir/libs/Maps") {
+        into('Maps')
+    }
+}
+
+tasks.named('startScripts') {
+    dependsOn shadowJar
+}
+
+tasks.named('startShadowScripts') {
+    dependsOn jar
+}
+
+task copyResourceFile(type: Copy) {
+    mustRunAfter ':assets:build'
+    from('assets/Maps') {
+        include '**/*'
+    }
+    into("$buildDir/libs/Maps")
+    doLast {
+        println "Maps folder copied to: ${buildDir}/libs/Maps"
+    }
+}
+
+jar {
+    mustRunAfter ':copyResourceFile'
+
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+wrapper {
+    gradleVersion = '8.11'
+}
+
+shadowJar {
+    mustRunAfter ':copyResourceFile'
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
+}
+
+application {
+    mainClass.set(mainClassName)
+}
