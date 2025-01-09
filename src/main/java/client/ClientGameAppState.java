@@ -20,7 +20,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
 import com.jme3.ui.Picture;
 import de.lessvoid.nifty.Nifty;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.factories.MobSpawnType;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
@@ -98,7 +98,7 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
 
     }
 
-    public <T extends InteractiveEntity> T registerEntity(T entity) {
+    public <T extends Entity> T registerEntity(T entity) {
         return currentGamemode.getLevelManager().registerEntity(entity);
     }
 
@@ -118,7 +118,7 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
         return currentGamemode.getLevelManager().getBLOCK_SIZE();
     }
 
-    public ConcurrentHashMap<Integer, InteractiveEntity> getMobs() {
+    public ConcurrentHashMap<Integer, Entity> getMobs() {
         return currentGamemode.getLevelManager().getMobs();
     }
 

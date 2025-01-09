@@ -8,10 +8,9 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.Chest;
 import game.entities.Destructible;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
-import game.items.Equippable;
 import game.items.Item;
 import server.ServerMain;
 
@@ -30,7 +29,7 @@ public abstract class TwoWayMessage extends AbstractMessage {
         return ((Chest) ServerMain.getInstance().getLevelManagerMobs().get(id));
     }
 
-    protected InteractiveEntity getEntityByIdServer(int id) {
+    protected Entity getEntityByIdServer(int id) {
         return ServerMain.getInstance().getLevelManagerMobs().get(id);
     }
 
@@ -46,7 +45,7 @@ public abstract class TwoWayMessage extends AbstractMessage {
         return ((Destructible) ServerMain.getInstance().getLevelManagerMobs().get(id));
     }
 
-    protected InteractiveEntity getEntityByIdClient(int id) {
+    protected Entity getEntityByIdClient(int id) {
         return ClientGameAppState.getInstance().getMobs().get(id);
     }
 
@@ -74,7 +73,7 @@ public abstract class TwoWayMessage extends AbstractMessage {
     }
 
     protected boolean entityExistsLocallyServer(int mobId) {
-        return ServerMain.getInstance().getLevelManagerMobs().get(mobId) != null;
+        return  null != ServerMain.getInstance().getLevelManagerMobs().get(mobId);
     }
 
     protected boolean entityNotExistsLocallyClient(int mobId) {

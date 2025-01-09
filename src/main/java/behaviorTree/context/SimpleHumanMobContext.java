@@ -4,6 +4,7 @@ import com.jme3.math.Vector3f;
 import data.DamageReceiveData;
 import events.DamageReceivedEvent;
 import events.GameEvent;
+import game.AttachedEntity;
 import game.entities.Destructible;
 import game.entities.mobs.HumanMob;
 import java.util.List;
@@ -199,11 +200,14 @@ public class SimpleHumanMobContext extends Context {
         }
         lastTargetChangeTimestampMillis = currentUpdateTimestamp;
 
-        var attackerPos = attacker.getNode().getWorldTranslation();
+
         resetVariables();
         setFindRandomPathTimer(findRandomPathCooldown);
         setTargetDestructible(destructibleTarget);
-        getHumanMob().getNode().lookAt(attackerPos, Vector3f.UNIT_Y);
+        if(attacker instanceof AttachedEntity attachedAttacker) {
+            var attackerPos = attachedAttacker.getNode().getWorldTranslation();
+            getHumanMob().getNode().lookAt(attackerPos, Vector3f.UNIT_Y);
+        }
 //        System.out.println(getHumanMob() + " switches target to (because received damage from): " + attacker);
     }
 }

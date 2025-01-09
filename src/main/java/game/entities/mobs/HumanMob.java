@@ -9,6 +9,7 @@ import behaviorTree.composite.SelectorNode;
 import behaviorTree.composite.SequenceNode;
 import behaviorTree.context.SimpleHumanMobContext;
 import game.effects.EmitterPooler;
+import game.entities.*;
 import game.items.Equippable;
 import game.items.Holdable;
 import game.items.Item;
@@ -21,9 +22,6 @@ import com.jme3.anim.AnimComposer;
 import com.jme3.anim.ArmatureMask;
 import com.jme3.anim.SkinningControl;
 import com.jme3.anim.tween.Tweens;
-import com.jme3.anim.tween.action.Action;
-import com.jme3.anim.tween.action.ClipAction;
-import com.jme3.animation.AnimControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -32,22 +30,13 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitorAdapter;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.debug.SkeletonDebugger;
 import com.jme3.scene.debug.custom.ArmatureDebugger;
 import data.DamageReceiveData;
-import debugging.Circle;
-import debugging.HumanPathDebugControl;
 import events.DamageReceivedEvent;
 import game.effects.ParticleUtils;
-import game.entities.Animation;
-import static game.entities.Animation.HUMAN_ATTACK_MELEE;
-import game.entities.Collidable;
-import game.entities.FloatAttribute;
-import game.entities.InteractiveEntity;
-import game.entities.InvokeMethodTween;
+
 import static game.entities.factories.MobSpawnType.HUMAN;
-import static game.entities.mobs.Mob.SPEED_ATTRIBUTE;
+
 import game.items.armor.Boots;
 import game.items.armor.Gloves;
 import game.items.armor.Helmet;
@@ -148,11 +137,6 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-        notifyServerAboutDealingDamage(damage, shooter);
-    }
-
-    @Override
     public void onInteract() {
 //        if (ServerMain.getInstance() == null) {
 //            return;
@@ -224,7 +208,11 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
         var notMe = this != ClientGameAppState.getInstance().getPlayer();
         ParticleEmitter blood = EmitterPooler.getBlood();
@@ -245,6 +233,10 @@ public class HumanMob extends Mob {
 
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
         if (health <= 0) {
             destroyServer();
@@ -258,8 +250,8 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void notifyServerAboutDealingDamage(float damage, InteractiveEntity attacker) {
-        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(id, attacker.getId(), damage);
+    public void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData) {
+        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
     }
@@ -497,20 +489,29 @@ public class HumanMob extends Mob {
         }
     }
 
-    private void debugSkeleton(Node player) {
-        player.depthFirstTraversal(new SceneGraphVisitorAdapter() {
-            @Override
-            public void visit(Node node) {
-                ArmatureDebugger skeletonDebug = new ArmatureDebugger("skeleton",
-                        skinningControl.getArmature(), skinningControl.getArmature().getJointList());
-                Material mat = new Material(Main.getInstance().getAssetManager(),
-                        "Common/MatDefs/Misc/Unshaded.j3md");
-                mat.setColor("Color", ColorRGBA.Green);
-                mat.getAdditionalRenderState().setDepthTest(false);
-                skeletonDebug.setMaterial(mat);
-                player.attachChild(skeletonDebug);
+    @Override
+    public void dealDamageClient(float damage, Destructible target) {
+        var targetDamageReceiveData = new DamageReceiveData(target.getId(),id,damage);
 
-            }
-        });
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyClient(targetDamageReceiveData);
+        }
+
+        target.onAttacked(this, targetDamageReceiveData);
     }
+
+    @Override
+    public void dealDamageServer(DamageReceiveData damageReceiveData, Destructible target) {
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyServer(damageReceiveData);
+        }
+
+        target.receiveDamageServer(damageReceiveData);
+    }
+
+    @Override
+    public void onAttacked(Mob shooter, DamageReceiveData damage) {
+        notifyServerAboutReceivingDamage(damage);
+    }
+
 }

@@ -6,6 +6,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
+import game.AttachedEntity;
 import server.ServerMain;
 
 @Serializable
@@ -66,7 +67,7 @@ public class MobPosRotUpdateMessage extends EntityUpdateMessage {
         if (entityExistsLocallyServer(id)) {
             Main.getInstance().enqueue(() -> {
                 if (ServerMain.getInstance().getLevelManagerMobs().get(id) != null) {
-                    ServerMain.getInstance().getLevelManagerMobs().get(id).getNode().setLocalRotation(getRot());
+                    ((AttachedEntity)  ServerMain.getInstance().getLevelManagerMobs().get(id)) .getNode().setLocalRotation(getRot());
                 }
             });
         }

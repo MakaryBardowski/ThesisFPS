@@ -37,10 +37,6 @@ public class IndestructibleDecoration extends Collidable {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-    }
-
-    @Override
     public void onInteract() {
     }
 

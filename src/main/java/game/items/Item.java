@@ -8,10 +8,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import static debugging.DebugUtils.createUnshadedBoxNode;
+
+import game.AttachedEntity;
 import game.effects.ParticleUtils;
 
 import static game.entities.DestructibleUtils.setupModelShootability;
-import game.entities.InteractiveEntity;
+
 import game.items.ItemTemplates.ItemTemplate;
 import lombok.Getter;
 
@@ -20,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static server.ServerMain.removeEntityByIdServer;
 
 @Getter
-public abstract class Item extends InteractiveEntity {
+public abstract class Item extends AttachedEntity {
 
     protected boolean droppable;
     protected String description;

@@ -1,5 +1,6 @@
 package game.entities.mobs;
 
+import game.entities.Destructible;
 import game.items.Item;
 import game.map.collision.WorldGrid;
 import client.ClientGameAppState;
@@ -13,12 +14,8 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import data.DamageReceiveData;
 import game.entities.Collidable;
-import game.entities.Destructible;
 import game.entities.FloatAttribute;
-import game.entities.InteractiveEntity;
 import game.entities.factories.MobSpawnType;
-import static game.entities.mobs.Mob.MOB_ROTATION_RATE;
-import static game.entities.mobs.Mob.SPEED_ATTRIBUTE;
 import game.map.collision.RectangleAABB;
 import lombok.Getter;
 import messages.DestructibleDamageReceiveMessage;
@@ -55,6 +52,26 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
+    public void dealDamageClient(float damage, Destructible target) {
+        var targetDamageReceiveData = new DamageReceiveData(target.getId(),id,damage);
+
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyClient(targetDamageReceiveData);
+        }
+
+        target.onAttacked(this, targetDamageReceiveData);
+    }
+
+    @Override
+    public void dealDamageServer(DamageReceiveData damageReceiveData, Destructible target) {
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyServer(damageReceiveData);
+        }
+
+        target.receiveDamageServer(damageReceiveData);
+    }
+
+    @Override
     protected final void createHitbox() {
         float hitboxWidth = 0.5f;
         float hitboxHeight = 1.25f;
@@ -73,8 +90,8 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-        notifyServerAboutDealingDamage(damage, shooter);
+    public void onAttacked(Mob shooter, DamageReceiveData damageReceiveData) {
+        notifyServerAboutReceivingDamage(damageReceiveData);
     }
 
     @Override
@@ -109,7 +126,11 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
         if (health <= 0) {
             health = 1;
@@ -118,6 +139,10 @@ public class TrainingDummy extends Mob {
     
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
         if (health <= 0) {
             health = 1;
@@ -154,8 +179,8 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
-    public void notifyServerAboutDealingDamage(float damage, InteractiveEntity attacker) {
-        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(id,attacker.getId(), damage);
+    public void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData) {
+        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
     }

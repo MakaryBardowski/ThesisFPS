@@ -55,8 +55,8 @@ public class MudBeetleActions {
                     }
 
                     Main.getInstance().enqueue(() -> {
-                        var emsg = new DestructibleDamageReceiveMessage(destructibleTarget.getId(),beetle.getId(), TEST_DAMAGE);
-                        emsg.applyDestructibleDamageAndNotifyClients(destructibleTarget, ServerMain.getInstance());
+//                        var emsg = new DestructibleDamageReceiveMessage(destructibleTarget.getId(),beetle.getId(), TEST_DAMAGE);
+//                        emsg.applyDestructibleDamageAndNotifyClients(destructibleTarget, ServerMain.getInstance());
 //                    var bullet = SceneUtils.createBullet(destructibleTarget.getNode().getWorldTranslation().clone());
 //                    Main.debugNode.attachChild(bullet);
 //                    

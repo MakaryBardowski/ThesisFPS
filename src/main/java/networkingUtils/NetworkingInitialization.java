@@ -1,5 +1,7 @@
 package networkingUtils;
 
+import messages.cardChoice.CardSelectionMessage;
+import messages.cardChoice.ChooseCardMessage;
 import messages.gameSetupMessages.MapMessage;
 import messages.items.*;
 import messages.messageListeners.ServerMessageListener;
@@ -84,6 +86,8 @@ public class NetworkingInitialization {
         Serializer.registerClass(NewDestructibleDecorationMessage.class);
         Serializer.registerClass(NewIndestructibleDecorationMessage.class);
         Serializer.registerClass(DeleteEntityMessage.class);
+        Serializer.registerClass(CardSelectionMessage.class);
+        Serializer.registerClass(ChooseCardMessage.class);
 
         Serializer.registerClass(ThrownGrenadeExplodedMessage.class);
 

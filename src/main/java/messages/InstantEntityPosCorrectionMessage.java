@@ -4,7 +4,7 @@ import client.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import server.ServerMain;
 
 @Serializable
@@ -17,7 +17,7 @@ public class InstantEntityPosCorrectionMessage extends EntityUpdateMessage {
     public InstantEntityPosCorrectionMessage() {
     }
 
-    public InstantEntityPosCorrectionMessage(InteractiveEntity e, Vector3f pos) {
+    public InstantEntityPosCorrectionMessage(Entity e, Vector3f pos) {
         super(e.getId());
         this.x = pos.getX();
         this.y = pos.getY();

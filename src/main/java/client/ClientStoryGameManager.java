@@ -1,9 +1,7 @@
 package client;
 
 public class ClientStoryGameManager extends ClientGameManager {
-
-    protected long[] levelSeeds;
-
+    
     @Override
     public void startGame() {
         setupLevelManager();

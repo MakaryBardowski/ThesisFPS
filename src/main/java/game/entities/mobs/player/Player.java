@@ -14,8 +14,8 @@ import com.jme3.scene.Node;
 import game.entities.Attribute;
 import game.entities.FloatAttribute;
 import FirstPersonHands.FirstPersonHands;
-import LemurGUI.LemurPlayerInventoryGui;
-import LemurGUI.LemurPlayerHealthbar;
+import guiComponents.LemurPlayerInventoryGui;
+import guiComponents.LemurPlayerHealthbar;
 import static client.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import static client.Main.CAM_ROT_SPEED;
@@ -34,6 +34,7 @@ import server.ServerMain;
 import static server.ServerMain.removeEntityByIdServer;
 
 public class Player extends HumanMob {
+    private static boolean isPlayerControlsEnabled = true;
 
     @Getter
     @Setter
@@ -141,9 +142,9 @@ public class Player extends HumanMob {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
         float previousHealth = getHealth();
-        super.receiveDamage(damageData);
+        super.receiveDamageClient(damageData);
         if (playerHealthbar != null) {
             float normalizedPercentHealth = getHealth() / getMaxHealth();
             float normalizedChange = (previousHealth - getHealth()) / getMaxHealth();
@@ -152,9 +153,9 @@ public class Player extends HumanMob {
     }
 
     @Override
-    public void receiveHeal(float heal) {
+    public void receiveHealClient(float heal) {
         float previousHealth = getHealth();
-        super.receiveHeal(heal);
+        super.receiveHealClient(heal);
 
         if (playerHealthbar != null) {
             float normalizedPercentHealth = getHealth() / getMaxHealth();
@@ -332,6 +333,18 @@ public class Player extends HumanMob {
             node.removeFromParent();
         });
         removeEntityByIdClient(id);
+    }
+
+    public static synchronized void enablePlayerControls(){
+        isPlayerControlsEnabled = true;
+    }
+
+    public static synchronized void disablePlayerControls(){
+        isPlayerControlsEnabled = false;
+    }
+
+    public static boolean isPlayerControlsEnabled(){
+        return isPlayerControlsEnabled;
     }
 
 }

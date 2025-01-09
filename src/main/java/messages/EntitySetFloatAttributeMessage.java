@@ -4,7 +4,7 @@ import client.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.FloatAttribute;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import lombok.Getter;
 import server.ServerMain;
 
@@ -21,7 +21,7 @@ public class EntitySetFloatAttributeMessage extends TwoWayMessage {
     public EntitySetFloatAttributeMessage() {
     }
 
-    public EntitySetFloatAttributeMessage(InteractiveEntity entity, int attributeId, float attributeValue) {
+    public EntitySetFloatAttributeMessage(Entity entity, int attributeId, float attributeValue) {
         this.entityId = entity.getId();
         this.attributeId = attributeId;
         this.attributeValue = attributeValue;

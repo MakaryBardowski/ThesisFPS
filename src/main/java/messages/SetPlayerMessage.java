@@ -1,7 +1,7 @@
 package messages;
 
-import LemurGUI.LemurPlayerInventoryGui;
-import LemurGUI.LemurPlayerHealthbar;
+import guiComponents.LemurPlayerInventoryGui;
+import guiComponents.LemurPlayerHealthbar;
 import client.ClientGameAppState;
 import client.PlayerHUD;
 import com.jme3.math.Vector3f;

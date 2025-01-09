@@ -4,7 +4,7 @@ import client.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.IntegerAttribute;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import lombok.Getter;
 import server.ServerMain;
 
@@ -22,7 +22,7 @@ public class EntitySetIntegerAttributeMessage extends TwoWayMessage {
         setReliable(true);
     }
 
-    public EntitySetIntegerAttributeMessage(InteractiveEntity entity, int attributeId, int attributeValue) {
+    public EntitySetIntegerAttributeMessage(Entity entity, int attributeId, int attributeValue) {
         this.entityId = entity.getId();
         this.attributeId = attributeId;
         this.attributeValue = attributeValue;

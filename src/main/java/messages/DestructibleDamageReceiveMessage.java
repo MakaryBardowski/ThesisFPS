@@ -5,16 +5,18 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import data.DamageReceiveData;
 import game.entities.Destructible;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
+import game.entities.mobs.Mob;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import server.ServerMain;
 
 @Serializable
 @Getter
 @NoArgsConstructor
 public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
-
+    @Setter
     protected float damage;
     protected int attackerId;
     
@@ -23,6 +25,12 @@ public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
         this.damage = damage;
         this.attackerId = attackerId;
     }
+
+    public DestructibleDamageReceiveMessage(DamageReceiveData damageReceiveData) {
+        super(damageReceiveData.getVictimId());
+        this.damage = damageReceiveData.getRawDamage();
+        this.attackerId = damageReceiveData.getAttackerId();
+    }
     
     public DamageReceiveData getDamageReceiveData() {
         return new DamageReceiveData(id,attackerId,damage);
@@ -30,12 +38,13 @@ public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
 
     @Override
     public void handleServer(ServerMain server,HostedConnection hc) {
-        InteractiveEntity i = getEntityByIdServer(id);
-        if (i != null) { // if the mob doesnt exist, it means the 
+        Entity victim = getEntityByIdServer(id);
+        Entity attacker = getEntityByIdServer(attackerId);
+        if (victim != null) { // if the mob doesnt exist, it means the
             // info was sent from a lagged user - dont forward it to others
-//            System.err.println(id);
-            Destructible d = ((Destructible) i);
-            applyDestructibleDamageAndNotifyClients(d, ServerMain.getInstance());
+            Mob attackerMob = ((Mob) attacker);
+            Destructible victimMob = ((Destructible) victim);
+            applyDestructibleDamageAndNotifyClients(victimMob,attackerMob, ServerMain.getInstance());
 
         }
     }
@@ -45,15 +54,21 @@ public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
         enqueueExecution(() -> {
             if (entityExistsLocallyClient(id)) {
                 Destructible d = (Destructible) getEntityByIdClient(id);
-                d.receiveDamage(getDamageReceiveData());
+                d.receiveDamageClient(getDamageReceiveData());
             }
         }
         );
     }
 
-    public void applyDestructibleDamageAndNotifyClients(Destructible d, ServerMain serverApp) {
-            d.receiveDamageServer(getDamageReceiveData());
-            this.setReliable(true);
-            serverApp.getServer().broadcast(this);
+    public void applyDestructibleDamageAndNotifyClients(Destructible target, Mob attacker, ServerMain serverApp) {
+            enqueueExecution(()->{
+                var damageReceiveData = getDamageReceiveData();
+                attacker.dealDamageServer(damageReceiveData,target); // can be modified inside
+
+                this.setDamage(damageReceiveData.getRawDamage());
+
+                this.setReliable(true);
+                serverApp.getServer().broadcast(this);
+            });
     }
 }

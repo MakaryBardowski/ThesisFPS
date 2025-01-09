@@ -4,7 +4,7 @@ import messages.gameSetupMessages.GameInfoOnStartMessage;
 
 public class ServerStoryGameManager extends ServerGameManager {
 
-    private final int LEVEL_COUNT = 6;
+    private final int LEVEL_COUNT = 8;
 
     public ServerStoryGameManager() {
         gamemodeId = 1;
@@ -13,14 +13,14 @@ public class ServerStoryGameManager extends ServerGameManager {
     @Override
     public void startGame() {
         setupLevelManager();
-        transmitSeedsToConnectedClients();
+        notifySeedsToConnectedClients();
         levelManager.jumpToLevel(0);
     }
 
     @Override
     public void updateMainLoop(float tpf) {}
 
-    private void transmitSeedsToConnectedClients() {
+    private void notifySeedsToConnectedClients() {
         var server = ServerMain.getInstance().getServer();
         var levelSeeds = levelManager.getLevelSeeds();
         var levelTypes = levelManager.getLevelTypes();

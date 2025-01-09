@@ -10,7 +10,7 @@ import de.lessvoid.nifty.controls.label.LabelControl;
 import game.entities.Attribute;
 import game.entities.Destructible;
 import game.entities.IntegerAttribute;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
 import game.items.ItemTemplates.ItemTemplate;
@@ -88,10 +88,10 @@ public abstract class RangedWeapon extends Weapon {
             if (distanceToFirstTarget < distanceToFirstWall) {
 
                 Integer hitId = Integer.valueOf(closest.getGeometry().getName());
-                InteractiveEntity mobHit = cs.getMobs().get(hitId);
+                Entity mobHit = cs.getMobs().get(hitId);
                 
                 if (mobHit instanceof Destructible destructible) {
-                    destructible.onShot(p, calculateDamage(distanceToFirstTarget));
+                    p.dealDamageClient(calculateDamage(distanceToFirstTarget),destructible);
                 }
             }
         }

@@ -1,12 +1,15 @@
 package statusEffects;
 
+import game.entities.Destructible;
+import game.entities.Entity;
 import game.entities.StatusEffectContainer;
 import lombok.Getter;
+import lombok.Setter;
 
-public abstract class StatusEffect {
-
+public abstract class StatusEffect<InputType,OutputType> extends Entity {
     @Getter
-    protected String name;
+    @Setter
+    protected Destructible target;
 
     protected EffectSource source;
 
@@ -14,23 +17,23 @@ public abstract class StatusEffect {
     protected EffectProcType procType;
 
     @Getter
-    protected StatusEffectContainer owner;
-
-    @Getter
+    @Setter
     protected boolean unique;
 
-    public StatusEffect(String name, EffectProcType procType) {
-        this.name = name;
+    public StatusEffect(int id, String name, StatusEffectContainer target, EffectProcType procType) {
+        super(id,name);
+        this.target = target;
         this.procType = procType;
     }
 
-    public abstract boolean updateServer();
+    public abstract OutputType applyServer(InputType input);
 
-    public abstract boolean updateClient();
+    public abstract OutputType applyClient(InputType input);
+
+    public abstract boolean shouldBeRemoved();
 
     protected enum EffectSource {
         BARBED_WIRE_BLEED,
-        SLOW,
         REGENERATION,
     }
 
