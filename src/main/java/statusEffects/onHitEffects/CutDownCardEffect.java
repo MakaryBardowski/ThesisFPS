@@ -7,8 +7,6 @@ import game.entities.StatusEffectContainer;
 import server.ServerMain;
 import statusEffects.EffectProcType;
 
-import java.util.Random;
-
 public class CutDownCardEffect extends OnHitEffect{
     private float EXECUTE_THRESHOLD = 15f/100;
 
