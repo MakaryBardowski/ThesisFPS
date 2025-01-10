@@ -7,6 +7,7 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.StatusEffectContainer;
 import game.entities.mobs.player.Player;
+import game.map.blocks.Map;
 import lombok.Getter;
 import messages.TwoWayMessage;
 import server.ServerMain;
@@ -14,12 +15,14 @@ import server.ServerMain;
 @Getter
 @Serializable
 public class ChooseCardMessage extends TwoWayMessage {
+    private int cardChoiceSessionId;
     private int playerId;
     private int chosenCardId;
 
     public ChooseCardMessage(){}
 
-    public ChooseCardMessage(int playerId, int chosenCardId){
+    public ChooseCardMessage(int cardChoiceSessionId, int playerId, int chosenCardId){
+        this.cardChoiceSessionId = cardChoiceSessionId;
         this.playerId = playerId;
         this.chosenCardId = chosenCardId;
         this.setReliable(true);
@@ -36,9 +39,18 @@ public class ChooseCardMessage extends TwoWayMessage {
                 System.err.println("[SERVER]" + playerId + " is not a player, but wants to choose a card!");
                 return;
             }
-            var card = AugmentCardsTemplateRegistry.getCardById(chosenCardId);
-            card.chooseCardServer(player);
-            server.getServer().broadcast(this);
+        var currentCardChoice = server.getCurrentGamemode().getLevelManager().getCardChoiceSessionsByIndex().get(cardChoiceSessionId);
+        if(currentCardChoice.isPlayerAlreadyChosenCard(playerId)){
+            System.err.println("[SERVER]" + playerId + " has already chosen a card!!");
+            return;
+        }
+
+        var card = AugmentCardsTemplateRegistry.getCardById(chosenCardId);
+        card.chooseCardServer(player);
+
+        currentCardChoice.registerCardChosenByPlayer(playerId,card);
+
+        server.getServer().broadcast(this);
     }
 
     @Override

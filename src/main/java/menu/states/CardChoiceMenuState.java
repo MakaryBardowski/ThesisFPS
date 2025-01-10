@@ -17,13 +17,15 @@ import java.util.function.Consumer;
 public class CardChoiceMenuState implements MenuState {
     private List<CardChoiceComponent> cards = new ArrayList<>(3);
 
+    private final int cardSessionId;
     private final int cardId1;
     private final int cardId2;
     private final int cardId3;
     private final int playerId;
     private final Client client;
 
-    public CardChoiceMenuState(int cardId1, int cardId2, int cardId3, int playerId, Client client){
+    public CardChoiceMenuState(int cardSessionId, int cardId1, int cardId2, int cardId3, int playerId, Client client){
+        this.cardSessionId = cardSessionId;
         this.cardId1 = cardId1;
         this.cardId2 = cardId2;
         this.cardId3 = cardId3;
@@ -53,8 +55,7 @@ public class CardChoiceMenuState implements MenuState {
         float cardSizeY = resolutionY*0.6f;
 
         Consumer<AugmentCardTemplate> onCardChoose = (card) -> {
-            client.send(new ChooseCardMessage(playerId,card.getCardId()));
-//            card.chooseCardClient();
+            client.send(new ChooseCardMessage(cardSessionId, playerId,card.getCardId()));
         };
 
         var cardPos1 = new Vector3f(cardMarginSide,cardMarginBot,0);

@@ -1,5 +1,6 @@
 package server;
 
+import cards.CardChoiceSession;
 import client.Main;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Vector3f;
@@ -96,6 +97,9 @@ public class ServerLevelManager extends LevelManager {
 
     private final Vector<Entity> entitiesBroadcastedAtNextLevel = new Vector<>();
 
+    @Getter
+    private final List<CardChoiceSession> cardChoiceSessionsByIndex = new ArrayList<>(10);
+
     public ServerLevelManager(int levelCount, Server server) {
         this.assetManager = Main.getInstance().getAssetManager();
         this.renderManager = Main.getInstance().getRenderManager();
@@ -164,6 +168,9 @@ public class ServerLevelManager extends LevelManager {
         if(levelIndex == 2){
             var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
 
+            var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
+            cardChoiceSessionsByIndex.add(cardSession);
+
             for(var player : players){
                 int cardId1 = 0;
                 int cardId2 = 1;
@@ -171,7 +178,7 @@ public class ServerLevelManager extends LevelManager {
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
 
-                var cardChoiceMessage = new CardSelectionMessage(cardId1,cardId2,cardId3);
+                var cardChoiceMessage = new CardSelectionMessage(cardSession.getCardChoiceSessionId(),cardId1,cardId2,cardId3);
                 server.broadcast(thisConnectionFilter,cardChoiceMessage);
             }
         }
