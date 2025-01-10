@@ -1,5 +1,6 @@
 package game.cameraAndInput;
 
+import game.AttachedEntity;
 import game.entities.mobs.player.Player;
 import client.ClientGameAppState;
 import client.Main;
@@ -22,12 +23,14 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import de.lessvoid.nifty.render.NiftyImage;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.items.Item;
 import game.items.weapons.Grenade;
 import game.items.weapons.MeleeWeapon;
 import game.items.weapons.RangedWeapon;
+import menu.states.InventoryMenuState;
 import messages.MobRotUpdateMessage;
+import server.ServerMain;
 
 public class InputController {
 
@@ -64,6 +67,10 @@ public class InputController {
         ActionListener actionListener = new ActionListener() {
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
+                if(!Player.isPlayerControlsEnabled()){
+                    return;
+                }
+
                 if (!player.isDead() && name.equals("W") && !keyPressed) {
                     player.setForward(false);
                     setMovingAnimationidle(player);
@@ -123,8 +130,12 @@ public class InputController {
                 }
 
                 if (name.equals("I") && !gs.getPlayer().isDead() && !keyPressed) {
-                    Player p = gs.getPlayer();
-                    p.getPlayerinventoryGui().toggle();
+                    var menuStateMachine = Main.getInstance().getMenuStateMachine();
+                    if(menuStateMachine.isStateNull()) {
+                        menuStateMachine.requestState(new InventoryMenuState(gs.getPlayer()));
+                    } else {
+                        menuStateMachine.requestState(null);
+                    }
                 }
 
                 if (name.equals(
@@ -152,6 +163,9 @@ public class InputController {
 //                }
                 if (name.equals("K") && !keyPressed) {
 //                    GlobalSettings.isAiDebug = !GlobalSettings.isAiDebug;
+                    if(ServerMain.getInstance() != null) {
+                        ServerMain.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
+                    }
                     System.gc();
                     player.setRight(false);
                     player.setLeft(false);
@@ -193,6 +207,10 @@ public class InputController {
         AnalogListener analogListener = new AnalogListener() {
             @Override
             public void onAnalog(String name, float value, float tpf) {
+                if(!Player.isPlayerControlsEnabled()){
+                    return;
+                }
+
                 if (name.equals("MouseMovedX")) {
                     deltaX = gs.getInputManager().getCursorPosition().x - prevJMEcursorPos.x;
                     if (!gs.getPlayer().isViewingEquipment()) {
@@ -359,7 +377,7 @@ public class InputController {
             String hitName = closest.getGeometry().getName();
             if (hitName.matches("-?\\d+")) {
                 Integer hitId = Integer.valueOf(hitName);
-                InteractiveEntity mobHit = (InteractiveEntity) ClientGameAppState.getInstance().getMobs().get(hitId);
+                var mobHit = (AttachedEntity) ClientGameAppState.getInstance().getMobs().get(hitId);
                 if (closest.getContactPoint().distance(p.getNode().getWorldTranslation()) <= cs.getPlayer().getPickupRange()) {
                     mobHit.onInteract();
                 }

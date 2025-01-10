@@ -1,6 +1,6 @@
 package game.entities.inventory;
 
-import LemurGUI.LemurPlayerInventoryGui;
+import guiComponents.LemurPlayerInventoryGui;
 import com.simsilica.lemur.component.IconComponent;
 import game.items.Item;
 import lombok.Getter;

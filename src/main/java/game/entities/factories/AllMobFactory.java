@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import server.ServerMain;
 import statusEffects.EffectFactory;
+import statusEffects.EffectTemplates;
 
 public class AllMobFactory extends MobFactory {
 
@@ -145,9 +146,9 @@ public class AllMobFactory extends MobFactory {
                 p.equipServer(item);
             }
 
-            var procsEverySeconds = 10; //10
-            var regenEffect = EffectFactory.createRegenerationEffect(p, 1, 64 * procsEverySeconds);
+            var regenEffect = serverLevelManager.createAndRegisterStatusEffect(EffectTemplates.DEFAULT_REGENERATION,p);
             p.addEffect(regenEffect);
+
             p.addAi();
             return p;
         } else if (spawnType == TRAINING_DUMMY) {

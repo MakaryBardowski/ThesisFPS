@@ -11,7 +11,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.factories.AllMobFactory;
 import game.entities.factories.MobSpawnType;
 import game.entities.factories.PlayerFactory;
@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import lombok.Setter;
+import menu.MenuStateMachine;
+import menu.states.CardChoiceMenuState;
 import server.LevelManager;
 
 public class ClientLevelManager extends LevelManager {
@@ -51,7 +53,7 @@ public class ClientLevelManager extends LevelManager {
     private Player player;
 
     @Getter
-    private final ConcurrentHashMap<Integer, InteractiveEntity> mobs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Entity> mobs = new ConcurrentHashMap<>();
 
     @Getter
     private WorldGrid grid;
@@ -106,6 +108,8 @@ public class ClientLevelManager extends LevelManager {
     }
 
     public void initialize() {
+
+
         var trueRootNode = Main.getInstance().getRootNode();
         trueRootNode.attachChild(rootNode);
 
@@ -233,7 +237,7 @@ public class ClientLevelManager extends LevelManager {
         return p;
     }
 
-    public <T extends InteractiveEntity> T registerEntity(T entity) {
+    public <T extends Entity> T registerEntity(T entity) {
         this.mobs.put(entity.getId(), entity);
         return entity;
     }

@@ -12,7 +12,6 @@ import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.ClipAction;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
@@ -25,7 +24,6 @@ import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
 import game.items.Holdable;
 import game.items.ItemTemplates;
-import game.map.collision.CollisionDebugUtils;
 import game.map.collision.RectangleOBB;
 import java.util.ArrayList;
 import messages.AnimationPlayedMessage;
@@ -182,13 +180,8 @@ public class Axe extends MeleeWeapon {
         if (!hit.isEmpty()) {
             composer.getCurrentAction().setSpeed(0.02f);
             slashControl.setSlowMaxTime(0.05f);
-            hit.get(0).onShot(p, getDamage());
+            p.dealDamageClient(getDamage(),hit.get(0));
         }
-    }
-
-    @Override
-    public void onShot(Mob shooter, float damage) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
@@ -266,7 +259,7 @@ public class Axe extends MeleeWeapon {
         );
 
         if (!hit.isEmpty()) {
-            hit.get(0).onShot(p, getDamage());
+            p.dealDamageClient(getDamage(),hit.get(0));
         }
     }
 

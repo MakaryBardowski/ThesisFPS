@@ -2,6 +2,7 @@ package game.entities;
 
 import com.jme3.scene.Node;
 import data.DamageReceiveData;
+import game.entities.mobs.Mob;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,15 +22,18 @@ public abstract class Destructible extends Collidable {
         attributes.put(MAX_HEALTH_ATTRIBUTE, new FloatAttribute(maxHealth));
     }
 
+    public abstract void onAttacked(Mob shooter, DamageReceiveData damage);
+
+
     public void onDeathServer() {};
     public void onDeathClient() {};
 
-    public abstract void receiveDamage(DamageReceiveData damageData);
+    public abstract void receiveDamageClient(DamageReceiveData damageData);
     public abstract void receiveDamageServer(DamageReceiveData damageData);
     
-    public abstract void notifyServerAboutDealingDamage(float damage, InteractiveEntity attackingEntity); // notify about receiving!!!!
+    public abstract void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData);
 
-    public void receiveHeal(float heal) {
+    public void receiveHealClient(float heal) {
         health += heal;
     }
 

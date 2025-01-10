@@ -3,10 +3,12 @@ package game.entities;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import game.AttachedEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class Movable extends InteractiveEntity {
+public abstract class Movable extends AttachedEntity {
 
     @Getter
     protected AtomicBoolean positionChangedOnServer = new AtomicBoolean(true);

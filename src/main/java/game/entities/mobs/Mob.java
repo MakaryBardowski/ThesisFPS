@@ -1,8 +1,7 @@
 package game.entities.mobs;
 
 import behaviorTree.BehaviorTree;
-import client.ClientGameAppState;
-import client.Main;
+import data.DamageReceiveData;
 import game.entities.Destructible;
 import game.entities.inventory.Equipment;
 import game.items.Item;
@@ -17,7 +16,6 @@ import game.entities.FloatAttribute;
 import game.entities.StatusEffectContainer;
 import game.map.collision.WorldGrid;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +30,7 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
 
     public static final int SPEED_ATTRIBUTE = 2;
 
-    private static final float DEFAULT_SPEED = 8.75f; //10, 13.25f for knife
+    private static final float DEFAULT_SPEED = 8.75f;
     protected static final int EQUIPMENT_SIZE = 20;
 
     protected Equipment equipment = new Equipment(new Item[EQUIPMENT_SIZE]); // 6 rows 3 cols
@@ -107,7 +105,6 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     }
 
     public void setServerLocation(Vector3f serverLocation) {
-
         this.serverLocation = serverLocation;
         posInterpolationValue = 0;
     }
@@ -121,8 +118,6 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
 
     protected void dropEquipment() {
         Random r = new Random();
-//        System.err.println("player " + this + " equipment:\n" + Arrays.toString(this.getEquipment()) + "\n\n");
-
         equipment.removeAllItems().forEach(item -> {
             item.drop(node.getWorldTranslation().add(r.nextFloat(-0.25f, 0.25f), 2 + r.nextFloat(-1, 1), r.nextFloat(-0.25f, 0.25f)));
         });
@@ -134,7 +129,6 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
             System.out.println("trying to update " + this);
         }
         if (behaviorTree != null) {
-//            System.out.println("suc");
             behaviorTree.update();
         }
     }
@@ -145,7 +139,8 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     }
 
     @Override
-    public void playAnimation(Animation anim) {
+    public void playAnimation(Animation anim) {}
 
-    }
+    public abstract void dealDamageClient(float damage, Destructible target);
+    public abstract void dealDamageServer(DamageReceiveData damageReceiveData, Destructible target);
 }

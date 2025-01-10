@@ -16,23 +16,15 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
 import data.DamageReceiveData;
 import game.effects.TimedSpatialRemoveControl;
-import game.entities.mobs.Mob;
 import game.map.collision.CollisionDebugUtils;
 import game.map.collision.RectangleAABB;
 import game.map.collision.RectangleOBB;
-import game.map.collision.WorldGrid;
 import messages.DestructibleDamageReceiveMessage;
-import messages.messageListeners.ServerMessageListener;
 import server.ServerMain;
-import statusEffects.DamageOverTimeEffect;
-import statusEffects.EffectFactory;
-import statusEffects.EffectProcType;
-import statusEffects.TimedSlowEffect;
 import static game.effects.DecalProjector.projectFromTo;
 
 public class Mine extends DestructibleDecoration {
@@ -83,7 +75,11 @@ public class Mine extends DestructibleDecoration {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health = health - calculateDamage(damageData.getRawDamage());
 
         if (health <= 0) {
@@ -96,6 +92,10 @@ public class Mine extends DestructibleDecoration {
 
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health = health - calculateDamage(damageData.getRawDamage());
 
         if (health <= 0) {
@@ -106,12 +106,6 @@ public class Mine extends DestructibleDecoration {
 
     @Override
     public void onCollisionClient(Collidable other) {
-//        spawnExplosionVisuals();
-        if (other instanceof Mob m) {
-            float slowStrength = 90; //in %
-            m.addEffect(new TimedSlowEffect("Mine slow", EffectProcType.PERIODICAL, 20, m, slowStrength));
-        }
-
     }
 
     @Override
@@ -120,27 +114,29 @@ public class Mine extends DestructibleDecoration {
     }
 
     private void explode() {
-        ServerMain serverApp = ServerMain.getInstance();
-
-        RectangleAABB explosionHitbox = new RectangleAABB(node.getWorldTranslation(), explosionSize, explosionSize, explosionSize);
-        for (Collidable c : serverApp.getGrid().getNearbyCollisionShapeAtPos(explosionHitbox.getPosition(), explosionHitbox)) {
-            if (c instanceof Destructible de && c.getCollisionShape().wouldCollideAtPosition(explosionHitbox, c.getCollisionShape().getPosition())) {
-                if (c != this) {
-                    var emsg = new DestructibleDamageReceiveMessage(de.getId(),id, damage);
-                    emsg.applyDestructibleDamageAndNotifyClients(de, serverApp);
-                }
-
-            }
-        }
+//        ServerMain serverApp = ServerMain.getInstance();
+//
+//        RectangleAABB explosionHitbox = new RectangleAABB(node.getWorldTranslation(), explosionSize, explosionSize, explosionSize);
+//        for (Collidable c : serverApp.getGrid().getNearbyCollisionShapeAtPos(explosionHitbox.getPosition(), explosionHitbox)) {
+//            if (c instanceof Destructible de && c.getCollisionShape().wouldCollideAtPosition(explosionHitbox, c.getCollisionShape().getPosition())) {
+//                if (c != this) {
+//                    var emsg = new DestructibleDamageReceiveMessage(de.getId(),id, damage);
+//                    emsg.applyDestructibleDamageAndNotifyClients(de, serverApp);
+//                }
+//
+//            }
+//        }
     }
 
     private void selfDestruct() {
         ServerMain serverApp = ServerMain.getInstance();
         Destructible d = this;
         float selfDestructDmg = 5000;
-        receiveDamageServer(new DamageReceiveData(id,id,selfDestructDmg));
 
-        var hmsg = new DestructibleDamageReceiveMessage(id,id, selfDestructDmg);
+        var damageReceiveData = new DamageReceiveData(id,id,selfDestructDmg);
+        receiveDamageServer(damageReceiveData);
+
+        var hmsg = new DestructibleDamageReceiveMessage(damageReceiveData);
         hmsg.setReliable(true);
         serverApp.getServer().broadcast(hmsg);
     }

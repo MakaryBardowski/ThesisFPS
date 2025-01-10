@@ -15,6 +15,7 @@ import behaviorTree.composite.SelectorNode;
 import behaviorTree.composite.SequenceNode;
 import behaviorTree.context.MudBeetleContext;
 import game.effects.EmitterPooler;
+import game.entities.Destructible;
 import game.items.Item;
 import game.map.collision.WorldGrid;
 import client.ClientGameAppState;
@@ -33,7 +34,6 @@ import static game.effects.DecalProjector.projectFromTo;
 import game.effects.ParticleUtils;
 import game.entities.Collidable;
 import game.entities.FloatAttribute;
-import game.entities.InteractiveEntity;
 import game.entities.factories.MobSpawnType;
 import game.map.collision.RectangleAABB;
 import java.util.Arrays;
@@ -124,6 +124,31 @@ public class MudBeetle extends Mob {
     }
 
     @Override
+    public void dealDamageClient(float damage, Destructible target) {
+        var targetDamageReceiveData = new DamageReceiveData(target.getId(),id,damage);
+
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyClient(targetDamageReceiveData);
+        }
+
+        target.onAttacked(this, targetDamageReceiveData);
+    }
+
+    @Override
+    public void dealDamageServer(DamageReceiveData damageReceiveData, Destructible target) {
+        for(var onHitEffect : onDealDamageEffects){
+            onHitEffect.applyServer(damageReceiveData);
+        }
+
+        target.receiveDamageServer(damageReceiveData);
+    }
+
+    @Override
+    public void onAttacked(Mob shooter, DamageReceiveData damageReceiveData) {
+        notifyServerAboutReceivingDamage(damageReceiveData);
+    }
+
+    @Override
     protected void createHitbox() {
         float hitboxWidth = 0.4f;
         float hitboxHeight = 0.4f;
@@ -139,11 +164,6 @@ public class MudBeetle extends Mob {
 
     @Override
     public void onCollisionServer(Collidable other) {
-    }
-
-    @Override
-    public void onShot(Mob shooter, float damage) {
-        notifyServerAboutDealingDamage(damage, shooter);
     }
 
     @Override
@@ -178,7 +198,11 @@ public class MudBeetle extends Mob {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
 
         ParticleEmitter blood = EmitterPooler.getBlood();
@@ -201,6 +225,10 @@ public class MudBeetle extends Mob {
     
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health -= calculateDamage(damageData.getRawDamage());
 
         if (health <= 0) {
@@ -245,8 +273,8 @@ public class MudBeetle extends Mob {
     }
 
     @Override
-    public void notifyServerAboutDealingDamage(float damage, InteractiveEntity shooter) {
-        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(id,shooter.getId(), damage);
+    public void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData) {
+        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
     }

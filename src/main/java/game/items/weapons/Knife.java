@@ -14,7 +14,7 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import de.lessvoid.nifty.controls.label.LabelControl;
-import game.entities.Animation;
+
 import static game.entities.Animation.HUMAN_ATTACK_MELEE;
 import game.entities.Collidable;
 import game.entities.Destructible;
@@ -23,7 +23,6 @@ import game.entities.InvokeMethodTween;
 import game.entities.mobs.HumanMob;
 import game.items.Holdable;
 import game.items.ItemTemplates.MeleeWeaponTemplate;
-import game.map.collision.CollisionDebugUtils;
 import game.map.collision.RectangleOBB;
 import java.util.ArrayList;
 import messages.AnimationPlayedMessage;
@@ -183,7 +182,7 @@ public class Knife extends MeleeWeapon {
         if (!hit.isEmpty()) {
             composer.getCurrentAction().setSpeed(0.02f);
             slashControl.setSlowMaxTime(0.05f);
-            hit.get(0).onShot(p, getDamage());
+            p.dealDamageClient(getDamage(),hit.get(0));
         }
     }
 
@@ -232,13 +231,8 @@ public class Knife extends MeleeWeapon {
         );
 
         if (!hit.isEmpty()) {
-            hit.get(0).onShot(p, getDamage());
+            p.dealDamageClient(getDamage(),hit.get(0));
         }
-    }
-
-    @Override
-    public void onShot(Mob shooter, float damage) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

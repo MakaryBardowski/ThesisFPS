@@ -5,7 +5,8 @@ import com.jme3.scene.Node;
 import game.entities.mobs.Mob;
 import game.map.collision.CollisionDebugUtils;
 import game.map.collision.RectangleOBB;
-import statusEffects.DamageOverTimeEffect;
+import server.ServerMain;
+import statusEffects.temporaryEffects.DamageOverTimeEffect;
 import statusEffects.EffectFactory;
 
 public class BarbedWire extends DestructibleDecoration {
@@ -41,7 +42,7 @@ public class BarbedWire extends DestructibleDecoration {
     @Override
     public void onCollisionServer(Collidable other) {
         if (other instanceof Mob m) {
-            DamageOverTimeEffect dot = EffectFactory.createBleedEffect(m, damage, 4, 5);
+            DamageOverTimeEffect dot = EffectFactory.createBleedEffect(ServerMain.getInstance().getAndIncreaseNextEntityId(),m, damage, 4, 5);
             m.addEffect(dot);
 
         }

@@ -33,7 +33,7 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
 import game.entities.Destructible;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.items.Item;
 
 public class PlayerHUD extends BaseAppState {
@@ -347,7 +347,7 @@ public class PlayerHUD extends BaseAppState {
                     return;
                 }
 
-                InteractiveEntity entityHit = gs.getMobs().get(Integer.valueOf(hit));
+                Entity entityHit = gs.getMobs().get(Integer.valueOf(hit));
                 if (entityHit instanceof Destructible enemyHit) {
                     if (enemyHit != null) {
                         boolean switched = gs.getPlayer().getCurrentTarget() != enemyHit;

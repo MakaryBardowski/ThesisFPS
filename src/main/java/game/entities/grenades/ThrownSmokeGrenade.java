@@ -80,11 +80,6 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
     public void onInteract() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }

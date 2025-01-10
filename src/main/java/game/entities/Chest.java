@@ -22,10 +22,7 @@ import messages.NewChestMessage;
 import server.ServerMain;
 import static server.ServerMain.removeEntityByIdServer;
 
-public class Chest extends Destructible {
-
-    static int cnt;
-
+public class Chest extends StatusEffectContainer {
     @Getter
     private final Item[] equipment = new Item[9];
     private boolean locked;
@@ -77,17 +74,21 @@ public class Chest extends Destructible {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-        notifyServerAboutDealingDamage(damage, shooter);
-    }
-
-    @Override
     public void onInteract() {
         System.out.println("This " + name + " might contain valuable loot.");
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void onAttacked(Mob shooter, DamageReceiveData damageReceiveData) {
+        notifyServerAboutReceivingDamage(damageReceiveData);
+    }
+
+    @Override
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health = health - damageData.getRawDamage();
 
         if (health <= 0) {
@@ -99,6 +100,10 @@ public class Chest extends Destructible {
 
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health = health - damageData.getRawDamage();
 
         if (health <= 0) {
@@ -170,8 +175,8 @@ public class Chest extends Destructible {
     }
 
     @Override
-    public void notifyServerAboutDealingDamage(float damage, InteractiveEntity attackingEntity) {
-        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(id, attackingEntity.id, damage);
+    public void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData) {
+        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
     }

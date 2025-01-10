@@ -32,7 +32,7 @@ public class DestructibleHealReceiveMessage extends EntityUpdateMessage {
             if (entityExistsLocallyClient(id)) {
 
                 Destructible d = (Destructible) getEntityByIdClient(id);
-                d.receiveHeal(heal);
+                d.receiveHealClient(heal);
             }
         }
         );

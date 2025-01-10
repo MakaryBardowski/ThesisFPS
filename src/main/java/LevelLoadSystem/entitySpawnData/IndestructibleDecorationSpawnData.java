@@ -2,7 +2,7 @@ package LevelLoadSystem.entitySpawnData;
 
 import com.jme3.math.Vector3f;
 import game.entities.DecorationTemplates;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import server.ServerLevelManager;
 
 public class IndestructibleDecorationSpawnData extends EntitySpawnData{
@@ -11,7 +11,7 @@ public class IndestructibleDecorationSpawnData extends EntitySpawnData{
     }
 
     @Override
-    public InteractiveEntity serverSpawn(ServerLevelManager serverLevelManager) {
-        return serverLevelManager.registerIndestructibleDecoration(DecorationTemplates.getTemplateByIndex(templateIndex),this.getPosition());
+    public Entity serverSpawn(ServerLevelManager serverLevelManager) {
+        return serverLevelManager.createAndRegisterIndestructibleDecoration(DecorationTemplates.getTemplateByIndex(templateIndex),this.getPosition());
     }
 }

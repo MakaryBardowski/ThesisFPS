@@ -7,6 +7,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
+import game.AttachedEntity;
 import game.entities.Collidable;
 import game.entities.mobs.player.Player;
 import game.map.collision.MovementCollisionUtils;

@@ -1,7 +1,7 @@
 package LevelLoadSystem.entitySpawnData;
 
 import com.jme3.math.Vector3f;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,6 +14,6 @@ public abstract class EntitySpawnData {
     protected int templateIndex;
     protected Vector3f position;
 
-    public abstract InteractiveEntity serverSpawn(ServerLevelManager serverLevelManager);
+    public abstract Entity serverSpawn(ServerLevelManager serverLevelManager);
 
 }

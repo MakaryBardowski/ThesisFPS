@@ -20,11 +20,6 @@ public class Report extends Item {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-
-    }
-
-    @Override
     public void onInteract() {
         ClientGameAppState gs = ClientGameAppState.getInstance();
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(this, gs.getPlayer(), MobItemInteractionMessage.ItemInteractionType.PICK_UP);

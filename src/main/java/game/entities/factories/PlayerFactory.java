@@ -15,7 +15,10 @@ import com.jme3.scene.Spatial;
 import game.entities.DestructibleUtils;
 import game.entities.mobs.HumanMob;
 import game.entities.mobs.playerClasses.PlayerClass;
+import server.ServerLevelManager;
+import server.ServerMain;
 import statusEffects.EffectFactory;
+import statusEffects.EffectTemplates;
 
 public class PlayerFactory extends MobFactory {
 
@@ -61,9 +64,14 @@ public class PlayerFactory extends MobFactory {
 
     @Override
     public Player createServerSide(MobSpawnType spawnType, Object... creationData) { // mob spawn type doesnt matter for player
+        var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
         PlayerClass pc = PlayerClass.getClassByIndex((int) creationData[0]);
         Player p = createPlayer(pc);
         DestructibleUtils.attachDestructibleToNode(p, mobsNode, playerSpawnpoint);
+
+        var regenEffect = serverLevelManager.createAndRegisterStatusEffect(EffectTemplates.DEFAULT_REGENERATION,p);
+        p.addEffect(regenEffect);
+
         return p;
     }
 
@@ -74,11 +82,7 @@ public class PlayerFactory extends MobFactory {
         AnimComposer composer = getAnimComposer(playerNode);
         System.out.println("[PlayerFactory] create player id " + id);
         
-        var p = new Player(id, playerNode, name, mainCamera, skinningControl, composer, pc);
-        var procsEverySeconds = 10;
-        var regenEffect = EffectFactory.createRegenerationEffect(p,1,64*procsEverySeconds);
-        p.addEffect(regenEffect);
-        return p;
+        return new Player(id, playerNode, name, mainCamera, skinningControl, composer, pc);
     }
 
     private void setupFirstPersonCamera(Player p) {

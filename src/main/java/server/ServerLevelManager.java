@@ -1,5 +1,6 @@
 package server;
 
+import cards.CardChoiceSession;
 import client.Main;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Vector3f;
@@ -45,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import messages.InstantEntityPosCorrectionMessage;
 import messages.PlayerJoinedMessage;
 import messages.SetPlayerMessage;
+import messages.cardChoice.CardSelectionMessage;
 import messages.gameSetupMessages.MapMessage;
 import messages.items.ChestItemInteractionMessage;
 import static messages.items.ChestItemInteractionMessage.ChestItemInteractionType.INSERT;
@@ -52,6 +54,10 @@ import messages.items.MobItemInteractionMessage;
 import messages.items.SetDefaultItemMessage;
 import messages.NewIndestructibleDecorationMessage;
 import pathfinding.AStar;
+import statusEffects.EffectFactory;
+import statusEffects.EffectTemplates;
+import statusEffects.StatusEffect;
+
 import static server.ServerMain.MAX_PLAYERS;
 
 public class ServerLevelManager extends LevelManager {
@@ -87,9 +93,12 @@ public class ServerLevelManager extends LevelManager {
     private Map map;
 
     @Getter
-    private final ConcurrentHashMap<Integer, InteractiveEntity> mobs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Entity> mobs = new ConcurrentHashMap<>();
 
-    private final Vector<InteractiveEntity> entitiesBroadcastedAtNextLevel = new Vector<>();
+    private final Vector<Entity> entitiesBroadcastedAtNextLevel = new Vector<>();
+
+    @Getter
+    private final List<CardChoiceSession> cardChoiceSessionsByIndex = new ArrayList<>(10);
 
     public ServerLevelManager(int levelCount, Server server) {
         this.assetManager = Main.getInstance().getAssetManager();
@@ -109,7 +118,7 @@ public class ServerLevelManager extends LevelManager {
 
         levelTypes[0] = MapType.STATIC;
         for (int i = 1; i < levelTypes.length; i++) {
-            if (i % 5 == 0) {
+            if (i % 6 == 0) {
                 levelTypes[i] = MapType.STATIC;
                 continue;
             }
@@ -155,6 +164,24 @@ public class ServerLevelManager extends LevelManager {
     @Override
     public final void jumpToLevel(int levelIndex) {
         clearEntities();
+
+        if(levelIndex == 2){
+            var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
+
+            var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
+            cardChoiceSessionsByIndex.add(cardSession);
+
+            for(var player : players){
+                int cardId1 = 0;
+                int cardId2 = 1;
+                int cardId3 = 1;
+
+                var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
+
+                var cardChoiceMessage = new CardSelectionMessage(cardSession.getCardChoiceSessionId(),cardId1,cardId2,cardId3);
+                server.broadcast(thisConnectionFilter,cardChoiceMessage);
+            }
+        }
 
         currentLevelIndex = levelIndex;
         if (levelIndexOutOfBounds(levelIndex)) {
@@ -207,29 +234,32 @@ public class ServerLevelManager extends LevelManager {
         insertIntoCollisionGrid(d);
     }
     
-    public DestructibleDecoration registerDestructibleDecoration(DecorationTemplates.DecorationTemplate template,Vector3f pos) {
+    public DestructibleDecoration createAndRegisterDestructibleDecoration(DecorationTemplates.DecorationTemplate template, Vector3f pos) {
         DestructibleDecoration d = DecorationFactory.createDestructibleDecoration(currentMaxId++, rootNode,pos, template, assetManager);
         registerEntityLocal(d);
         insertIntoCollisionGrid(d);
         return d;
     }
 
-    public IndestructibleDecoration registerIndestructibleDecoration(DecorationTemplates.DecorationTemplate template, Vector3f pos) {
+    public IndestructibleDecoration createAndRegisterIndestructibleDecoration(DecorationTemplates.DecorationTemplate template, Vector3f pos) {
         IndestructibleDecoration d = DecorationFactory.createIndestructibleDecoration(currentMaxId++, rootNode,pos, template, assetManager);
         registerEntityLocal(d);
         insertIntoCollisionGrid(d);
         return d;
     }
 
-    public Mob registerMob(MobSpawnType spawnType) {
+    public Mob createAndRegisterMob(MobSpawnType spawnType) {
         Mob mob = new AllMobFactory(currentMaxId++, assetManager, rootNode).createServerSide(spawnType);
-
         insertIntoCollisionGrid(mob);
-
         return registerEntityLocal(mob);
     }
 
-    public Player registerPlayer(HostedConnection hc) {
+    public StatusEffect createAndRegisterStatusEffect(EffectTemplates.EffectTemplate effectTemplate, StatusEffectContainer target) {
+        var statusEffect = EffectFactory.createEffect(effectTemplate, getAndIncreaseNextEntityId(), target);
+        return registerEntityLocal(statusEffect);
+    }
+
+    public Player createAndRegisterPlayer(HostedConnection hc) {
         int playerClassIndex = (int) hc.getAttribute("class");
         Player player = new PlayerFactory(currentMaxId++, assetManager, rootNode, renderManager).createServerSide(null, playerClassIndex);
 
@@ -270,7 +300,7 @@ public class ServerLevelManager extends LevelManager {
         return registerEntityLocal(player);
     }
 
-    public Chest registerRandomChest(Vector3f offset) {
+    public Chest createAndRegisterRandomChest(Vector3f offset) {
         Chest chest = Chest.createRandomChestServer(currentMaxId++, rootNode, offset, assetManager);
         Random r = new Random();
         int randomValue = r.nextInt(16);
@@ -600,11 +630,11 @@ public class ServerLevelManager extends LevelManager {
         return itemsToKeep;
     }
 
-    private boolean isNotItemToKeep(InteractiveEntity entity, List<Item> itemsTokeep) {
+    private boolean isNotItemToKeep(Entity entity, List<Item> itemsTokeep) {
         return !(entity instanceof Item item && itemsTokeep.contains(item));
     }
 
-    private boolean isNotPlayer(InteractiveEntity entity) {
+    private boolean isNotPlayer(Entity entity) {
         return !(entity instanceof Player);
     }
 
@@ -632,7 +662,7 @@ public class ServerLevelManager extends LevelManager {
         return registerEntityLocal(item);
     }
 
-    private <T extends InteractiveEntity> T registerEntityLocal(T entity) {
+    private <T extends Entity> T registerEntityLocal(T entity) {
         mobs.put(entity.getId(), entity);
         return entity;
     }
@@ -646,7 +676,7 @@ public class ServerLevelManager extends LevelManager {
         }
     }
 
-    public void broadcastEntityOnNextLevel(InteractiveEntity entity){
+    public void broadcastEntityOnNextLevel(Entity entity){
         entitiesBroadcastedAtNextLevel.add(entity);
     }
 

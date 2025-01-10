@@ -18,7 +18,7 @@ import messages.NewDestructibleDecorationMessage;
 import server.ServerMain;
 import static server.ServerMain.removeEntityByIdServer;
 
-public class DestructibleDecoration extends Destructible {
+public class DestructibleDecoration extends StatusEffectContainer {
 
     @Getter
     protected DecorationTemplate template;
@@ -40,12 +40,12 @@ public class DestructibleDecoration extends Destructible {
     }
 
     @Override
-    public void onShot(Mob shooter, float damage) {
-        notifyServerAboutDealingDamage(damage, shooter);
+    public void onInteract() {
     }
 
     @Override
-    public void onInteract() {
+    public void onAttacked(Mob shooter, DamageReceiveData damageReceiveData) {
+        notifyServerAboutReceivingDamage(damageReceiveData);
     }
 
     @Override
@@ -69,7 +69,11 @@ public class DestructibleDecoration extends Destructible {
     }
 
     @Override
-    public void receiveDamage(DamageReceiveData damageData) {
+    public void receiveDamageClient(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyClient(damageData);
+        }
+
         health = health - damageData.getRawDamage();
 
         if (health <= 0) {
@@ -81,6 +85,10 @@ public class DestructibleDecoration extends Destructible {
 
     @Override
     public void receiveDamageServer(DamageReceiveData damageData) {
+        for(var onDamageReceivedEffect : onDamageReceivedEffects){
+            onDamageReceivedEffect.applyServer(damageData);
+        }
+
         health = health - damageData.getRawDamage();
 
         if (health <= 0) {
@@ -113,8 +121,8 @@ public class DestructibleDecoration extends Destructible {
     }
 
     @Override
-    public void notifyServerAboutDealingDamage(float damage, InteractiveEntity attacker) {
-        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(id, attacker.id, damage);
+    public void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData) {
+        DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
     }

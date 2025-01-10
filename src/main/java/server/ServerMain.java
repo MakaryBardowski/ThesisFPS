@@ -17,7 +17,7 @@ import com.jme3.network.Server;
 import networkingUtils.NetworkingInitialization;
 import com.jme3.renderer.RenderManager;
 import game.entities.Destructible;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.StatusEffectContainer;
 import game.entities.grenades.ThrownGrenade;
 import game.entities.mobs.AiSteerable;
@@ -46,7 +46,10 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
 
     @Getter
     private static ServerMain instance;
-    private final float TIME_PER_TICK = 0.0156f;
+
+    @Getter
+    private final int TICKS_PER_SECOND = 64;
+    private final float TIME_PER_TICK = 1f/TICKS_PER_SECOND;
     private float tickTimer;
 
     @Getter
@@ -130,7 +133,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
 
         // notify players about game starting
         server.getConnections().forEach(hc -> {
-            var newPlayer = currentGamemode.levelManager.registerPlayer(hc);
+            var newPlayer = currentGamemode.levelManager.createAndRegisterPlayer(hc);
             hostsByPlayerId.put(newPlayer.getId(), hc);
             System.out.println("[SERVER] added player " + newPlayer.getId());
         });
@@ -185,7 +188,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
         mobEquipment.removeItem(item);
     }
 
-    public ConcurrentHashMap<Integer, InteractiveEntity> getLevelManagerMobs() {
+    public ConcurrentHashMap<Integer, Entity> getLevelManagerMobs() {
         return currentGamemode.getLevelManager().getMobs();
     }
 

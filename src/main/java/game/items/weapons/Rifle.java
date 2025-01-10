@@ -9,19 +9,14 @@ import game.entities.mobs.player.Player;
 import projectiles.controls.BulletTracerControl;
 import client.ClientGameAppState;
 import client.Main;
-import com.epagagames.particles.Emitter;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.SkinningControl;
 import com.jme3.asset.AssetManager;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.renderer.queue.RenderQueue;
@@ -29,17 +24,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
 import de.lessvoid.nifty.controls.label.LabelControl;
-import game.effects.EmitterPooler;
-import game.entities.Destructible;
+
 import static game.entities.DestructibleUtils.setupModelShootability;
-import game.entities.InteractiveEntity;
+
 import game.entities.mobs.HumanMob;
 import game.items.AmmoPack;
 import game.items.Holdable;
-import game.items.Item;
 import game.items.ItemTemplates;
-import static game.items.weapons.RangedWeapon.AMMO_ATTRIBUTE;
-import messages.EntitySetFloatAttributeMessage;
 import messages.EntitySetIntegerAttributeMessage;
 import messages.HitscanTrailMessage;
 import messages.items.MobItemInteractionMessage;
@@ -227,11 +218,6 @@ public class Rifle extends RangedWeapon {
         Texture tex1 = Main.getInstance().getAssetManager().loadTexture("Effects/Particles/part_beam.png");
         mat.setTexture("Texture", tex1);
         return mat;
-    }
-
-    @Override
-    public void onShot(Mob shooter, float damage) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

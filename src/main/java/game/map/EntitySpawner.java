@@ -56,7 +56,7 @@ public class EntitySpawner {
 //                mob.addAi();
 //                mob.setPositionServer(mobPos);
 //            } else {
-            HumanMob mob = (HumanMob) serverLevelManager.registerMob(MobSpawnType.HUMAN);
+            HumanMob mob = (HumanMob) serverLevelManager.createAndRegisterMob(MobSpawnType.HUMAN);
             mob.addAi();
             mob.setPositionServer(mobPos);
         }

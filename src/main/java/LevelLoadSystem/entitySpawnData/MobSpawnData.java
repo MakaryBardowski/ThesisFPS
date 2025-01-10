@@ -1,8 +1,7 @@
 package LevelLoadSystem.entitySpawnData;
 
 import com.jme3.math.Vector3f;
-import game.entities.DecorationTemplates;
-import game.entities.InteractiveEntity;
+import game.entities.Entity;
 import game.entities.factories.MobSpawnType;
 import server.ServerLevelManager;
 
@@ -16,8 +15,8 @@ public class MobSpawnData extends EntitySpawnData{
     }
 
     @Override
-    public InteractiveEntity serverSpawn(ServerLevelManager serverLevelManager) {
-        var mob = serverLevelManager.registerMob(MobSpawnType.values()[templateIndex]);
+    public Entity serverSpawn(ServerLevelManager serverLevelManager) {
+        var mob = serverLevelManager.createAndRegisterMob(MobSpawnType.values()[templateIndex]);
         mob.setPositionServer(getPosition());
         return mob;
     }
