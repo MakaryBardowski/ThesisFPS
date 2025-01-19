@@ -1,6 +1,6 @@
 package debugging;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;

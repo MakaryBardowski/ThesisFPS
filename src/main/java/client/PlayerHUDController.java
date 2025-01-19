@@ -1,5 +1,6 @@
 package client;
 
+import client.appStates.ClientGameAppState;
 import game.items.Item;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;

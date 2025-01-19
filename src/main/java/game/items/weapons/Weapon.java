@@ -64,6 +64,10 @@ public abstract class Weapon extends Item implements Attacks, Holdable {
         return getFloatAttribute(DAMAGE_ATTRIBUTE).getValue();
     }
 
+    public void setDamage(float value) {
+        setFloatAttribute(DAMAGE_ATTRIBUTE,value);
+    }
+
     @Override
     public void attributeChangedNotification(int attributeId, Attribute copyOfAttribute) {
         super.attributeChangedNotification(attributeId, copyOfAttribute); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody

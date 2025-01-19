@@ -1,22 +1,19 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
-import game.items.ItemTemplates;
+import client.appStates.ClientGameAppState;
+
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
-import com.jme3.util.BufferUtils;
-import debugging.DebugUtils;
+
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
 import game.items.ItemTemplates.GlovesTemplate;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

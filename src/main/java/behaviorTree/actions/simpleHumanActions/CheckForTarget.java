@@ -4,7 +4,7 @@ import behaviorTree.NodeAction;
 import behaviorTree.NodeCompletionStatus;
 import behaviorTree.context.Context;
 import behaviorTree.context.SimpleHumanMobContext;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;

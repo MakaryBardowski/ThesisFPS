@@ -3,6 +3,7 @@ package game.entities.mobs;
 import behaviorTree.BehaviorTree;
 import data.DamageReceiveData;
 import game.entities.Destructible;
+import game.entities.factories.MobSpawnType;
 import game.entities.inventory.Equipment;
 import game.items.Item;
 import game.map.collision.CollidableInterface;
@@ -22,6 +23,7 @@ import lombok.Setter;
 import settings.GlobalSettings;
 
 public abstract class Mob extends StatusEffectContainer implements CollidableInterface, MobInterface, Animated {
+    protected final MobSpawnType mobSpawnType; // original template that spawned this mob
 
     @Getter
     protected BehaviorTree behaviorTree;
@@ -56,8 +58,9 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     @Setter
     protected float rotInterpolationValue;
 
-    public Mob(int id, Node node, String name) {
+    public Mob(MobSpawnType mobSpawnType, int id, Node node, String name) {
         super(id, name, node);
+        this.mobSpawnType = mobSpawnType;
         this.serverLocation = node.getWorldTranslation();
         this.serverRotation = node.getLocalRotation();
         attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));

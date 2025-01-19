@@ -1,7 +1,7 @@
 package game.items.weapons;
 
 import FirstPersonHands.FirstPersonHandAnimationData;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -16,7 +16,7 @@ import lombok.Getter;
 import messages.GrenadeThrownMessage;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewGrenadeMessage;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import com.jme3.anim.tween.Tween;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.anim.tween.action.Action;
@@ -24,7 +24,6 @@ import com.jme3.anim.tween.action.ClipAction;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.items.Holdable;
-import server.ServerMain;
 
 public class Grenade extends ThrowableWeapon {
 

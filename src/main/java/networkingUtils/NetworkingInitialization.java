@@ -28,7 +28,6 @@ import messages.InstantEntityPosCorrectionMessage;
 import messages.NewDestructibleDecorationMessage;
 import messages.NewIndestructibleDecorationMessage;
 import messages.ThrownGrenadeExplodedMessage;
-import messages.gameSetupMessages.GameInfoOnStartMessage;
 import messages.gameSetupMessages.NextLevelMessage;
 import messages.lobby.GameStartedMessage;
 import messages.lobby.HostChangedNicknameMessage;
@@ -44,7 +43,6 @@ public class NetworkingInitialization {
         Serializer.registerClass(HostChangedNicknameMessage.class);
         Serializer.registerClass(GameStartedMessage.class);
         Serializer.registerClass(HostChangedPlayerClassMessage.class);
-        Serializer.registerClass(GameInfoOnStartMessage.class);
         Serializer.registerClass(MapMessage.class);
 
         Serializer.registerClass(EntityUpdateMessage.class);

@@ -1,6 +1,6 @@
 package game.map.proceduralGeneration;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import game.map.MapGenerationResult;
 import java.util.ArrayList;
 import java.util.Arrays;

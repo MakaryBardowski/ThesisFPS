@@ -1,9 +1,6 @@
 package LevelLoadSystem;
 
-import LevelLoadSystem.entitySpawnData.DestructibleDecorationSpawnData;
-import LevelLoadSystem.entitySpawnData.EntitySpawnData;
-import LevelLoadSystem.entitySpawnData.IndestructibleDecorationSpawnData;
-import LevelLoadSystem.entitySpawnData.ItemSpawnData;
+import LevelLoadSystem.entitySpawnData.*;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -65,6 +62,8 @@ public class LevelLoadResultDeserializer extends StdDeserializer<LevelLoadResult
                 savedEntitiesData.add(getDestructibleDecorationSpawnData(entityNode));
             } else if(entityTypeIndex == 2) {
                 savedEntitiesData.add(getIndestructibleDecorationSpawnData(entityNode));
+            } else if(entityTypeIndex == 3){
+                savedEntitiesData.add(getMobSpawnData(entityNode));
             }
         }
 
@@ -96,6 +95,15 @@ public class LevelLoadResultDeserializer extends StdDeserializer<LevelLoadResult
         var droppable = entityNode.get(LevelLoadKeys.ENTITY_ITEM_IS_DROPPABLE).asBoolean();
 
         return new ItemSpawnData(entityTemplateIndex,new Vector3f(positionX,positionY,positionZ),isDropped,droppable);
+    }
+
+    private EntitySpawnData getMobSpawnData(JsonNode entityNode){
+        var entityTemplateIndex = entityNode.get(LevelLoadKeys.ENTITY_TEMPLATE_INDEX_KEY).asInt();
+        var positionX = (float) entityNode.get(LevelLoadKeys.ENTITY_POSITION_KEY).get(LevelLoadKeys.ENTITY_POSITION_X_KEY).asDouble();
+        var positionY = (float) entityNode.get(LevelLoadKeys.ENTITY_POSITION_KEY).get(LevelLoadKeys.ENTITY_POSITION_Y_KEY).asDouble();
+        var positionZ = (float) entityNode.get(LevelLoadKeys.ENTITY_POSITION_KEY).get(LevelLoadKeys.ENTITY_POSITION_Z_KEY).asDouble();
+
+        return new MobSpawnData(entityTemplateIndex,new Vector3f(positionX,positionY,positionZ));
     }
 
     private List<Vector3f> getPlayerSpawnpoints(JsonNode playerSpawnpointsNode){

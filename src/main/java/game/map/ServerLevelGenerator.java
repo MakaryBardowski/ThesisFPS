@@ -15,7 +15,7 @@ public class ServerLevelGenerator {
     private static final String BOSS_LEVEL_FILEPATH_PREFIX = "assets/Maps/bossRoom";
     private static final String INVALID_MAP_TYPE_FOR_FILE_LOADING_PROVIDED_MESSAGE = "cannot load map of given type '%s'. Maps can be loaded with types ARMORY,BOSS";
 
-    public static final String SAVED_MAP_FILEPATH_TEMPLATE = MAPS_PWD + "/Maps/office" + LEVEL_FILE_EXTENSION;
+    public static final String SAVED_MAP_FILEPATH_TEMPLATE = MAPS_PWD + "/Maps/Map";
 
 
     private final long levelSeed;
@@ -57,7 +57,7 @@ public class ServerLevelGenerator {
 
     public String getSavedLevelFilepath(MapType mapType, int levelIndex){
         if(mapType == MapType.STATIC) {
-            return SAVED_MAP_FILEPATH_TEMPLATE;
+            return SAVED_MAP_FILEPATH_TEMPLATE+levelIndex+LEVEL_FILE_EXTENSION;
         }
         throw new IllegalArgumentException(String.format(INVALID_MAP_TYPE_FOR_FILE_LOADING_PROVIDED_MESSAGE,mapType));
     }

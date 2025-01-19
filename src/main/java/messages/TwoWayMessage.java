@@ -1,6 +1,6 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;

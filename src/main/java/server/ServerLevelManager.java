@@ -12,6 +12,7 @@ import com.jme3.network.Server;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import data.jumpToLevelData.BaseJumpToLevelData;
 import game.entities.*;
 import game.entities.factories.AllMobFactory;
 import game.entities.factories.DecorationFactory;
@@ -43,11 +44,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.Setter;
 import messages.InstantEntityPosCorrectionMessage;
 import messages.PlayerJoinedMessage;
 import messages.SetPlayerMessage;
 import messages.cardChoice.CardSelectionMessage;
 import messages.gameSetupMessages.MapMessage;
+import messages.gameSetupMessages.NextLevelMessage;
 import messages.items.ChestItemInteractionMessage;
 import static messages.items.ChestItemInteractionMessage.ChestItemInteractionType.INSERT;
 import messages.items.MobItemInteractionMessage;
@@ -60,7 +63,7 @@ import statusEffects.StatusEffect;
 
 import static server.ServerMain.MAX_PLAYERS;
 
-public class ServerLevelManager extends LevelManager {
+public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
 
     private final Server server;
     private final Random RANDOM = new Random();
@@ -68,6 +71,14 @@ public class ServerLevelManager extends LevelManager {
     private final AssetManager assetManager;
     private final RenderManager renderManager;
     private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
+
+    @Getter
+    @Setter
+    protected long[] levelSeeds;
+
+    @Getter
+    @Setter
+    protected MapType[] levelTypes;
 
     @Getter
     private final Node rootNode;
@@ -128,17 +139,13 @@ public class ServerLevelManager extends LevelManager {
 
     }
 
-    public void movePlayersToSpawnpointsAndNotify(List<Vector3f> playerSpawnpoints){
-            for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
-                Player player = players.get(playerIndex);
-                var playerSpawnpointInWorld = playerSpawnpoints.get(playerIndex).mult(BLOCK_SIZE);
+    public void movePlayersToSpawnpoints(java.util.Map<Integer,Vector3f> playerSpawnpoints){
+            for(var entry : playerSpawnpoints.entrySet()){
+                var player = (Player) mobs.get(entry.getKey());
 
                 grid.remove(player);
-                player.getNode().setLocalTranslation(playerSpawnpointInWorld);
+                player.getNode().setLocalTranslation(entry.getValue());
                 grid.insert(player);
-                InstantEntityPosCorrectionMessage corrMsg = new InstantEntityPosCorrectionMessage(player, playerSpawnpointInWorld);
-                corrMsg.setReliable(true);
-                server.broadcast(corrMsg);
             }
     }
 
@@ -162,19 +169,23 @@ public class ServerLevelManager extends LevelManager {
     }
 
     @Override
-    public final void jumpToLevel(int levelIndex) {
+    public final void jumpToLevel(BaseJumpToLevelData jumpToLevelData) {
+        var levelIndex = jumpToLevelData.getLevelIndex();
+        var newLevelSeed = jumpToLevelData.getLevelSeed();
+        var newLevelType = jumpToLevelData.getLevelType();
+
         clearEntities();
 
-        if(levelIndex == 2){
+        if(levelIndex == 3){
             var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
 
             var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
             cardChoiceSessionsByIndex.add(cardSession);
 
             for(var player : players){
-                int cardId1 = 0;
-                int cardId2 = 1;
-                int cardId3 = 1;
+                int cardId1 = RANDOM.nextInt(2);
+                int cardId2 = RANDOM.nextInt(2);
+                int cardId3 = RANDOM.nextInt(2);
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
 
@@ -192,9 +203,6 @@ public class ServerLevelManager extends LevelManager {
             initializeCollisionGrid();
         }
 
-        var newLevelSeed = levelSeeds[levelIndex];
-        var newLevelType = levelTypes[levelIndex];
-
         Main.getInstance().enqueue(() -> {
             try {
                 var levelGenerator = new ServerLevelGenerator(newLevelSeed,newLevelType,levelIndex);
@@ -204,18 +212,37 @@ public class ServerLevelManager extends LevelManager {
                 if(newLevelType.equals(MapType.STATIC)) {
                     notifyAboutMap(map);
                 }
+                var playerSpawnpoints = levelGenerationResult.getPlayerSpawnpoints();
+                var spawnpointsByPlayerId = assignSpawnpointsToPlayerIds(playerSpawnpoints);
 
-                movePlayersToSpawnpointsAndNotify(levelGenerationResult.getPlayerSpawnpoints());
+                movePlayersToSpawnpoints(spawnpointsByPlayerId);
 
                 AStar.setPathfindingMap(map,MAP_SIZE_XZ,MAP_SIZE_Y,MAP_SIZE_XZ);
                 EntitySpawner mg = new EntitySpawner(newLevelSeed, BLOCK_SIZE);
                 mg.spawnNewLevelEntities(levelGenerationResult.getEntitySpawnData());
                 notifyPlayersAboutNewLevelEntities();
+
+                server.broadcast(new NextLevelMessage(currentLevelIndex,newLevelSeed,newLevelType,spawnpointsByPlayerId));
+
             }catch (IOException exception){
                 System.err.println("Server could not load level of type "+newLevelType +" with seed "+newLevelSeed+". Reason: "+exception.getMessage());
+                server.getConnections().forEach(hostedConnection -> hostedConnection.close("Server failed to load next level no. "+currentLevelIndex+" seed "+newLevelSeed));
             }
 
         });
+    }
+
+    private java.util.Map<Integer,Vector3f> assignSpawnpointsToPlayerIds(List<Vector3f> playerSpawnpoints) {
+        var spawnpointsByPlayerId = new HashMap<Integer,Vector3f>();
+        for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
+            Player player = players.get(playerIndex);
+            if(player.isDead()){
+                continue;
+            }
+            var playerSpawnpointInWorld = playerSpawnpoints.get(playerIndex).mult(BLOCK_SIZE);
+            spawnpointsByPlayerId.put(player.getId(),playerSpawnpointInWorld);
+        }
+        return spawnpointsByPlayerId;
     }
 
     public void registerRandomDestructibleDecoration(Vector3f pos) {
@@ -264,7 +291,6 @@ public class ServerLevelManager extends LevelManager {
         Player player = new PlayerFactory(currentMaxId++, assetManager, rootNode, renderManager).createServerSide(null, playerClassIndex);
 
         player.setName(hc.getAttribute("nick"));
-        System.out.println("ustawiono nazwe " + player.getName());
 
         Helmet defaultHead = (Helmet) registerItemLocal(ItemTemplates.HEAD_1, false);
         Vest defaultVest = (Vest) registerItemLocal(ItemTemplates.TORSO_1, false);

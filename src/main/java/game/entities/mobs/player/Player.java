@@ -1,10 +1,11 @@
 package game.entities.mobs.player;
 
+import game.entities.factories.MobSpawnType;
 import game.entities.inventory.Hotbar;
 import game.items.Equippable;
 import game.items.Item;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.anim.SkinningControl;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -16,7 +17,7 @@ import game.entities.FloatAttribute;
 import FirstPersonHands.FirstPersonHands;
 import guiComponents.LemurPlayerInventoryGui;
 import guiComponents.LemurPlayerHealthbar;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import static client.Main.CAM_ROT_SPEED;
 import static client.Main.CAM__MOVE_SPEED;
@@ -119,7 +120,7 @@ public class Player extends HumanMob {
     }
 
     public Player(int id, Node node, String name, Camera mainCamera, SkinningControl skinningControl, AnimComposer composer, PlayerClass playerClass) {
-        super(id, node, name, skinningControl, composer);
+        super(MobSpawnType.HUMAN, id, node, name, skinningControl, composer);
         this.playerClass = playerClass;
         this.mainCamera = mainCamera;
         firstPersonHands = new FirstPersonHands(this);
@@ -244,7 +245,7 @@ public class Player extends HumanMob {
                 node.move(movementVector.getX(), 0, 0);
             }
 //            if (node.getWorldTranslation().distance(serverLocation) > cachedSpeed * tpf) {
-            PlayerPosUpdateRequest posu = new PlayerPosUpdateRequest(id, node.getWorldTranslation());
+            PlayerPosUpdateRequest posu = new PlayerPosUpdateRequest(cm.getCurrentGamemode().getLevelManager().getCurrentLevelIndex(),id, node.getWorldTranslation());
             cm.getClient().send(posu);
 //            }
 

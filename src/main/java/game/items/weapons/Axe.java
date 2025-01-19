@@ -4,7 +4,7 @@ import FirstPersonHands.FirstPersonHandAnimationData;
 import game.items.ItemTemplates.ItemTemplate;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.anim.tween.Tween;
 import com.jme3.anim.tween.Tweens;

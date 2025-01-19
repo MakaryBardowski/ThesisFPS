@@ -2,7 +2,7 @@ package game.cameraAndInput;
 
 import game.AttachedEntity;
 import game.entities.mobs.player.Player;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import static client.Main.CAM_ROT_SPEED;
 import static client.Main.CAM__MOVE_SPEED;
@@ -23,7 +23,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import de.lessvoid.nifty.render.NiftyImage;
-import game.entities.Entity;
 import game.items.Item;
 import game.items.weapons.Grenade;
 import game.items.weapons.MeleeWeapon;

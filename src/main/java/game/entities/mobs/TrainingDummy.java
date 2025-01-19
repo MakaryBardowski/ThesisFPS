@@ -3,8 +3,8 @@ package game.entities.mobs;
 import game.entities.Destructible;
 import game.items.Item;
 import game.map.collision.WorldGrid;
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.ClientSynchronizationUtils;
 import client.Main;
 import com.jme3.anim.AnimComposer;
@@ -31,7 +31,7 @@ public class TrainingDummy extends Mob {
     private AnimComposer modelComposer;
 
     public TrainingDummy(int id, Node node, String name) {
-        super(id, node, name);
+        super(MobSpawnType.TRAINING_DUMMY, id, node, name);
         
         maxHealth = 100;
         health = 100;
@@ -120,7 +120,7 @@ public class TrainingDummy extends Mob {
 
     @Override
     public AbstractMessage createNewEntityMessage() {
-        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), MobSpawnType.TRAINING_DUMMY);
+        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), mobSpawnType);
         msg.setReliable(true);
         return msg;
     }

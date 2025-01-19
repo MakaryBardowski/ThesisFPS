@@ -1,6 +1,6 @@
 package messages.items;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.mobs.HumanMob;

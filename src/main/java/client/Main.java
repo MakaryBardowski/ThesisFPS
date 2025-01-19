@@ -1,5 +1,7 @@
 package client;
 
+import client.appStates.ClientGameAppState;
+import client.appStates.MainMenuAppState;
 import com.jme3.app.DetailedProfilerState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.ScreenshotAppState;
@@ -7,7 +9,6 @@ import com.jme3.input.FlyByCamera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
-import com.simsilica.lemur.style.BaseStyles;
 import lombok.Getter;
 import menu.MenuStateMachine;
 import networkingUtils.NetworkingInitialization;

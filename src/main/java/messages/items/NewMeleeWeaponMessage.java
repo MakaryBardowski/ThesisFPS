@@ -1,6 +1,6 @@
 package messages.items;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
@@ -12,13 +12,14 @@ import server.ServerMain;
 @Serializable
 @Getter
 public class NewMeleeWeaponMessage extends NewItemMessage {
-    private int ammo;
+    private float damage;
 
     public NewMeleeWeaponMessage() {
     }
 
     public NewMeleeWeaponMessage(MeleeWeapon item) {
         super(item);
+        this.damage = item.getDamage();
     }
 
     @Override
@@ -28,7 +29,9 @@ public class NewMeleeWeaponMessage extends NewItemMessage {
 
     @Override
     public void handleClient(ClientGameAppState client) {
-            Item i = (Item) ifa.createItem(id, getTemplate(), droppable);
+            var i = (MeleeWeapon) ifa.createItem(id, getTemplate(), droppable);
+            i.setName(name);
+            i.setDamage(damage);
             if(isAlreadyDropped()){
                 Main.getInstance().enqueue(()-> {
                     i.drop(getDroppedPosition());

@@ -7,7 +7,7 @@ import guiComponents.inventoryComponents.TooltipMouseListener;
 import guiComponents.inventoryComponents.TooltipMouseListener.TooltipSource;
 
 import guiComponents.dragDrop.DragAndDropControl;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;

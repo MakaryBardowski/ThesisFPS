@@ -3,13 +3,11 @@ package behaviorTree.context;
 import com.jme3.math.Vector3f;
 import events.GameEvent;
 import game.entities.Destructible;
-import game.entities.mobs.HumanMob;
 import game.entities.mobs.MudBeetle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Future;
-import pathfinding.Node;
+
 
 public class MudBeetleContext extends Context {
 

@@ -1,8 +1,7 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
-import com.jme3.network.AbstractMessage;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.DestructibleUtils;
@@ -21,6 +20,8 @@ public class NewMobMessage extends TwoWayMessage {
     private int id;
     @Getter
     private float health;
+    @Getter
+    private float maxHealth;
     private float x;
     private float y;
     private float z;
@@ -32,6 +33,7 @@ public class NewMobMessage extends TwoWayMessage {
         this.id = mob.getId();
         this.mobType = mobType;
         this.health = mob.getHealth();
+        this.maxHealth = mob.getMaxHealth();
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
@@ -59,7 +61,7 @@ public class NewMobMessage extends TwoWayMessage {
                 VoxelLighting.setupModelLight(p.getNode());
                 DestructibleUtils.setupModelShootability(p.getNode(), p.getId());
                 placeMob(nmsg.getPos(), p);
-
+                p.setMaxHealth(nmsg.getMaxHealth());
                 p.setHealth(nmsg.getHealth());
             }
             );

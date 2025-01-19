@@ -1,17 +1,12 @@
 package game.map;
 
-import LevelLoadSystem.LevelLoader;
-import LevelLoadSystem.entitySpawnData.EntitySpawnData;
-import client.ClientGameAppState;
-import client.Main;
+import client.appStates.ClientGameAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import game.map.blocks.Map;
 import game.map.proceduralGeneration.RandomMapGenerator;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class ClientLevelGenerator {
     private final long levelSeed;

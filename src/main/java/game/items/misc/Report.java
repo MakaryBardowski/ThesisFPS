@@ -1,13 +1,11 @@
 package game.items.misc;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
-import game.entities.mobs.Mob;
 import game.items.Item;
 import game.items.ItemTemplates;
 import messages.items.MobItemInteractionMessage;
-import messages.items.NewAmmoPackMessage;
 import messages.items.NewMiscItemMessage;
 
 public class Report extends Item {

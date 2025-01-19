@@ -1,14 +1,13 @@
 package game.entities.grenades;
 
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import game.entities.Collidable;
-import game.entities.mobs.Mob;
 import lombok.Getter;
 import lombok.Setter;
 import server.ServerMain;

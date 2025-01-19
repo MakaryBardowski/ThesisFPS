@@ -24,7 +24,7 @@ public class ItemTemplates {
         return templates.get(index);
     }
 
-    public static final ItemTemplate RIFLE_MANNLICHER_95 = new RangedWeaponTemplate("Mannlicher 95 [Rifle]", WEAPONS_PATH + "Mannlicher95/mannlicher95.j3o", ICON_PATH + "equipmentMannlicher95.png", WEAPONS_PATH + "Mannlicher95/Mannlicher95Drop.j3o",
+    public static final ItemTemplate RIFLE_MANNLICHER_95 = new RangedWeaponTemplate("Mannlicher 95", WEAPONS_PATH + "Mannlicher95/mannlicher95.j3o", ICON_PATH + "equipmentMannlicher95.png", WEAPONS_PATH + "Mannlicher95/Mannlicher95Drop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 1.2f),
             new ThirdPersonOffsetData(new Vector3f(-0.37f,          0.33f,    0f), new Vector3f(0 * FastMath.DEG_TO_RAD, -90 * FastMath.DEG_TO_RAD, 180 * FastMath.DEG_TO_RAD), 1),
             ItemType.RIFLE, 0,
@@ -32,28 +32,28 @@ public class ItemTemplates {
             MobRangedWeaponUsageData.RIFLE_MANNLICHER_95_MOB_USAGE_DATA
     );
 
-    public static final ItemTemplate VEST_TRENCH = new VestTemplate("Trench Jacket [Vest]", ITEMS_PATH + "TrenchSet/officersCoat.j3o", ICON_PATH + "equipmentTrenchCoat.png", ITEMS_PATH + "TrenchSet/officersCoatDrop.j3o",
+    public static final ItemTemplate VEST_TRENCH = new VestTemplate("Soldier Jacket", ITEMS_PATH + "TrenchSet/officersCoat.j3o", ICON_PATH + "equipmentTrenchCoat.png", ITEMS_PATH + "TrenchSet/officersCoatDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.15f, 0), new Vector3f(-90 * FastMath.DEG_TO_RAD, 0, 0 * FastMath.DEG_TO_RAD), 0.85f),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.VEST, 1,
             VestStatTemplate.TRENCH_VEST_DEFAULT_STATS
     );
 
-    public static final ItemTemplate BOOTS_TRENCH = new BootsTemplate("Trench Boots [Boots]", ITEMS_PATH + "TrenchSet/officersLeg?.j3o", ICON_PATH + "equipmentTrenchShoes.png", ITEMS_PATH + "TrenchSet/officersBootsDrop.j3o",
+    public static final ItemTemplate BOOTS_TRENCH = new BootsTemplate("Soldier Boots", ITEMS_PATH + "TrenchSet/officersLeg?.j3o", ICON_PATH + "equipmentTrenchShoes.png", ITEMS_PATH + "TrenchSet/officersBootsDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 0 * FastMath.DEG_TO_RAD), 0.75f),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.BOOTS, 2,
             BootsStatTemplate.TRENCH_BOOTS_DEFAULT_STATS
     );
 
-    public static final ItemTemplate GLOVES_TRENCH = new GlovesTemplate("Trench Gloves [Gloves]", ITEMS_PATH + "TrenchSet/officersHand?.j3o", null, null,
+    public static final ItemTemplate GLOVES_TRENCH = new GlovesTemplate("Soldier Gloves", ITEMS_PATH + "TrenchSet/officersHand?.j3o", null, null,
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 1),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.GLOVES, 3,
             GlovesStatTemplate.TRENCH_GLOVES_DEFAULT_STATS
     );
 
-    public static final ItemTemplate KNIFE = new MeleeWeaponTemplate("Knife [Melee]", WEAPONS_PATH + "trenchKnife/trenchKnife.j3o", ICON_PATH + "equipmentTrenchKnife.png", WEAPONS_PATH + "trenchKnife/trenchKnifeDrop.j3o",
+    public static final ItemTemplate KNIFE = new MeleeWeaponTemplate("Steel Knife", WEAPONS_PATH + "trenchKnife/trenchKnife.j3o", ICON_PATH + "equipmentTrenchKnife.png", WEAPONS_PATH + "trenchKnife/trenchKnifeDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(90 * FastMath.DEG_TO_RAD, 0, 90 * FastMath.DEG_TO_RAD), 1),
             new ThirdPersonOffsetData(new Vector3f(-0.23f,          0.25f,    0f), new Vector3f(200 * FastMath.DEG_TO_RAD, 90 * FastMath.DEG_TO_RAD, 0), 1),
             ItemType.KNIFE, 4,
@@ -86,7 +86,7 @@ public class ItemTemplates {
             GlovesStatTemplate.DEFAULT_GLOVES_DEFAULT_STATS
     );
 
-    public static final ItemTemplate PISTOL_C96 = new RangedWeaponTemplate("C96 [Pistol]", WEAPONS_PATH + "C96/c96.j3o", ICON_PATH + "equipmentC96.png", WEAPONS_PATH + "C96/c96drop.j3o",
+    public static final ItemTemplate PISTOL_C96 = new RangedWeaponTemplate("C96", WEAPONS_PATH + "C96/c96.j3o", ICON_PATH + "equipmentC96.png", WEAPONS_PATH + "C96/c96drop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 1.2f),
             new ThirdPersonOffsetData(new Vector3f(-0.37f,          0.33f,    0f), new Vector3f(180 * FastMath.DEG_TO_RAD, 90 * FastMath.DEG_TO_RAD, 0), 1),
             ItemType.PISTOL, 9,
@@ -124,7 +124,7 @@ public class ItemTemplates {
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.SHOTGUN_AMMO, 15);
 
-    public static final ItemTemplate LMG_HOTCHKISS = new RangedWeaponTemplate("Hotchkiss [LMG]", WEAPONS_PATH + "Hotchkiss/hotchkissFp.j3o", ICON_PATH + "equipmentHotchkiss.png", WEAPONS_PATH + "Hotchkiss/hotchkissDrop.j3o",
+    public static final ItemTemplate LMG_HOTCHKISS = new RangedWeaponTemplate("Hotchkiss", WEAPONS_PATH + "Hotchkiss/hotchkissFp.j3o", ICON_PATH + "equipmentHotchkiss.png", WEAPONS_PATH + "Hotchkiss/hotchkissDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 0.8f),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.LMG, 16,
@@ -151,7 +151,7 @@ public class ItemTemplates {
             HelmetStatTemplate.GAS_MASK_DEFAULT_STATS
     );
 
-    public static final ItemTemplate AXE = new MeleeWeaponTemplate("Fireaxe [Melee]", WEAPONS_PATH + "Fireaxe/fireaxe.j3o", ICON_PATH + "equipmentTrenchKnife.png", WEAPONS_PATH + "Fireaxe/fireaxeDrop.j3o",
+    public static final ItemTemplate AXE = new MeleeWeaponTemplate("Fireaxe", WEAPONS_PATH + "Fireaxe/fireaxe.j3o", ICON_PATH + "equipmentTrenchKnife.png", WEAPONS_PATH + "Fireaxe/fireaxeDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0 * FastMath.DEG_TO_RAD, 0, 0 * FastMath.DEG_TO_RAD), 1),
             //                                   lewo/prawo  przod/tyl   gora/dol
             new ThirdPersonOffsetData(new Vector3f(-0.22f,          0.2f,    0f), new Vector3f(-90 * FastMath.DEG_TO_RAD, 0 * FastMath.DEG_TO_RAD, -110 * FastMath.DEG_TO_RAD), 1),
@@ -160,7 +160,7 @@ public class ItemTemplates {
             MobMeleeWeaponUsageData.AXE_DEFAULT_STATS
     );
 
-    public static final ItemTemplate RIFLE_BORYSOV = new RangedWeaponTemplate("Borysov [Rifle]", WEAPONS_PATH + "borysov/borysovFP.j3o", ICON_PATH + "equipmentMannlicher95.png", WEAPONS_PATH + "borysov/borysovDrop.j3o",
+    public static final ItemTemplate RIFLE_BORYSOV = new RangedWeaponTemplate("Borysov", WEAPONS_PATH + "borysov/borysovFP.j3o", ICON_PATH + "equipmentMannlicher95.png", WEAPONS_PATH + "borysov/borysovDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 1.2f),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.RIFLE, 21,
@@ -172,6 +172,20 @@ public class ItemTemplates {
             new DropOffsetData(new Vector3f(0, 0.0f, 0), new Vector3f(0, 0, 0 * FastMath.DEG_TO_RAD), 1f),
             new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
             ItemType.REPORT, 22);
+
+    public static final ItemTemplate SECRET_SOCIETY_VEST_1 = new VestTemplate("Red Hand Cloak", ITEMS_PATH+"SecretSociety1/SecretSocietyVest1.j3o", ICON_PATH + "equipmentTrenchCoat.png", ITEMS_PATH + "TrenchSet/officersCoatDrop.j3o",
+            new DropOffsetData(new Vector3f(0, 0.15f, 0), new Vector3f(-90 * FastMath.DEG_TO_RAD, 0, 0 * FastMath.DEG_TO_RAD), 0.85f),
+            new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
+            ItemType.VEST, 23,
+            VestStatTemplate.SECRET_SOCIETY_VEST_1_DEFAULT_STATS
+    );
+
+    public static final ItemTemplate SECRET_SOCIETY_HOOD_1 = new HelmetTemplate("Red hand Mask", ITEMS_PATH+ "SecretSociety1/SecretSocietyHelmetHood1.j3o", ICON_PATH + "equipmentSmokeGrenade.png", ITEMS_PATH + "Misc/gasMask.j3o",
+            new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 0.8f),
+            new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
+            ItemType.HELMET, 24, false,
+            HelmetStatTemplate.SECRET_SOCIETY_HOOD_1_DEFAULT_STATS
+    );
 
     static {
         templates.add(RIFLE_MANNLICHER_95.getTemplateIndex(), RIFLE_MANNLICHER_95);
@@ -198,7 +212,8 @@ public class ItemTemplates {
         templates.add(AXE.getTemplateIndex(), AXE);
         templates.add(RIFLE_BORYSOV.getTemplateIndex(), RIFLE_BORYSOV);
         templates.add(REPORT.getTemplateIndex(), REPORT);
-
+        templates.add(SECRET_SOCIETY_VEST_1.getTemplateIndex(), SECRET_SOCIETY_VEST_1);
+        templates.add(SECRET_SOCIETY_HOOD_1.getTemplateIndex(), SECRET_SOCIETY_HOOD_1);
     }
 
     @Getter

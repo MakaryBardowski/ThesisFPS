@@ -1,13 +1,11 @@
 package messages.cardChoice;
 
 import cards.AugmentCardsTemplateRegistry;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.StatusEffectContainer;
-import game.entities.mobs.player.Player;
-import game.map.blocks.Map;
 import lombok.Getter;
 import messages.TwoWayMessage;
 import server.ServerMain;

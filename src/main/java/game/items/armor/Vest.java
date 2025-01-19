@@ -1,7 +1,7 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
-import game.items.ItemTemplates;
+import client.appStates.ClientGameAppState;
+
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
@@ -9,12 +9,8 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
-import game.items.Holdable;
 import game.items.ItemTemplates.VestTemplate;
-import java.util.Arrays;
 import messages.items.MobItemInteractionMessage;
-import messages.items.NewHelmetMessage;
 import messages.items.NewVestMessage;
 
 public class Vest extends Armor {
@@ -88,7 +84,6 @@ public class Vest extends Armor {
     @Override
     public String getDescription() {
         StringBuilder builder = new StringBuilder();
-        builder.append("-Worn\n");
         builder.append("Armor value: ");
         builder.append(armorValue);
         return builder.toString();

@@ -1,6 +1,6 @@
 package messages.lobby;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import client.MainMenuController;
 import com.jme3.network.HostedConnection;

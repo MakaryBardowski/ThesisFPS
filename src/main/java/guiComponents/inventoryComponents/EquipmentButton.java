@@ -2,7 +2,7 @@ package guiComponents.inventoryComponents;
 
 import guiComponents.LemurPlayerInventoryGui;
 import guiComponents.dragDrop.DragAndDropControl;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.collision.CollisionResult;
 import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.Vector2f;

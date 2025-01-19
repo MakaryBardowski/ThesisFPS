@@ -1,6 +1,6 @@
 package game.items.weapons;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;

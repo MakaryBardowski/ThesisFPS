@@ -1,6 +1,6 @@
 package game.entities;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.epagagames.particles.Emitter;
 import com.epagagames.particles.emittershapes.EmitterCircle;
 import com.epagagames.particles.influencers.ColorInfluencer;
@@ -21,7 +21,6 @@ import com.jme3.texture.Texture;
 import data.DamageReceiveData;
 import game.effects.TimedSpatialRemoveControl;
 import game.map.collision.CollisionDebugUtils;
-import game.map.collision.RectangleAABB;
 import game.map.collision.RectangleOBB;
 import messages.DestructibleDamageReceiveMessage;
 import server.ServerMain;

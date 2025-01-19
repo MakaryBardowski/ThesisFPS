@@ -1,13 +1,12 @@
 package game.entities;
 
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import game.entities.DecorationTemplates.DecorationTemplate;
-import game.entities.mobs.Mob;
 import game.map.collision.RectangleAABB;
 import game.map.collision.WorldGrid;
 import lombok.Getter;

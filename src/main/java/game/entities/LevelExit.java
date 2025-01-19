@@ -1,10 +1,9 @@
 package game.entities;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import game.entities.DecorationTemplates.DecorationTemplate;
-import game.entities.mobs.Mob;
 import messages.gameSetupMessages.NextLevelMessage;
 
 public class LevelExit extends IndestructibleDecoration {

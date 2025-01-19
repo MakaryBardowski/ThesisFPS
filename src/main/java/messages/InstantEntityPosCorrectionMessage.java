@@ -1,6 +1,6 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
@@ -15,6 +15,7 @@ public class InstantEntityPosCorrectionMessage extends EntityUpdateMessage {
     protected float z;
     
     public InstantEntityPosCorrectionMessage() {
+        this.setReliable(true);
     }
 
     public InstantEntityPosCorrectionMessage(Entity e, Vector3f pos) {
@@ -22,6 +23,7 @@ public class InstantEntityPosCorrectionMessage extends EntityUpdateMessage {
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
+        this.setReliable(true);
     }
 
     public Vector3f getPos(){

@@ -10,12 +10,13 @@ import behaviorTree.composite.SequenceNode;
 import behaviorTree.context.SimpleHumanMobContext;
 import game.effects.EmitterPooler;
 import game.entities.*;
+import game.entities.factories.MobSpawnType;
 import game.items.Equippable;
 import game.items.Holdable;
 import game.items.Item;
 import game.map.collision.WorldGrid;
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.ClientSynchronizationUtils;
 import client.Main;
 import com.jme3.anim.AnimComposer;
@@ -23,14 +24,10 @@ import com.jme3.anim.ArmatureMask;
 import com.jme3.anim.SkinningControl;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.SceneGraphVisitorAdapter;
-import com.jme3.scene.debug.custom.ArmatureDebugger;
 import data.DamageReceiveData;
 import events.DamageReceivedEvent;
 import game.effects.ParticleUtils;
@@ -96,9 +93,10 @@ public class HumanMob extends Mob {
 
     private Geometry hitboxDebug;
 
-    public HumanMob(int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
-        super(id, node, name);
-
+    public HumanMob(MobSpawnType mobSpawnType,int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
+        super(mobSpawnType,id, node, name);
+        maxHealth = 24;
+        health = 24;
         armatureNode = (Node) node.getChild("Armature");
         thirdPersonHandsNode = new Node();
         armatureNode.attachChild(thirdPersonHandsNode); // attach it to the Node holding the base mesh
@@ -310,7 +308,7 @@ public class HumanMob extends Mob {
 
     @Override
     public AbstractMessage createNewEntityMessage() {
-        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), HUMAN);
+        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), mobSpawnType);
         msg.setReliable(true);
         return msg;
     }

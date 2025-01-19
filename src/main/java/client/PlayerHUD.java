@@ -1,5 +1,6 @@
 package client;
 
+import client.appStates.ClientGameAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.BaseAppState;
@@ -32,6 +33,7 @@ import de.lessvoid.nifty.controls.label.builder.LabelBuilder;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.tools.Color;
 import game.entities.Destructible;
 import game.entities.Entity;
 import game.items.Item;
@@ -457,7 +459,7 @@ public class PlayerHUD extends BaseAppState {
 
         TextRenderer textRenderer = textElement.getRenderer(TextRenderer.class
         );
-        textRenderer.setText(itemHit.getTemplate().getName()); // Set the text to something
+        textRenderer.setText(itemHit.getName()); // Set the text to something
 
         textElement = tooltipNifty.getCurrentScreen().findElementByName("itemDescription");
 

@@ -1,6 +1,6 @@
 package guiComponents;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;

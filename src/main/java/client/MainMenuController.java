@@ -1,5 +1,8 @@
 package client;
 
+import client.appStates.ClientGameAppState;
+import client.appStates.LobbyTeamViewAppState;
+import client.appStates.MainMenuAppState;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;

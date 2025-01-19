@@ -7,7 +7,7 @@ import static behaviorTree.NodeCompletionStatus.STOP_TREE_EXECUTION;
 import static behaviorTree.NodeCompletionStatus.SUCCESS;
 import behaviorTree.context.Context;
 import behaviorTree.context.MudBeetleContext;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import messages.DestructibleDamageReceiveMessage;
+
 import pathfinding.AStar;
 import server.ServerMain;
 

@@ -18,8 +18,8 @@ import game.effects.EmitterPooler;
 import game.entities.Destructible;
 import game.items.Item;
 import game.map.collision.WorldGrid;
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.ClientSynchronizationUtils;
 import client.Main;
 import com.jme3.anim.AnimComposer;
@@ -53,7 +53,7 @@ public class MudBeetle extends Mob {
     private AnimComposer modelComposer;
 
     public MudBeetle(int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
-        super(id, node, name);
+        super(MobSpawnType.MUD_BEETLE, id, node, name);
 
         maxHealth = 8;
         health = 8;
@@ -192,7 +192,7 @@ public class MudBeetle extends Mob {
 
     @Override
     public AbstractMessage createNewEntityMessage() {
-        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), MobSpawnType.MUD_BEETLE);
+        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), mobSpawnType);
         msg.setReliable(true);
         return msg;
     }

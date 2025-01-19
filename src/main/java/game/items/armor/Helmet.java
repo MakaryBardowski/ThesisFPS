@@ -1,22 +1,17 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
-import game.items.ItemTemplates;
+import client.appStates.ClientGameAppState;
+
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
-import com.jme3.math.Quaternion;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
 import game.items.ItemTemplates.HelmetTemplate;
-import game.items.ItemTemplates.ItemTemplate;
-import java.util.Random;
 import messages.items.MobItemInteractionMessage;
-import messages.items.NewGlovesMessage;
 import messages.items.NewHelmetMessage;
 
 public class Helmet extends Armor {

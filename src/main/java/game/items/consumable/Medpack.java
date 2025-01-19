@@ -1,7 +1,7 @@
 package game.items.consumable;
 
 import game.items.weapons.*;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import game.entities.mobs.HumanMob;
@@ -10,7 +10,7 @@ import game.entities.mobs.player.Player;
 import game.items.ItemTemplates;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewGrenadeMessage;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import com.jme3.network.Filters;
 import messages.DestructibleHealReceiveMessage;
 import server.ServerMain;

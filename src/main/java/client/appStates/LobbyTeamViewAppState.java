@@ -1,5 +1,6 @@
-package client;
+package client.appStates;
 
+import client.Main;
 import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
@@ -17,9 +18,6 @@ import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
-import de.lessvoid.nifty.tools.SizeValue;
-import de.lessvoid.nifty.tools.SizeValueType;
-import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
 import game.items.ItemTemplates;
 import game.items.ItemTemplates.HelmetTemplate;
@@ -46,8 +44,6 @@ public class LobbyTeamViewAppState extends BaseAppState {
         client = MainMenuAppState.getClient();
         assetManager = app.getAssetManager();
         setupTeamViewScene();
-        System.out.println("TEAM VIEWRER!");
-
     }
 
     @Override

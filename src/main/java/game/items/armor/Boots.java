@@ -1,6 +1,6 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
@@ -9,7 +9,6 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
 import game.items.ItemTemplates.BootsTemplate;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewBootsMessage;

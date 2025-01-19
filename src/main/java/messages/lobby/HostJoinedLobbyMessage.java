@@ -1,8 +1,8 @@
 package messages.lobby;
 
-import client.ClientGameAppState;
-import client.LobbyTeamViewAppState;
-import client.MainMenuAppState;
+import client.appStates.ClientGameAppState;
+import client.appStates.LobbyTeamViewAppState;
+import client.appStates.MainMenuAppState;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;

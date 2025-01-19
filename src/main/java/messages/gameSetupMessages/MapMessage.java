@@ -1,6 +1,6 @@
 package messages.gameSetupMessages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.map.blocks.Map;
@@ -50,7 +50,6 @@ public class MapMessage extends TwoWayMessage {
 
     @Override
     public void handleClient(ClientGameAppState client) {
-        System.out.println("RECEIVED A MAP");
         client.getCurrentGamemode().getLevelManager().setNextStaticMap(getMap());
     }
 
