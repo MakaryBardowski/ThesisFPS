@@ -4,10 +4,10 @@ import game.entities.StatusEffectContainer;
 import server.ServerMain;
 import statusEffects.EffectTemplates;
 
-public class CutDownCard extends AugmentCardTemplate {
+public class HardnessCard extends AugmentCardTemplate {
 
-    public CutDownCard() {
-        super(0,"Cut Down", "Dealing damage to targets with \nless than \\#FF0000#7.5\\#FFFFFF#% health instantly kills them.","Textures/GUI/Cards/cutdown.png");
+    public HardnessCard() {
+        super(2,"Hardness", "Reduce all incoming damage by\n\\#FF0000#1\\#FFFFFF#.","Textures/GUI/Cards/regeneration.png");
     }
 
     @Override
@@ -17,7 +17,7 @@ public class CutDownCard extends AugmentCardTemplate {
 
     @Override
     public void chooseCardServer(StatusEffectContainer statusEffectContainer) {
-        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.CUTDOWN_CARD_EXECUTE,statusEffectContainer);
+        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.HARDNESS_CARD_ARMOR,statusEffectContainer);
         statusEffectContainer.addEffect(effect);
     }
 }

@@ -28,6 +28,7 @@ import game.items.weapons.Grenade;
 import game.items.weapons.MeleeWeapon;
 import game.items.weapons.RangedWeapon;
 import menu.states.InventoryMenuState;
+import menu.states.PauseMenuState;
 import messages.MobRotUpdateMessage;
 import server.ServerMain;
 
@@ -66,6 +67,10 @@ public class InputController {
         ActionListener actionListener = new ActionListener() {
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
+                if(name.equals("Esc") && !keyPressed){
+                    Main.getInstance().getMenuStateMachine().requestState(new PauseMenuState());
+                }
+
                 if(!Player.isPlayerControlsEnabled()){
                     return;
                 }
@@ -109,8 +114,8 @@ public class InputController {
                 }
 
                 if (!player.isDead() && isHotbarName(name) && !keyPressed) {
-                    System.out.println("hotbar name ======== "+name);
-                    Item equippedItem = player.getHotbar().getItemAt(Integer.parseInt(name));
+                    int hotbarIndex = Integer.parseInt(name);
+                    Item equippedItem = player.getHotbar().getItemAt(hotbarIndex);
                     player.equip(equippedItem);
                     PlayerHUDController.sendEquipMessageToServer(equippedItem);
                 }
@@ -165,6 +170,7 @@ public class InputController {
                     if(ServerMain.getInstance() != null) {
                         ServerMain.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
                     }
+
                     System.gc();
                     player.setRight(false);
                     player.setLeft(false);
@@ -286,6 +292,7 @@ public class InputController {
         inputManager.addMapping("S", new KeyTrigger(KeyInput.KEY_S)); // backward
         inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A)); // strafe left
         inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D)); // strafe right
+        inputManager.addMapping("Esc", new KeyTrigger(KeyInput.KEY_ESCAPE));
 
         inputManager.addMapping("Attack", new MouseButtonTrigger(MouseInput.BUTTON_LEFT)); // shoot
         inputManager.addMapping("AttackR", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); // shoot
@@ -317,6 +324,7 @@ public class InputController {
                 new MouseAxisTrigger(MouseInput.AXIS_Y, true)
         );
 
+        inputManager.addListener(actionListener,"Esc");
         inputManager.addListener(analogListener, "MouseMovedX");
         inputManager.addListener(analogListener, "MouseMovedY");
         inputManager.addListener(actionListener, "W");
@@ -346,6 +354,11 @@ public class InputController {
         inputManager.addListener(actionListener, "0");
 
     }
+
+    public static void destroyKeys(InputManager inputManager) {
+        inputManager.clearMappings();
+    }
+
 
     private void setMovingAnimationPlayer(Player p, float animSpeed) {
 //        if (p.getHandsAnimChannel() != null && !p.getHandsAnimChannel().getAnimationName().equals("Run") || p.getHandsAnimChannel().getSpeed() < animSpeed) {

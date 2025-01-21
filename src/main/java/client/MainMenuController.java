@@ -3,6 +3,7 @@ package client;
 import client.appStates.ClientGameAppState;
 import client.appStates.LobbyTeamViewAppState;
 import client.appStates.MainMenuAppState;
+import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
@@ -45,10 +46,12 @@ public class MainMenuController implements ScreenController {
     }
 
     public static void joinLobby() {
-        
+
         MainMenuController.goToLobbyScreenClient();
 
-        System.out.println("joining lobby");
+//        System.out.println("joining lobby "+Main.getInstance().getCamera().getRotation());
+//        Main.getInstance().getCamera().setLocation(new Vector3f(0,0,0));
+
         Element textFieldElement = MainMenuAppState.getNifty().getCurrentScreen().findElementById("ip-textfield");
         TextField textFieldControl = textFieldElement.getNiftyControl(TextField.class);
         String serverIpAddress = textFieldControl.getDisplayedText();

@@ -1,4 +1,4 @@
-package guiComponents.menuComponents;
+package menu.menuComponents.cardChoice;
 
 import cards.AugmentCardTemplate;
 import client.Main;

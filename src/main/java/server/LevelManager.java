@@ -10,4 +10,5 @@ public abstract class LevelManager<T extends BaseJumpToLevelData>{
     protected int currentLevelIndex;
 
     public abstract void jumpToLevel(T jumpToLevelData);
-    }
+    public abstract void cleanup();
+}

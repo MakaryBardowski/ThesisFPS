@@ -12,6 +12,8 @@ public class EffectTemplates {
     public static final EffectTemplate DEFAULT_REGENERATION = new EffectTemplate(1);
     public static final EffectTemplate DEADEYE_CARD_CRIT = new EffectTemplate(2);
     public static final EffectTemplate CUTDOWN_CARD_EXECUTE = new EffectTemplate(3);
+    public static final EffectTemplate HARDNESS_CARD_ARMOR = new EffectTemplate(4);
+    public static final EffectTemplate GOOD_LUCK_PROTECTION = new EffectTemplate(5);
 
     public static EffectTemplate getTemplateByIndex(int index){
         return templates.get(index);

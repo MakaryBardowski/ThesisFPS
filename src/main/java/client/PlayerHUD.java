@@ -33,7 +33,6 @@ import de.lessvoid.nifty.controls.label.builder.LabelBuilder;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
-import de.lessvoid.nifty.tools.Color;
 import game.entities.Destructible;
 import game.entities.Entity;
 import game.items.Item;
@@ -52,14 +51,17 @@ public class PlayerHUD extends BaseAppState {
     public static Node itemDropTooltipNode = new Node();
     private Geometry itemDropTooltipGeom;
     private Material itemDropTooltipMaterial;
-    private NiftyJmeDisplay niftyDisplay;
-    private ViewPort niftyView;
+
     private Nifty tooltipNifty;
     private final int texSize = 128;
     private final int texW = (int) (texSize * 2.5f);
     private final int texH = texSize;
     private final FrameBuffer fb = new FrameBuffer(texW, texH, 0);
     private final Texture2D niftytex = new Texture2D(texW, texH, Format.RGB8);
+
+    private NiftyJmeDisplay mainNiftyDisplay;
+    private NiftyJmeDisplay itemDropTooltipNiftyDisplay;
+    private ViewPort itemDropTooltipViewPort;
 
     public PlayerHUD(ClientGameAppState gs) {
         this.gs = gs;
@@ -68,48 +70,16 @@ public class PlayerHUD extends BaseAppState {
     @Override
     protected void initialize(Application app) {
 
-        //It is technically safe to do all initialization and cleanup in the
-        //onEnable()/onDisable() methods. Choosing to use initialize() and
-        //cleanup() for this is a matter of performance specifics for the
-        //implementor.
-        //TODO: initialize your AppState, e.g. attach spatials to rootNode
-    }
-
-    @Override
-    protected void cleanup(Application app) {
-        //TODO: clean up what you initialized in the initialize method,
-        //e.g. remove all spatials from rootNode
-    }
-
-    //onEnable()/onDisable() can be used for managing things that should
-    //only exist while the state is enabled. Prime examples would be scene
-    //graph attachment or input listener attachment.
-    public void bind(Nifty nifty, Screen screen) {
-
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void onStartScreen() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void onEndScreen() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    protected void onEnable() {
-
-        NiftyJmeDisplay niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
+        mainNiftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
                 getApplication().getAssetManager(),
                 getApplication().getInputManager(),
                 getApplication().getAudioRenderer(),
                 getApplication().getGuiViewPort());
 
-        nifty = niftyDisplay.getNifty();
+        nifty = mainNiftyDisplay.getNifty();
         gs.setNifty(nifty);
         System.out.println(gs+" GS--");
-        getApplication().getGuiViewPort().addProcessor(niftyDisplay);
+        getApplication().getGuiViewPort().addProcessor(mainNiftyDisplay);
         ((SimpleApplication) getApplication()).getFlyByCamera().setDragToRotate(true);
 
         nifty.loadStyleFile("nifty-default-styles.xml");
@@ -293,11 +263,37 @@ public class PlayerHUD extends BaseAppState {
             }
         }.build(nifty));
         // </screen>
-
         initializeDropTooltip();
 
-        nifty.gotoScreen("Screen_ID"); // start the screen   
+        nifty.gotoScreen("Screen_ID"); // start the screen
         gs.getFlyCam().setDragToRotate(false);
+    }
+
+    @Override
+    protected void cleanup(Application app) {
+        getApplication().getGuiViewPort().removeProcessor(mainNiftyDisplay);
+        getApplication().getGuiViewPort().removeProcessor(itemDropTooltipNiftyDisplay);
+        getApplication().getRenderManager().removePreView(itemDropTooltipViewPort);
+        itemDropTooltipNode.removeFromParent();
+        itemDropTooltipNode = new Node();
+    }
+
+    public void bind(Nifty nifty, Screen screen) {
+
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void onStartScreen() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void onEndScreen() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void onEnable() {
+
     }
 
     @Override
@@ -427,6 +423,7 @@ public class PlayerHUD extends BaseAppState {
 
         var assetManager = cs.getAssetManager();
         var renderManager = cs.getRenderManager();
+
         InputManager inputManager = null;
         AudioRenderer audioRenderer = null;
 
@@ -436,16 +433,16 @@ public class PlayerHUD extends BaseAppState {
 
         itemDropTooltipGeom.setMaterial(itemDropTooltipMaterial);
 
-        niftyView = renderManager.createPreView("NiftyView", new Camera(texW, texH));
-        niftyView.setClearFlags(true, true, true);
+        itemDropTooltipViewPort = renderManager.createPreView("NiftyView", new Camera(texW, texH));
+        itemDropTooltipViewPort.setClearFlags(true, true, true);
 
-        niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
-                assetManager, inputManager, audioRenderer, niftyView);
+        itemDropTooltipNiftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
+                assetManager, inputManager, audioRenderer, itemDropTooltipViewPort);
 
-        tooltipNifty = niftyDisplay.getNifty();
+        tooltipNifty = itemDropTooltipNiftyDisplay.getNifty();
         tooltipNifty.fromXml("Interface/ItemDropTooltip.xml", "tooltipScreen");
         fb.setDepthBuffer(Format.Depth);
-        niftyView.setOutputFrameBuffer(fb);
+        itemDropTooltipViewPort.setOutputFrameBuffer(fb);
 
     }
 
@@ -468,8 +465,8 @@ public class PlayerHUD extends BaseAppState {
                 );
         textRenderer.setText(itemHit.getDescription()); // Set the text to something
 
-        niftyView.removeProcessor(niftyDisplay);
-        niftyView.addProcessor(niftyDisplay);
+        itemDropTooltipViewPort.removeProcessor(itemDropTooltipNiftyDisplay);
+        itemDropTooltipViewPort.addProcessor(itemDropTooltipNiftyDisplay);
 
         fb.resetObject();
         fb.setColorTexture(niftytex);

@@ -7,7 +7,7 @@ import com.jme3.network.Client;
 import com.jme3.scene.Node;
 import com.simsilica.lemur.GuiGlobals;
 import game.entities.mobs.player.Player;
-import guiComponents.menuComponents.CardChoiceComponent;
+import menu.menuComponents.cardChoice.CardChoiceComponent;
 import messages.cardChoice.ChooseCardMessage;
 
 import java.util.ArrayList;
@@ -73,6 +73,11 @@ public class CardChoiceMenuState implements MenuState {
         guiNode.attachChild(card1);
         guiNode.attachChild(card2);
         guiNode.attachChild(card3);
+    }
+
+    @Override
+    public MenuState onDuplicateStateRequest(MenuState requestedState) {
+        return requestedState;
     }
 
     @Override

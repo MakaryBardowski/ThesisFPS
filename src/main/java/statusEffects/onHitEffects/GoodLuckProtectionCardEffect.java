@@ -7,10 +7,14 @@ import game.entities.StatusEffectContainer;
 import server.ServerMain;
 import statusEffects.EffectProcType;
 
-public class CutDownCardEffect extends OnHitEffect{
-    private float EXECUTE_THRESHOLD = 7.5f/100;
+import java.util.Random;
 
-    public CutDownCardEffect(int id, String name, StatusEffectContainer target, EffectProcType procType) {
+public class GoodLuckProtectionCardEffect extends OnHitEffect{
+    private static final float MAX_MULTIPLIER = 1.2f;
+    private static final float MIN_MULTIPLIER = 0.85f;
+    private final Random random = new Random();
+
+    public GoodLuckProtectionCardEffect(int id, String name, StatusEffectContainer target, EffectProcType procType) {
         super(id, name, target, procType);
     }
 
@@ -19,9 +23,7 @@ public class CutDownCardEffect extends OnHitEffect{
         var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
         var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
 
-        if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= victim.getMaxHealth()*EXECUTE_THRESHOLD){
-            input.setRawDamage(victim.getMaxHealth()*99);
-        }
+        input.setRawDamage(input.getRawDamage()*random.nextFloat(MIN_MULTIPLIER,MAX_MULTIPLIER));
         return input;
     }
 

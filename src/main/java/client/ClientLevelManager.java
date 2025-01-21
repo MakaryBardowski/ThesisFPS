@@ -10,9 +10,12 @@ import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import data.jumpToLevelData.BaseJumpToLevelData;
 import data.jumpToLevelData.ClientJumpToLevelData;
 import game.entities.Entity;
@@ -276,4 +279,16 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
         }
     }
 
+    @Override
+    public void cleanup() {
+        if(player != null && player.getGunViewPort() != null){
+            player.getGunViewPort().detachScene(player.getGunNode());
+            renderManager.removeMainView(player.getGunViewPort());
+            player.getPlayerHealthbar().cleanup();
+            player.getPlayerinventoryGui().cleanup();
+        }
+        rootNode.removeFromParent();
+        Main.getInstance().getCamera().setLocation(new Vector3f(0,6,0.1f));
+        Main.getInstance().getCamera().setRotation(new Quaternion(0,1,0,0));
+    }
 }

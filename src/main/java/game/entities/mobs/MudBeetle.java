@@ -255,7 +255,7 @@ public class MudBeetle extends Mob {
 
     @Override
     public float calculateDamage(float damage) {
-        return damage;
+        return damage > 0 ? damage : 0;
     }
 
     @Override

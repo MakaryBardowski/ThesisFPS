@@ -45,6 +45,8 @@ public class LemurPlayerInventoryGui {
     private float equipmentTileSizePx;
     private boolean enabled;
 
+    private Container hotbarContainer;
+
     public LemurPlayerInventoryGui(Player player) {
         this.player = player;
         initialize();
@@ -107,7 +109,7 @@ public class LemurPlayerInventoryGui {
 
         var hotbarButtonsCount = 10;
         var hotbarButtonSize = sizePx;
-        Container hotbarContainer = new Container();
+        hotbarContainer = new Container();
 
         hotbarContainer.setLocalTranslation(settings.getWidth() - (hotbarButtonsCount * hotbarButtonSize) / 2 - settings.getWidth() * 0.5f, settings.getHeight() * 0.01f + hotbarButtonSize, 0);
         for (int i = 0; i < hotbarButtonsCount; i++) {
@@ -180,9 +182,6 @@ public class LemurPlayerInventoryGui {
         var c = new IconComponent(path);
         c.setIconSize(new Vector2f(sizePx, sizePx));
         clickMe.setIcon(c);
-        clickMe.addClickCommands((Button source) -> {
-            System.out.println("Hotbar . " + hotbarButtonIndex);
-        });
         return clickMe;
     }
 
@@ -243,6 +242,12 @@ public class LemurPlayerInventoryGui {
         }
     }
 
+    public void updateHotbarButtons(){
+        for(int i = 0; i < hotbarButtonsByIndex.size();i++){
+            updateHotbarButton(i);
+        }
+    }
+
     public synchronized void updateEquipmentGui(){
         for (var buttonIndex : equipmentButtonsByIndex.keySet()) {
             var button = equipmentButtonsByIndex.get(buttonIndex);
@@ -293,5 +298,20 @@ public class LemurPlayerInventoryGui {
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(item, player, MobItemInteractionMessage.ItemInteractionType.EQUIP);
         imsg.setReliable(true);
         gs.getClient().send(imsg);
+    }
+
+    public void cleanup(){
+        if(tooltipContainer != null) {
+            tooltipContainer.removeFromParent();
+        }
+        if(dragItemIconContainer != null) {
+            dragItemIconContainer.removeFromParent();
+        }
+        if(dragItemIconLabel != null) {
+            dragItemIconLabel.removeFromParent();
+        }
+        if(hotbarContainer != null) {
+            hotbarContainer.removeFromParent();
+        }
     }
 }

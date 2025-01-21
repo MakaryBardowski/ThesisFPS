@@ -13,13 +13,16 @@ public class InventoryMenuState implements MenuState {
     @Override
     public void close() {
         player.getPlayerinventoryGui().toggle();
-        System.out.println("close");
     }
 
     @Override
     public void open(Node guiNode, float resolutionX, float resolutionY) {
         player.getPlayerinventoryGui().toggle();
-        System.out.println("open");
+    }
+
+    @Override
+    public MenuState onDuplicateStateRequest(MenuState requestedState) {
+        return requestedState;
     }
 
     @Override

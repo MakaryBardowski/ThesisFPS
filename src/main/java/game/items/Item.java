@@ -60,7 +60,6 @@ public abstract class Item extends AttachedEntity {
         parentNode.scale(template.getDropData().getScale());
         parentNode.setLocalTranslation(itemSpawnpoint);
         droppedItemNode = parentNode;
-        System.out.println("dropped item node set for item "+this);
         ClientGameAppState.getInstance().getPickableNode().attachChild(parentNode);
         ParticleUtils.spawnStaticItemPhysicalParticleShaded(parentNode, itemSpawnpoint, this);
     }

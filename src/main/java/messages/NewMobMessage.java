@@ -25,6 +25,7 @@ public class NewMobMessage extends TwoWayMessage {
     private float x;
     private float y;
     private float z;
+    private float speed;
 
     public NewMobMessage() {
     }
@@ -37,6 +38,7 @@ public class NewMobMessage extends TwoWayMessage {
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
+        this.speed = mob.getCachedSpeed();
     }
 
     @Override
@@ -63,6 +65,7 @@ public class NewMobMessage extends TwoWayMessage {
                 placeMob(nmsg.getPos(), p);
                 p.setMaxHealth(nmsg.getMaxHealth());
                 p.setHealth(nmsg.getHealth());
+                p.setCachedSpeed(speed);
             }
             );
         }

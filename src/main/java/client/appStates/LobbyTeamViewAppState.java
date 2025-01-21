@@ -39,6 +39,8 @@ public class LobbyTeamViewAppState extends BaseAppState {
     private static String currentNickname = "";
     private static ClientGameAppState client;
 
+    private final AmbientLight light = new AmbientLight();
+
     @Override
     protected void initialize(Application app) {
         client = MainMenuAppState.getClient();
@@ -51,11 +53,11 @@ public class LobbyTeamViewAppState extends BaseAppState {
         app.getViewPort().setBackgroundColor(ColorRGBA.Black);
         backgroundNode.removeFromParent();
         teamNode.removeFromParent();
+        backgroundNode.removeLight(light);
     }
 
     @Override
     protected void onEnable() {
-//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
@@ -64,9 +66,8 @@ public class LobbyTeamViewAppState extends BaseAppState {
     }
 
     private void setupTeamViewScene() {
-        AmbientLight al = new AmbientLight();
-        al.setColor(ColorRGBA.White.mult(0.5f));
-        backgroundNode.addLight(al);
+        light.setColor(ColorRGBA.White.mult(0.5f));
+        backgroundNode.addLight(light);
 
         getApplication().getViewPort().setBackgroundColor(ColorRGBA.Cyan);
 
@@ -77,7 +78,7 @@ public class LobbyTeamViewAppState extends BaseAppState {
 
         var startCamLoc = getApplication().getCamera().getLocation().clone().setY(6).setZ(6.1f);
         getApplication().getCamera().setLocation(startCamLoc);
-
+        System.out.println(getApplication().getCamera().getRotation());
         changeClass(0);
     }
 

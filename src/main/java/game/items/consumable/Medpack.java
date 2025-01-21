@@ -122,14 +122,7 @@ public class Medpack extends ThrowableWeapon {
 
     @Override
     public void playerEquip(Player p) {
-//        Holdable unequippedItem = p.getEquippedRightHand();
-//        if (unequippedItem != null) {
-//            unequippedItem.playerUnequip(p);
-//        }
-//        p.setHoldsTrigger(false);
-//        playerHoldInRightHand(p);
-        p.getEquipment().removeItem(this);
-        removeEntityByIdClient(id);
+
     }
 
     @Override

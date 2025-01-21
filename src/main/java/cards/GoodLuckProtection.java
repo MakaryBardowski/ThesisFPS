@@ -4,10 +4,10 @@ import game.entities.StatusEffectContainer;
 import server.ServerMain;
 import statusEffects.EffectTemplates;
 
-public class CutDownCard extends AugmentCardTemplate {
+public class GoodLuckProtection extends AugmentCardTemplate {
 
-    public CutDownCard() {
-        super(0,"Cut Down", "Dealing damage to targets with \nless than \\#FF0000#7.5\\#FFFFFF#% health instantly kills them.","Textures/GUI/Cards/cutdown.png");
+    public GoodLuckProtection() {
+        super(3,"Good Luck\nProtection", "All damage you deal has \na random multiplier of \n\\#FF0000#85\\#FFFFFF#%-\\#FF0000#120\\#FFFFFF#%.","Textures/GUI/Cards/cutdown.png");
     }
 
     @Override
@@ -17,7 +17,7 @@ public class CutDownCard extends AugmentCardTemplate {
 
     @Override
     public void chooseCardServer(StatusEffectContainer statusEffectContainer) {
-        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.CUTDOWN_CARD_EXECUTE,statusEffectContainer);
+        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.GOOD_LUCK_PROTECTION,statusEffectContainer);
         statusEffectContainer.addEffect(effect);
     }
 }

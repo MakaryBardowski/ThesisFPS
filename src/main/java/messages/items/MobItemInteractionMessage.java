@@ -6,6 +6,7 @@ import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.mobs.Mob;
+import game.entities.mobs.player.Player;
 import game.items.Item;
 import lombok.Getter;
 import messages.TwoWayMessage;
@@ -24,6 +25,7 @@ public class MobItemInteractionMessage extends TwoWayMessage {
     protected int interactionTypeIndex;
 
     public MobItemInteractionMessage() {
+        this.setReliable(true);
     }
 
     public MobItemInteractionMessage(Item item, Mob mob, ItemInteractionType type) {
@@ -40,6 +42,15 @@ public class MobItemInteractionMessage extends TwoWayMessage {
 
     @Override
     public void handleServer(ServerMain server, HostedConnection hc) {
+        if(getMobByIdServer(mobId) == null){
+            System.err.println("Provided mob with id "+mobId + " doesnt exist on server. It requested item interaction "+getInteractionType());
+            return;
+        }
+        if(getItemByIdServer(itemId) == null){
+            System.err.println("Provided item with id "+itemId + " doesnt exist on server. It was a target of item interaction "+getInteractionType());
+            return;
+        }
+
         if (getInteractionType() == ItemInteractionType.PICK_UP) {
             var mob = getMobByIdServer(mobId);
             var newItem = getItemByIdServer(itemId);
@@ -63,36 +74,41 @@ public class MobItemInteractionMessage extends TwoWayMessage {
     @Override
     public void handleClient(ClientGameAppState client) {
         Main.getInstance().enqueue(() -> {
+            if(getMobByIdClient(mobId) == null){
+                System.err.println("Provided mob with id "+mobId + " doesnt exist on client. It requested item interaction "+getInteractionType());
+                return;
+            }
+            Item targetItem = getItemByIdClient(itemId);
+            if(targetItem == null){
+                System.err.println("Provided item with id "+itemId + " doesnt exist on client. It was a target of item interaction "+getInteractionType());
+                return;
+            }
+
             switch (getInteractionType()) {
                 case EQUIP:
-                    Item equipped = getItemByIdClient(itemId);
-                    if (equipped == null) {
-                        throw new NullPointerException("THE item with ID = " + itemId + " doesnt exist!");
-                    }
-                    getMobByIdClient(mobId).equip(equipped);
+                    getMobByIdClient(mobId).equip(targetItem);
                     break;
                 case UNEQUIP:
-                    Item unequipped = getItemByIdClient(itemId);
-                    getMobByIdClient(mobId).unequip(unequipped);
+                    getMobByIdClient(mobId).unequip(targetItem);
                     break;
                 case PICK_UP:
-                    Item pickedUp = getItemByIdClient(itemId);
-
-                    if (pickedUp.getDroppedItemNode() != null) {
+                    if (targetItem.getDroppedItemNode() != null) {
                         Main.getInstance().enqueue(() -> {
-                            pickedUp.getDroppedItemNode().removeFromParent();
+                            targetItem.getDroppedItemNode().removeFromParent();
                         });
                     }
 
-                    getMobByIdClient(mobId).getEquipment().addItem(pickedUp);
+                    getMobByIdClient(mobId).getEquipment().addItem(targetItem);
                     break;
                 case DROP:
+                    removeItemFromPlayerHotbar(client.getPlayer(),targetItem);
                     removeItemFromMobEquipmentClient(mobId, itemId);
                     Item dropped = getItemByIdClient(itemId);
                     var mobDroppingItem = getMobByIdClient(mobId);
                     dropped.drop(mobDroppingItem.getNode().getWorldTranslation().add(0, 2, 0), mobDroppingItem.getNode().getLocalRotation().getRotationColumn(2).normalize().multLocal(8));
                     break;
                 case DESTROY:
+                    removeItemFromPlayerHotbar(client.getPlayer(),targetItem);
                     removeItemFromMobEquipmentClient(mobId, itemId);
                     removeEntityByIdClient(itemId);
                     break;
@@ -114,4 +130,9 @@ public class MobItemInteractionMessage extends TwoWayMessage {
         return ItemInteractionType.values()[interactionTypeIndex];
     }
 
+    public void removeItemFromPlayerHotbar(Player player, Item targetItem){
+        if(player != null && player.getPlayerinventoryGui() != null && mobId == player.getId()){
+            player.getHotbar().removeItem(targetItem);
+        }
+    }
 }

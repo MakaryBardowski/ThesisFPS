@@ -1,8 +1,11 @@
 package server;
 
 import com.jme3.app.Application;
+import com.jme3.network.serializing.Serializer;
+import com.jme3.network.service.serializer.ServerSerializerRegistrationsService;
 import game.entities.mobs.Mob;
 import game.map.blocks.Map;
+import lombok.Setter;
 import messages.messageListeners.ServerMessageListener;
 import messages.MobPosRotUpdateMessage;
 
@@ -34,6 +37,7 @@ import messages.GrenadePosUpdateMessage;
 import messages.lobby.GameStartedMessage;
 
 public class ServerMain extends AbstractAppState implements ConnectionListener {
+    private static final String SERVER_CLOSE_MESSAGE = "Host player has quit the game.";
 
     public static final byte MAX_PLAYERS = 4;
 
@@ -45,6 +49,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     private final HashMap<Integer, HostedConnection> hostsByPlayerId = new HashMap<>(MAX_PLAYERS);
 
     @Getter
+    @Setter
     private static ServerMain instance;
 
     @Getter
@@ -86,7 +91,6 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     }
 
     @Override // the whole update method should be on another thread
-
     public void update(float tpf) {
         timePerFrame = tpf;
 
@@ -160,6 +164,10 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
 
     private void startServer() {
         try {
+
+            Serializer.initialize();
+            NetworkingInitialization.initializeSerializables();
+
             server = Network.createServer(NetworkingInitialization.PORT);
             server.addConnectionListener(this);
             server.addMessageListener(new ServerMessageListener(this));
@@ -204,4 +212,17 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
         return currentGamemode.getLevelManager().getMobs().get(id) != null;
     }
 
+    @Override
+    public void stateDetached(AppStateManager stateManager) {
+        super.stateDetached(stateManager);
+
+        var server = ServerMain.getInstance().getServer();
+        server.getConnections().forEach(hc -> hc.close(SERVER_CLOSE_MESSAGE));
+
+//        ServerSerializerRegistrationsService ssr = server.getServices().getService( ServerSerializerRegistrationsService.class );
+//        server.getServices().removeService(ssr);
+        server.close();
+        currentGamemode.getLevelManager().cleanup();
+        ServerMain.setInstance(null);
+    }
 }

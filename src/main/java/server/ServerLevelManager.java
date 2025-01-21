@@ -64,10 +64,10 @@ import statusEffects.StatusEffect;
 import static server.ServerMain.MAX_PLAYERS;
 
 public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
+    private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
 
     private final Server server;
     private final Random RANDOM = new Random();
-    private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
     private final AssetManager assetManager;
     private final RenderManager renderManager;
     private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
@@ -183,9 +183,9 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
             cardChoiceSessionsByIndex.add(cardSession);
 
             for(var player : players){
-                int cardId1 = RANDOM.nextInt(2);
-                int cardId2 = RANDOM.nextInt(2);
-                int cardId3 = RANDOM.nextInt(2);
+                int cardId1 = RANDOM.nextInt(4);
+                int cardId2 = RANDOM.nextInt(4);
+                int cardId3 = RANDOM.nextInt(4);
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
 
@@ -230,6 +230,11 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
             }
 
         });
+    }
+
+    @Override
+    public void cleanup() {
+        this.rootNode.removeFromParent();
     }
 
     private java.util.Map<Integer,Vector3f> assignSpawnpointsToPlayerIds(List<Vector3f> playerSpawnpoints) {

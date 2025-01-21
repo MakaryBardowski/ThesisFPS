@@ -26,6 +26,11 @@ public class MenuStateMachine {
 
     public synchronized void requestState(MenuState newState) {
         if (currentState != null) {
+
+            if(newState != null && currentState.getClass().equals(newState.getClass())){
+                newState = currentState.onDuplicateStateRequest(newState);
+            }
+
             if (!currentState.isTransitionAllowed(newState)) {
                 return;
             }

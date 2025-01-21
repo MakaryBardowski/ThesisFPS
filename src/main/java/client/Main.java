@@ -13,6 +13,8 @@ import lombok.Getter;
 import menu.MenuStateMachine;
 import networkingUtils.NetworkingInitialization;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class Main extends SimpleApplication {
     private static final String IDE_MODE = System.getenv("IDE_MODE");
     private static Main instance;
@@ -46,16 +48,14 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
         GuiGlobals.initialize(this);
-//        BaseStyles.loadGlassStyle();
-//        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
 
         this.menuStateMachine = new MenuStateMachine(guiNode, settings.getWidth(),settings.getHeight());
 
         setDisplayFps(false);
         setDisplayStatView(false);
-        System.out.println("app camera" + cam);
-        
+
         flyCam.setMoveSpeed(0); //30
         flyCam.setRotationSpeed(0); //1.0
         speed = 1f;

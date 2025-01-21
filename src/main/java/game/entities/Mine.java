@@ -70,7 +70,7 @@ public class Mine extends DestructibleDecoration {
 
     @Override
     public float calculateDamage(float damage) {
-        return damage * 2;
+        return damage * 2 > 0 ? damage * 2 : 0;
     }
 
     @Override

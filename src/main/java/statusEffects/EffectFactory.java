@@ -2,8 +2,10 @@ package statusEffects;
 
 import game.entities.StatusEffectContainer;
 import server.ServerMain;
+import statusEffects.onDamagedEffects.HardnessCardEffect;
 import statusEffects.onHitEffects.CutDownCardEffect;
 import statusEffects.onHitEffects.DeadeyeCardEffect;
+import statusEffects.onHitEffects.GoodLuckProtectionCardEffect;
 import statusEffects.onHitEffects.OnHitEffect;
 import statusEffects.temporaryEffects.DamageOverTimeEffect;
 import statusEffects.temporaryEffects.HealOverTimeEffect;
@@ -19,6 +21,10 @@ public class EffectFactory {
             return createDeadeyeCritChanceEffect(newEffectId,"Deadeye card effect",target);
         } else if (effectTemplate == EffectTemplates.CUTDOWN_CARD_EXECUTE){
             return createCutDownExecuteEffect(newEffectId,"Cutdown card effect",target);
+        } else if (effectTemplate == EffectTemplates.HARDNESS_CARD_ARMOR){
+            return createHardnessEffect(newEffectId,"Hardness card effect",target);
+        } else if (effectTemplate == EffectTemplates.GOOD_LUCK_PROTECTION){
+            return createGoodLuckProtectionEffect(newEffectId,"Good Luck Protection card effect",target);
         }
 
         throw new IllegalArgumentException(String.format(INVALID_EFFECT_ID_PROVIDED,effectTemplate));
@@ -37,9 +43,18 @@ public class EffectFactory {
         return new CutDownCardEffect(id,name, target, EffectProcType.ON_HIT);
     }
 
+    private static StatusEffect createHardnessEffect(int id, String name, StatusEffectContainer target) {
+        return new HardnessCardEffect(id,name,target,EffectProcType.ON_DAMAGED);
+    }
+
     public static DamageOverTimeEffect createBleedEffect(int id, StatusEffectContainer target, float damage, int maxTicks, int procsEvery) {
         var dot = new DamageOverTimeEffect(id,"Bleed", target, EffectProcType.PERIODICAL, maxTicks, procsEvery, damage);
         dot.setTarget(target);
         return dot;
+    }
+
+    private static StatusEffect createGoodLuckProtectionEffect(int id, String name, StatusEffectContainer target) {
+        return new GoodLuckProtectionCardEffect(id,name, target, EffectProcType.ON_HIT);
+
     }
 }
