@@ -35,9 +35,6 @@ public class Main extends SimpleApplication {
     private static double previous_max_mem_debug = 0;
     private double time_from_start_millis_debug = 0;
 
-    @Getter
-    private MenuStateMachine menuStateMachine;
-
     public static void main(String[] args) {
         Main app = new Main();
         setupSettings(app);
@@ -50,8 +47,6 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
         GuiGlobals.initialize(this);
-
-        this.menuStateMachine = new MenuStateMachine(guiNode, settings.getWidth(),settings.getHeight());
 
         setDisplayFps(false);
         setDisplayStatView(false);

@@ -126,7 +126,7 @@ public class ItemTemplates {
 
     public static final ItemTemplate LMG_HOTCHKISS = new RangedWeaponTemplate("Hotchkiss", WEAPONS_PATH + "Hotchkiss/hotchkissFp.j3o", ICON_PATH + "equipmentHotchkiss.png", WEAPONS_PATH + "Hotchkiss/hotchkissDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 0.8f),
-            new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
+            new ThirdPersonOffsetData(new Vector3f(-0.37f,          0.33f,    0f), new Vector3f(0 * FastMath.DEG_TO_RAD, -90 * FastMath.DEG_TO_RAD, 180 * FastMath.DEG_TO_RAD), 1),
             ItemType.LMG, 16,
             RangedWeaponStatTemplate.LMG_HOTCHKISS_DEFAULT_STATS,
             MobRangedWeaponUsageData.LMG_HOTCHKISS_MOB_USAGE_DATA
@@ -162,7 +162,7 @@ public class ItemTemplates {
 
     public static final ItemTemplate RIFLE_BORYSOV = new RangedWeaponTemplate("Borysov", WEAPONS_PATH + "borysov/borysovFP.j3o", ICON_PATH + "equipmentMannlicher95.png", WEAPONS_PATH + "borysov/borysovDrop.j3o",
             new DropOffsetData(new Vector3f(0, 0.05f, 0), new Vector3f(0, 0, 90 * FastMath.DEG_TO_RAD), 1.2f),
-            new ThirdPersonOffsetData(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1),
+            new ThirdPersonOffsetData(new Vector3f(-0.37f,          0.33f,    0f), new Vector3f(0 * FastMath.DEG_TO_RAD, -90 * FastMath.DEG_TO_RAD, 180 * FastMath.DEG_TO_RAD), 1),
             ItemType.RIFLE, 21,
             RangedWeaponStatTemplate.RIFLE_BORYSOV_DEFAULT_STATS,
             MobRangedWeaponUsageData.RIFLE_BORYSOV_MOB_USAGE_DATA

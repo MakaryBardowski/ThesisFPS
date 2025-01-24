@@ -32,8 +32,6 @@ import data.DamageReceiveData;
 import events.DamageReceivedEvent;
 import game.effects.ParticleUtils;
 
-import static game.entities.factories.MobSpawnType.HUMAN;
-
 import game.items.armor.Boots;
 import game.items.armor.Gloves;
 import game.items.armor.Helmet;
@@ -281,28 +279,28 @@ public class HumanMob extends Mob {
     @Override
     public void equip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.humanMobEquip(this);
+            equippableItem.humanMobEquipClient(this);
         }
     }
 
     @Override
     public void unequip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.humanMobUnequip(this);
+            equippableItem.humanMobUnequipClient(this);
         }
     }
 
     @Override
     public void equipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerEquip(this);
+            equippableItem.serverEquip(this);
         }
     }
 
     @Override
     public void unequipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerUnequip(this);
+            equippableItem.serverUnequip(this);
         }
     }
 

@@ -90,28 +90,28 @@ public class Player extends HumanMob {
     @Override
     public void equip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.playerEquip(this);
+            equippableItem.playerEquipClient(this);
         }
     }
 
     @Override
     public void unequip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.playerUnequip(this);
+            equippableItem.playerUnequipClient(this);
         }
     }
 
     @Override
     public void equipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerEquip(this);
+            equippableItem.serverEquip(this);
         }
     }
 
     @Override
     public void unequipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerUnequip(this);
+            equippableItem.serverUnequip(this);
         }
     }
 
@@ -338,6 +338,9 @@ public class Player extends HumanMob {
 
     public static synchronized void enablePlayerControls(){
         isPlayerControlsEnabled = true;
+        if(ClientGameAppState.getInstance() != null) { // if player closes the game
+            ClientGameAppState.getInstance().getInputController().initializeParamsAfterMouseEnable();
+        }
     }
 
     public static synchronized void disablePlayerControls(){

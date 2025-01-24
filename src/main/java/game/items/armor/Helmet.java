@@ -29,7 +29,7 @@ public class Helmet extends Armor {
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
 //        Node bb = m.getSkinningControl().getAttachmentsNode("BackpackBone");
 //        Node ba = (Node) Main.getInstance().getAssetManager().loadModel("Models/backpack/backpack.j3o");
 //        bb.attachChild(ba);
@@ -59,19 +59,30 @@ public class Helmet extends Armor {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void humanMobUnequipClient(HumanMob m) {
+        m.getDefaultHelmet().humanMobEquipClient(m);
     }
 
     @Override
-    public void playerEquip(Player m) {
-        humanMobEquip(m);
-
+    public void playerEquipClient(Player m) {
+        var unequippedItem = m.getHelmet();
+        if(unequippedItem == this){
+            return;
+        }
+        if (unequippedItem != null) {
+            unequippedItem.playerUnequipClient(m);
+        }
+        humanMobEquipClient(m);
     }
 
     @Override
-    public void playerUnequip(Player m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void playerUnequipClient(Player p) {
+        if (p.getHelmet() != this) {
+            return;
+        }
+
+        humanMobUnequipClient(p);
+        p.getDefaultHelmet().playerEquipClient(p);
     }
 
     @Override
@@ -90,13 +101,15 @@ public class Helmet extends Armor {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setHelmet(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getHelmet() == this) {
+            m.setHelmet(m.getDefaultHelmet());
+        }
     }
 
     @Override

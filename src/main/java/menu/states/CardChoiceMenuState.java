@@ -76,11 +76,6 @@ public class CardChoiceMenuState implements MenuState {
     }
 
     @Override
-    public MenuState onDuplicateStateRequest(MenuState requestedState) {
-        return requestedState;
-    }
-
-    @Override
     public boolean isTransitionAllowed(MenuState newState) {
         return false;
     }

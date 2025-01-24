@@ -19,11 +19,10 @@ public class AssaultClass extends PlayerClass {
     public List<ItemTemplates.ItemTemplate> getStartingEquipmentTemplates() {
         return List.of(
                 KNIFE,
-                RIFLE_BORYSOV,
+                RIFLE_MANNLICHER_95,
                 RIFLE_AMMO_PACK,
                 SMOKE_GRENADE,
-                BOOTS_TRENCH,
-                REPORT
+                BOOTS_TRENCH
         );
 
     }

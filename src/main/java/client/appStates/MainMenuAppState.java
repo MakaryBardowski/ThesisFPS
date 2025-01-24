@@ -74,8 +74,9 @@ public class MainMenuAppState extends BaseAppState {
         nifty.fromXml("Interface/MainMenu.xml", "MainMenu");
         
         getApplication().getGuiViewPort().addProcessor(niftyDisplay);
-        ((SimpleApplication) getApplication()).getFlyByCamera().setDragToRotate(true);
-        
+        ((SimpleApplication) getApplication()).getFlyByCamera().setDragToRotate(false);
+        ((SimpleApplication) getApplication()).getInputManager().setCursorVisible(true);
+
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");
 

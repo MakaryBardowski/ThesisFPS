@@ -5,6 +5,8 @@ import client.ClientStoryGameManager;
 import client.Main;
 import client.PlayerHUD;
 import com.jme3.network.service.serializer.ClientSerializerRegistrationsService;
+import game.cameraAndInput.InputController;
+import menu.MenuStateMachine;
 import messages.messageListeners.ClientMessageListener;
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.Client;
@@ -74,14 +76,24 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
     @Getter
     private ClientGameManager currentGamemode = new ClientStoryGameManager();
 
+    @Getter
+    private MenuStateMachine menuStateMachine;
 
     private Picture crosshair;
+
+    @Getter
+    @Setter
+    private InputController inputController;
+
+    private Node guiNode = new Node("Client game gui node");
 
     public ClientGameAppState(Main app, String serverIp) {
         instance = this;
         this.applicationSettings = app.getAppSettings();
         stateManager = Main.getInstance().getStateManager();
         this.serverIp = serverIp;
+        app.getGuiNode().attachChild(guiNode);
+        this.menuStateMachine = new MenuStateMachine(guiNode, applicationSettings.getWidth(),applicationSettings.getHeight());
     }
 
     @Override

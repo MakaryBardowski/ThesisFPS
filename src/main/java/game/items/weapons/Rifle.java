@@ -57,16 +57,19 @@ public class Rifle extends RangedWeapon {
     }
 
     @Override
-    public void playerEquip(Player p) {
+    public void playerEquipClient(Player p) {
         Holdable unequippedItem = p.getEquippedRightHand();
+        if(unequippedItem == this){
+            return;
+        }
         if (unequippedItem != null) {
-            unequippedItem.playerUnequip(p);
+            unequippedItem.playerUnequipClient(p);
         }
         playerHoldInRightHand(p);
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
         if (p.getEquippedRightHand() != this) {
             return;
         }
@@ -240,13 +243,15 @@ public class Rifle extends RangedWeapon {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setEquippedRightHand(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getEquippedRightHand() == this) {
+            m.setEquippedRightHand(null);
+        }
     }
 
     private static ParticleEmitter setupMuzzleFlashEmitter() {
@@ -337,17 +342,17 @@ public class Rifle extends RangedWeapon {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
+    public void humanMobUnequipClient(HumanMob m) {
         if (m.getEquippedRightHand() == this) {
             m.setEquippedRightHand(null);
         }
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         Holdable unequippedItem = m.getEquippedRightHand();
         if (unequippedItem != null) {
-            unequippedItem.humanMobUnequip(m);
+            unequippedItem.humanMobUnequipClient(m);
         }
         m.setEquippedRightHand(this);
         humanEquipInThirdPerson(m, Main.getInstance().getAssetManager());

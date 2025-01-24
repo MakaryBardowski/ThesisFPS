@@ -45,6 +45,7 @@ public class PauseMenuState implements MenuState{
 
         Runnable quit = () -> {
             Main.getInstance().enqueue( () -> {
+                var gs = ClientGameAppState.getInstance();
                 InputController.destroyKeys(Main.getInstance().getInputManager());
                 var stateMgr = Main.getInstance().getStateManager();
 
@@ -53,7 +54,7 @@ public class PauseMenuState implements MenuState{
 
                 MainMenuAppState mms = new MainMenuAppState(Main.getInstance().getAssetManager(), Main.getInstance().getInputManager(), Main.getInstance().getAudioRenderer(), Main.getInstance().getGuiViewPort());
                 stateMgr.attach(mms);
-                Main.getInstance().getMenuStateMachine().requestState(null);
+                gs.getMenuStateMachine().requestState(null);
                 // if you try to start new game too fast the then sometimes port may not be free again yet (fix later)
                 if (ServerMain.getInstance() != null) {
                     var serverState = stateMgr.getState(ServerMain.class);
@@ -63,7 +64,7 @@ public class PauseMenuState implements MenuState{
         };
 
         Runnable returnToGame = () -> {
-            Main.getInstance().getMenuStateMachine().requestState(null);
+            ClientGameAppState.getInstance().getMenuStateMachine().requestState(null);
         };
 
         var buttonPos1 = new Vector3f(buttonMarginX-buttonSizeX/2, buttonMarginY,0);
@@ -77,11 +78,6 @@ public class PauseMenuState implements MenuState{
 
         guiNode.attachChild(card1);
         guiNode.attachChild(card2);
-    }
-
-    @Override
-    public MenuState onDuplicateStateRequest(MenuState requestedState) {
-        return null;
     }
 
     @Override

@@ -66,7 +66,7 @@ public class ChooseCardMessage extends TwoWayMessage {
 
         if(playerId == client.getPlayer().getId()) {
             enqueueExecution(() -> {
-                Main.getInstance().getMenuStateMachine().forceState(null);
+                client.getMenuStateMachine().forceState(null);
             });
         }
     }

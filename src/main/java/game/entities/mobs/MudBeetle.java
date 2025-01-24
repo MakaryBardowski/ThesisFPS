@@ -3,13 +3,7 @@ package game.entities.mobs;
 import behaviorTree.BehaviorNode;
 import behaviorTree.BehaviorTree;
 import behaviorTree.LeafNode;
-import behaviorTree.actions.MudBeetleActions.AttackAction;
-import behaviorTree.actions.MudBeetleActions.CheckForTargetAction;
-import behaviorTree.actions.MudBeetleActions.IsPathfindingNeededAction;
-import behaviorTree.actions.MudBeetleActions.MoveInRangeAction;
-import behaviorTree.actions.MudBeetleActions.PathfindAction;
-import behaviorTree.actions.MudBeetleActions.ResetPathAction;
-import behaviorTree.actions.MudBeetleActions.WalkAction;
+import behaviorTree.actions.mudBeetleActions.*;
 import behaviorTree.composite.ParallelNode;
 import behaviorTree.composite.SelectorNode;
 import behaviorTree.composite.SequenceNode;
@@ -85,26 +79,36 @@ public class MudBeetle extends Mob {
     }
 
     public void addAi() {
+        var attack = new LeafNode(new Attack());
+
         List<BehaviorNode> children = Arrays.asList(
-                new SequenceNode(Arrays.asList(
-                        new LeafNode(new CheckForTargetAction()),
-                        new LeafNode(new ResetPathAction()),
-                        new SelectorNode(Arrays.asList(
-                                new LeafNode(new AttackAction()),
-                                new SequenceNode(Arrays.asList(
-                                        new LeafNode(new MoveInRangeAction()),
-                                        new LeafNode(new AttackAction())
+                new LeafNode(new GetCurrentTimestamp()),
+                new LeafNode(new RotateToDesiredRotation()),
+                new SelectorNode(Arrays.asList(
+                        new SequenceNode(Arrays.asList(
+                                new LeafNode(new CheckForTarget()),
+                                new LeafNode(new ResetPath()),
+                                new SelectorNode(Arrays.asList(
+                                        attack,
+                                        new SequenceNode(Arrays.asList(
+                                                new LeafNode(new MoveInRange()),
+                                                attack
+                                        ))
                                 ))
                         ))
                 )),
                 new SelectorNode(Arrays.asList(
                         new SequenceNode(Arrays.asList(
-                                new LeafNode(new IsPathfindingNeededAction()),
-                                new LeafNode(new PathfindAction())
+                                new LeafNode(new IsPathfindingNeeded()),
+                                new LeafNode(new Pathfind())
+                        )),
+                        new SequenceNode(Arrays.asList(
+                                new LeafNode(new ShouldLookIntoRandomDirection()),
+                                new LeafNode(new SetRandomLookDirection())
                         )),
                         new SequenceNode(Arrays.asList(
                                 new LeafNode(new WalkAction()),
-                                new LeafNode(new ResetPathAction())
+                                new LeafNode(new ResetPath())
                         ))
                 ))
         );

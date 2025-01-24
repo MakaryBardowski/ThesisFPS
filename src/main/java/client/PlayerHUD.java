@@ -80,7 +80,6 @@ public class PlayerHUD extends BaseAppState {
         gs.setNifty(nifty);
         System.out.println(gs+" GS--");
         getApplication().getGuiViewPort().addProcessor(mainNiftyDisplay);
-        ((SimpleApplication) getApplication()).getFlyByCamera().setDragToRotate(true);
 
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");

@@ -121,12 +121,12 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerEquip(Player p) {
+    public void playerEquipClient(Player p) {
 
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
         if (p.getEquippedRightHand() != this) {
             return;
         }
@@ -138,7 +138,7 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         var sm = ServerMain.getInstance();
         var hc = sm.getHostsByPlayerId().get(m.getId());
         Filters.notEqualTo(hc);
@@ -159,7 +159,7 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
+    public void serverUnequip(HumanMob m) {
 //        m.setEquippedRightHand(null);
     }
 

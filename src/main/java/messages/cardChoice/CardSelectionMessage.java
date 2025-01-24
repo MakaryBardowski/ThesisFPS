@@ -35,8 +35,7 @@ public class CardSelectionMessage extends TwoWayMessage {
     @Override
     public void handleClient(ClientGameAppState client) {
         enqueueExecution(()->{
-            System.out.println(client.getMobs());
-            Main.getInstance().getMenuStateMachine().forceState(new CardChoiceMenuState(cardSessionId,cardId1,cardId2,cardId3, client.getPlayer().getId(), client.getClient()));
+            client.getMenuStateMachine().forceState(new CardChoiceMenuState(cardSessionId,cardId1,cardId2,cardId3, client.getPlayer().getId(), client.getClient()));
         });
     }
 }

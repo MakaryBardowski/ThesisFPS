@@ -8,7 +8,7 @@ public class AugmentCardsTemplateRegistry {
     private static final Map<Integer, AugmentCardTemplate> CARD_REGISTRY = new HashMap<>();
 
     static {
-        var cutDown = new GoodLuckProtection();
+        var cutDown = new CutDownCard();
         var pinpoint = new PinpointCard();
         var hardness = new HardnessCard();
         var goodLuckProtection = new GoodLuckProtection();

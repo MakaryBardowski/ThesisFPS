@@ -25,11 +25,16 @@ public class EntitySpawnDataGenerator {
         mobsByChance.put(40f, MobSpawnType.HUMAN);
         mobsByChance.put(60f, MobSpawnType.MUD_BEETLE);;
 
-        itemsByChance.put(16f, ItemTemplates.PISTOL_AMMO_PACK);
-        itemsByChance.put(14f, ItemTemplates.MEDPACK);
-        itemsByChance.put(17f, ItemTemplates.RIFLE_AMMO_PACK);
-        itemsByChance.put(13f, ItemTemplates.PISTOL_C96);
-        itemsByChance.put(40f, ItemTemplates.KNIFE);
+        itemsByChance.put(9f, ItemTemplates.PISTOL_AMMO_PACK);
+        itemsByChance.put(5f, ItemTemplates.MEDPACK);
+        itemsByChance.put(8f, ItemTemplates.RIFLE_AMMO_PACK);
+        itemsByChance.put(7f, ItemTemplates.PISTOL_C96);
+        itemsByChance.put(1f,ItemTemplates.LMG_HOTCHKISS);
+
+        itemsByChance.put(3f,ItemTemplates.LMG_AMMO_PACK);
+        itemsByChance.put(0.5f,ItemTemplates.GAS_MASK);
+        itemsByChance.put(66.5f, ItemTemplates.KNIFE);
+
 
 
         mobSpawnTypeRandomGenerator = new PercentageRandomGenerator<>(mobsByChance);

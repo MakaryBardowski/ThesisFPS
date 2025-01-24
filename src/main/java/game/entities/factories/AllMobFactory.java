@@ -93,6 +93,7 @@ public class AllMobFactory extends MobFactory {
         if (spawnType == MUD_BEETLE) {
             MudBeetle p = createMudBeetle();
             DestructibleUtils.attachDestructibleToNode(p, mobsNode, new Vector3f(10, 4, 10));
+            p.addAi();
             return p;
         } else if (spawnType == HUMAN) {
             HumanMob p = createHumanMob(spawnType,"Soldier "+id);

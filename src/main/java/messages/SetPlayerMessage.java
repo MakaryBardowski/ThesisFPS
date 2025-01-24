@@ -78,7 +78,9 @@ public class SetPlayerMessage extends TwoWayMessage {
     }
 
     private void addInputListeners() {
-        new InputController().createInputListeners(ClientGameAppState.getInstance());
+        var inputController = new InputController();
+        inputController.createInputListeners(ClientGameAppState.getInstance());
+        ClientGameAppState.getInstance().setInputController(inputController);
     }
 
     private void addPlayerHUD(Player player) {

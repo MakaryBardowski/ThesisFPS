@@ -66,7 +66,11 @@ public class MobItemInteractionMessage extends TwoWayMessage {
 //            getMobById(imsg.getMobId()).unequip(getItemById(imsg.getItemId()));
             server.getServer().broadcast(this);
         } else if (getInteractionType() == ItemInteractionType.DROP) {
+            var mob = getMobByIdServer(mobId);
+            var droppedItem = getItemByIdServer(itemId);
+
             removeItemFromMobEquipmentServer(mobId, itemId);
+            mob.unequipServer(droppedItem);
             server.getServer().broadcast(this);
         }
     }
@@ -105,6 +109,7 @@ public class MobItemInteractionMessage extends TwoWayMessage {
                     removeItemFromMobEquipmentClient(mobId, itemId);
                     Item dropped = getItemByIdClient(itemId);
                     var mobDroppingItem = getMobByIdClient(mobId);
+                    mobDroppingItem.unequip(targetItem);
                     dropped.drop(mobDroppingItem.getNode().getWorldTranslation().add(0, 2, 0), mobDroppingItem.getNode().getLocalRotation().getRotationColumn(2).normalize().multLocal(8));
                     break;
                 case DESTROY:
@@ -131,7 +136,7 @@ public class MobItemInteractionMessage extends TwoWayMessage {
     }
 
     public void removeItemFromPlayerHotbar(Player player, Item targetItem){
-        if(player != null && player.getPlayerinventoryGui() != null && mobId == player.getId()){
+        if(player != null && mobId == player.getId() && player.getPlayerinventoryGui() != null){
             player.getHotbar().removeItem(targetItem);
         }
     }

@@ -26,7 +26,7 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         m.setVest(this);
         Node n = m.getSkinningControl().getAttachmentsNode("Spine");
         n.detachAllChildren();
@@ -37,31 +37,38 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void humanMobUnequipClient(HumanMob m) {
+        m.getDefaultVest().humanMobEquipClient(m);
     }
 
     @Override
-    public void playerEquip(Player p) {
-        Vest unequippedItem = p.getVest();
-        if (unequippedItem != null) {
-            unequippedItem.playerUnequip(p);
+    public void playerEquipClient(Player p) {
+        var unequippedItem = p.getVest();
+        if(unequippedItem == this){
+            return;
         }
-        humanMobEquip(p);
+        if (unequippedItem != null) {
+            unequippedItem.playerUnequipClient(p);
+        }
+        humanMobEquipClient(p);
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
+        if (p.getVest() != this) {
+            return;
+        }
+
+        humanMobUnequipClient(p);
+        p.getDefaultVest().playerEquipClient(p);
     }
 
     @Override
     public void onInteract() {
-
         ClientGameAppState gs = ClientGameAppState.getInstance();
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(this, gs.getPlayer(), MobItemInteractionMessage.ItemInteractionType.PICK_UP);
         imsg.setReliable(true);
         gs.getClient().send(imsg);
-
     }
 
     @Override
@@ -72,13 +79,15 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setVest(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getVest() == this) {
+            m.setVest(m.getDefaultVest());
+        }
     }
 
     @Override

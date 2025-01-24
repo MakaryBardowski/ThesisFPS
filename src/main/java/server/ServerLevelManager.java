@@ -186,6 +186,11 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
                 int cardId1 = RANDOM.nextInt(4);
                 int cardId2 = RANDOM.nextInt(4);
                 int cardId3 = RANDOM.nextInt(4);
+                while(cardId1 == cardId2 || cardId1 == cardId3 || cardId2 == cardId3){
+                     cardId1 = RANDOM.nextInt(4);
+                     cardId2 = RANDOM.nextInt(4);
+                     cardId3 = RANDOM.nextInt(4);
+                }
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
 

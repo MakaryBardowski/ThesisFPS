@@ -1,5 +1,6 @@
 package game.cameraAndInput;
 
+import com.jme3.math.*;
 import game.AttachedEntity;
 import game.entities.mobs.player.Player;
 import client.appStates.ClientGameAppState;
@@ -17,12 +18,7 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
-import de.lessvoid.nifty.render.NiftyImage;
 import game.items.Item;
 import game.items.weapons.Grenade;
 import game.items.weapons.MeleeWeapon;
@@ -33,8 +29,9 @@ import messages.MobRotUpdateMessage;
 import server.ServerMain;
 
 public class InputController {
+    private float MAX_VERTICAL_ROTATION_DEG = 80;
+    private float MIN_VERTICAL_ROTATION_DEG = -80;
 
-    private NiftyImage guiElement;
     private InputManager m;
     private HeadBobControl headBob;
     private static final float ONE_DEGREE = 0.0174f;
@@ -42,8 +39,8 @@ public class InputController {
     /*
     JME cursor position cannot be altered externally
      */
-    private final Vector2f prevJMEcursorPos = new Vector2f();
-    private final Vector2f cursorPositionForPlayerRotation = new Vector2f();
+    private Vector2f prevJMEcursorPos;
+    private Vector2f cursorPositionForPlayerRotation;
     private float deltaX;
     private float deltaY;
     private float centeredX;
@@ -51,6 +48,7 @@ public class InputController {
     private Quaternion newRotationQuat;
     private float currentMaxDeviationX = 0;
     private float currentMaxDeviationY = 0;
+    private float proposedRotationY = 0;
 
     private boolean updatePlayersThirdPersonHandsRot = false;
 
@@ -68,7 +66,13 @@ public class InputController {
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
                 if(name.equals("Esc") && !keyPressed){
-                    Main.getInstance().getMenuStateMachine().requestState(new PauseMenuState());
+                    var menus = gs.getMenuStateMachine();
+                    if(menus.getCurrentState() == null) {
+                        menus.requestState(new PauseMenuState());
+                    } else {
+                        System.out.println("request old state");
+                        menus.requestPreviousState();
+                    }
                 }
 
                 if(!Player.isPlayerControlsEnabled()){
@@ -134,7 +138,7 @@ public class InputController {
                 }
 
                 if (name.equals("I") && !gs.getPlayer().isDead() && !keyPressed) {
-                    var menuStateMachine = Main.getInstance().getMenuStateMachine();
+                    var menuStateMachine = gs.getMenuStateMachine();
                     if(menuStateMachine.isStateNull()) {
                         menuStateMachine.requestState(new InventoryMenuState(gs.getPlayer()));
                     } else {
@@ -208,8 +212,10 @@ public class InputController {
     private AnalogListener initAnalogListener(final ClientGameAppState gs) {
         final Player player = gs.getPlayer();
 
-//        prevJMEcursorPos.set(gs.getInputManager().getCursorPosition());
+        initializeParamsAfterMouseEnable();
+
         AnalogListener analogListener = new AnalogListener() {
+            Vector2f currentCursorPos = new Vector2f();
             @Override
             public void onAnalog(String name, float value, float tpf) {
                 if(!Player.isPlayerControlsEnabled()){
@@ -220,13 +226,11 @@ public class InputController {
                     deltaX = gs.getInputManager().getCursorPosition().x - prevJMEcursorPos.x;
                     if (!gs.getPlayer().isViewingEquipment()) {
                         cursorPositionForPlayerRotation.setX(cursorPositionForPlayerRotation.x + deltaX);
-                        centeredX = cursorPositionForPlayerRotation.x - 0.5f * gs.getSettings().getWidth();
+                        centeredX = cursorPositionForPlayerRotation.x;
                         newRotationQuat = new Quaternion();
 
                         centeredX = -0.005f * centeredX;
-
                         newRotationQuat.fromAngles(0, centeredX, 0);
-
                         currentMaxDeviationX += centeredX;
 
                         player.getNode().setLocalRotation(newRotationQuat);
@@ -235,23 +239,26 @@ public class InputController {
 
                 }
                 if (name.equals("MouseMovedY")) {
-                    deltaY = gs.getInputManager().getCursorPosition().y - prevJMEcursorPos.y;
+                    float cursorY = gs.getInputManager().getCursorPosition().y;
+                    deltaY = cursorY - prevJMEcursorPos.y;
+
                     if (!gs.getPlayer().isViewingEquipment()) {
+                        centeredY += deltaY;
+                        float proposedRotationDeg = centeredY * -0.005f * FastMath.RAD_TO_DEG;
+                        if (proposedRotationDeg > MAX_VERTICAL_ROTATION_DEG) {
+                            proposedRotationDeg = MAX_VERTICAL_ROTATION_DEG;
+                        } else if (proposedRotationDeg < MIN_VERTICAL_ROTATION_DEG) {
+                            proposedRotationDeg = MIN_VERTICAL_ROTATION_DEG;
+                        }
 
-                        cursorPositionForPlayerRotation.setY(cursorPositionForPlayerRotation.y + deltaY);
-                        centeredY = cursorPositionForPlayerRotation.y - 0.5f * gs.getSettings().getWidth();
                         newRotationQuat = new Quaternion();
-
-                        centeredY = -0.005f * centeredY; //reusingVariable
-                        newRotationQuat.fromAngles(centeredY, 0, 0);
-
-                        currentMaxDeviationY += centeredY;
-
+                        newRotationQuat.fromAngles(proposedRotationDeg * FastMath.DEG_TO_RAD, 0, 0);
                         player.getRotationNode().setLocalRotation(newRotationQuat);
 
+                        centeredY = proposedRotationDeg / -0.005f / FastMath.RAD_TO_DEG;
                     }
-                    prevJMEcursorPos.setY(gs.getInputManager().getCursorPosition().y);
 
+                    prevJMEcursorPos.setY(cursorY);
                 }
                 if (currentMaxDeviationX >= NOTIFY_SERVER_THRESHOLD || currentMaxDeviationX <= -NOTIFY_SERVER_THRESHOLD || currentMaxDeviationY >= NOTIFY_SERVER_THRESHOLD || currentMaxDeviationY <= -NOTIFY_SERVER_THRESHOLD) {
                     currentMaxDeviationX = 0;
@@ -280,6 +287,13 @@ public class InputController {
         gs.setAnalogListener(analogListener);
 
         return analogListener;
+    }
+
+    public void initializeParamsAfterMouseEnable() {
+        prevJMEcursorPos = ClientGameAppState.getInstance().getInputManager().getCursorPosition().clone().mult(1);
+        if(cursorPositionForPlayerRotation == null) {
+            cursorPositionForPlayerRotation = new Vector2f();
+        }
     }
 
     private boolean isHotbarName(String s) {
