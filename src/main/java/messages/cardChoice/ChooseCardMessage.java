@@ -36,7 +36,7 @@ public class ChooseCardMessage extends TwoWayMessage {
                 System.err.println("[SERVER]" + playerId + " is not a player, but wants to choose a card!");
                 return;
             }
-        var currentCardChoice = server.getCurrentGamemode().getLevelManager().getCardChoiceSessionsByIndex().get(cardChoiceSessionId);
+        var currentCardChoice = server.getCurrentGamemode().getLevelManager().getCardChoiceSessions().get(cardChoiceSessionId);
         if(currentCardChoice.isPlayerAlreadyChosenCard(playerId)){
             System.err.println("[SERVER]" + playerId + " has already chosen a card!!");
             return;

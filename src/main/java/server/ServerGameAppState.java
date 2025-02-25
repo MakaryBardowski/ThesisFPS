@@ -12,7 +12,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 
-import com.jme3.network.ConnectionListener;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
@@ -74,7 +73,7 @@ public class ServerGameAppState extends AbstractAppState {
     private boolean serverPaused = true;
 
     @Getter
-    private final ServerGameManager currentGamemode;
+    private ServerGameManager currentGamemode;
 
     public ServerGameAppState(AssetManager assetManager, RenderManager renderManager) {
 
@@ -84,7 +83,7 @@ public class ServerGameAppState extends AbstractAppState {
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-
+        super.initialize(stateManager,app);
         startServer();
 
     }
@@ -141,7 +140,7 @@ public class ServerGameAppState extends AbstractAppState {
             System.out.println("[SERVER] added player " + newPlayer.getId());
         });
 
-        currentGamemode.levelManager.notifyAllPlayersAboutNonMobEntities();
+        currentGamemode.levelManager.notifyPlayersAboutNonMobEntities();
 
         hostsByPlayerId.forEach( (id,hc) -> {
             currentGamemode.levelManager.notifyPlayerAboutInitialGameState(id,hc);
@@ -189,7 +188,7 @@ public class ServerGameAppState extends AbstractAppState {
     }
 
     public ConcurrentHashMap<Integer, Entity> getLevelManagerMobs() {
-        return currentGamemode.getLevelManager().getMobs();
+        return currentGamemode.getLevelManager().getEntitiesById();
     }
 
     public WorldGrid getGrid() {
@@ -201,7 +200,7 @@ public class ServerGameAppState extends AbstractAppState {
     }
 
     public boolean containsEntityWithId(int id) {
-        return currentGamemode.getLevelManager().getMobs().get(id) != null;
+        return currentGamemode.getLevelManager().getEntitiesById().get(id) != null;
     }
 
     @Override

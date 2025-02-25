@@ -138,7 +138,7 @@ public class Player extends HumanMob {
         }
 
         cachedSpeed = 11.25f;
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
 
     }
 
@@ -308,9 +308,9 @@ public class Player extends HumanMob {
     @Override
     public void attributeChangedNotification(int attributeId, Attribute oldAttributeCopy, Attribute copyOfNewAttribute) {
         super.attributeChangedNotification(attributeId, oldAttributeCopy, copyOfNewAttribute);
-        if (attributeId == SPEED_ATTRIBUTE) {
+        if (attributeId == SPEED_ATTRIBUTE_KEY) {
             cachedSpeed = ((FloatAttribute) copyOfNewAttribute).getValue();
-        } else if(attributeId == MAX_HEALTH_ATTRIBUTE){
+        } else if(attributeId == MAX_HEALTH_ATTRIBUTE_KEY){
             if (playerHealthbar != null) {
                 float normalizedPercentHealth = getHealth() / getMaxHealth();
                 float maxHealthChangePercent = ((FloatAttribute)oldAttributeCopy).getValue()/((FloatAttribute)copyOfNewAttribute).getValue();

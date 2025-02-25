@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 public abstract class Destructible extends Collidable {
 
-    public static final int HEALTH_ATTRIBUTE = 0;
-    public static final int MAX_HEALTH_ATTRIBUTE = 1;
+    public static final int HEALTH_ATTRIBUTE_KEY = 0;
+    public static final int MAX_HEALTH_ATTRIBUTE_KEY = 1;
 
     protected float initialHealth = 12;
     protected float initialMaximumHealth = 12;
@@ -44,19 +44,19 @@ public abstract class Destructible extends Collidable {
     public abstract float calculateDamage(float damage);
 
     public float getMaxHealth(){
-        return ((FloatAttribute)attributes.get(MAX_HEALTH_ATTRIBUTE)).getValue();
+        return ((FloatAttribute)attributes.get(MAX_HEALTH_ATTRIBUTE_KEY)).getValue();
     }
 
     public void setMaxHealth(float value){
-        attributes.put(MAX_HEALTH_ATTRIBUTE,new FloatAttribute(value));
+        attributes.put(MAX_HEALTH_ATTRIBUTE_KEY,new FloatAttribute(value));
     }
 
     public float getHealth(){
-        return ((FloatAttribute)attributes.get(HEALTH_ATTRIBUTE)).getValue();
+        return ((FloatAttribute)attributes.get(HEALTH_ATTRIBUTE_KEY)).getValue();
     }
 
     public void setHealth(float value){
-        attributes.put(HEALTH_ATTRIBUTE,new FloatAttribute(value));
+        attributes.put(HEALTH_ATTRIBUTE_KEY,new FloatAttribute(value));
     }
 
 }

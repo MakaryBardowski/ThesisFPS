@@ -126,7 +126,7 @@ public class HumanMob extends Mob {
 //        node.attachChild(Circle.createCircle(20, ColorRGBA.Red));
 
         cachedSpeed = 7.5f;
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
         onInteract();
 
 //        debugSkeleton(node);

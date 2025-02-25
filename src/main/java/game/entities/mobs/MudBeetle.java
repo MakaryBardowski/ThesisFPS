@@ -53,7 +53,7 @@ public class MudBeetle extends Mob {
         setMaxHealth(8);
         
         cachedSpeed = 6;
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
 
         this.skinningControl = skinningControl;
         this.modelComposer = modelComposer;

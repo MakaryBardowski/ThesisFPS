@@ -22,7 +22,7 @@ import lombok.Setter;
 import settings.GlobalSettings;
 
 public abstract class Mob extends StatusEffectContainer implements MobInterface, Animated {
-    public static final int SPEED_ATTRIBUTE = 2;
+    public static final int SPEED_ATTRIBUTE_KEY = 2;
 
     protected static final float MOB_ROTATION_RATE = 6f;
     protected static final int EQUIPMENT_SIZE = 20;
@@ -62,7 +62,7 @@ public abstract class Mob extends StatusEffectContainer implements MobInterface,
         this.mobSpawnType = mobSpawnType;
         this.serverLocation = node.getWorldTranslation();
         this.serverRotation = node.getLocalRotation();
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
     }
 
     public boolean doesNotCollideWithEntitiesAtPositionServer(Vector3f newPos, WorldGrid grid, ArrayList<Collidable> solidCollidables) {

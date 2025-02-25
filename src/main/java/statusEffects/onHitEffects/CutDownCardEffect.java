@@ -17,9 +17,9 @@ public class CutDownCardEffect extends OnHitEffect{
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
         var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
-        var attacker = (Destructible) serverLevelManager.getMobs().get(input.getAttackerId());
+        var attacker = (Destructible) serverLevelManager.getEntitiesById().get(input.getAttackerId());
 
-        var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
+        var victim = (Destructible) serverLevelManager.getEntitiesById().get(input.getVictimId());
 
         if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= attacker.getMaxHealth()*EXECUTE_THRESHOLD){
             input.setRawDamage(victim.getMaxHealth()*99);

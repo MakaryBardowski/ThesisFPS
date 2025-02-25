@@ -20,13 +20,13 @@ public class OverfedCardEffect extends OnHitEffect{
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
         var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
-        var attacker = (Destructible) serverLevelManager.getMobs().get(input.getAttackerId());
-        var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
+        var attacker = (Destructible) serverLevelManager.getEntitiesById().get(input.getAttackerId());
+        var victim = (Destructible) serverLevelManager.getEntitiesById().get(input.getVictimId());
 
         if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= 0){
             attacker.setFloatAttributesAndNotifyClients(getHealthAndMaxHealthUpdate(
-                    attacker.getFloatAttribute(Destructible.MAX_HEALTH_ATTRIBUTE).getValue()+HEALTH_INCREASE,
-                    attacker.getFloatAttribute(Destructible.HEALTH_ATTRIBUTE).getValue()+HEALTH_INCREASE
+                    attacker.getFloatAttribute(Destructible.MAX_HEALTH_ATTRIBUTE_KEY).getValue()+HEALTH_INCREASE,
+                    attacker.getFloatAttribute(Destructible.HEALTH_ATTRIBUTE_KEY).getValue()+HEALTH_INCREASE
             ));
         }
         return input;
@@ -34,8 +34,8 @@ public class OverfedCardEffect extends OnHitEffect{
 
     private Map<Integer,Float> getHealthAndMaxHealthUpdate(float newMaxHealthValue, float newHealthValue){
         var updates = new HashMap<Integer,Float>();
-        updates.put(Destructible.MAX_HEALTH_ATTRIBUTE,newMaxHealthValue);
-        updates.put(Destructible.HEALTH_ATTRIBUTE,newHealthValue);
+        updates.put(Destructible.MAX_HEALTH_ATTRIBUTE_KEY,newMaxHealthValue);
+        updates.put(Destructible.HEALTH_ATTRIBUTE_KEY,newHealthValue);
         return updates;
     }
 

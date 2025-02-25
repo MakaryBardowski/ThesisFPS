@@ -23,8 +23,8 @@ public class DeadeyeCardEffect extends OnHitEffect{
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
         var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
-        var attacker = (Destructible) serverLevelManager.getMobs().get(input.getAttackerId());
-        var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
+        var attacker = (Destructible) serverLevelManager.getEntitiesById().get(input.getAttackerId());
+        var victim = (Destructible) serverLevelManager.getEntitiesById().get(input.getVictimId());
 
         // additional 1 percent per tile
         var additionalCritChanceForDistance = (

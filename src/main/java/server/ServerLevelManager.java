@@ -64,13 +64,14 @@ import statusEffects.StatusEffect;
 import static server.ServerGameAppState.MAX_PLAYERS;
 
 public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
-    private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
-
     private final Server server;
-    private final Random RANDOM = new Random();
-    private final AssetManager assetManager;
-    private final RenderManager renderManager;
+
+    @Getter
+    private final ConcurrentHashMap<Integer, Entity> entitiesById = new ConcurrentHashMap<>();
     private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
+
+    @Getter
+    private Map map;
 
     @Getter
     @Setter
@@ -79,6 +80,14 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     @Getter
     @Setter
     protected MapType[] levelTypes;
+
+    private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
+
+    private final Random RANDOM = new Random();
+    private final AssetManager assetManager;
+    private final RenderManager renderManager;
+
+
 
     @Getter
     private final Node rootNode;
@@ -100,16 +109,10 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     @Getter
     private WorldGrid grid;
 
-    @Getter
-    private Map map;
-
-    @Getter
-    private final ConcurrentHashMap<Integer, Entity> mobs = new ConcurrentHashMap<>();
-
     private final Vector<Entity> entitiesBroadcastedAtNextLevel = new Vector<>();
 
     @Getter
-    private final List<CardChoiceSession> cardChoiceSessionsByIndex = new ArrayList<>(10);
+    private final List<CardChoiceSession> cardChoiceSessions = new ArrayList<>(10);
 
     public ServerLevelManager(int levelCount, Server server) {
         this.assetManager = Main.getInstance().getAssetManager();
@@ -147,7 +150,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
 
     public void movePlayersToSpawnpoints(java.util.Map<Integer,Vector3f> playerSpawnpoints){
             for(var entry : playerSpawnpoints.entrySet()){
-                var player = (Player) mobs.get(entry.getKey());
+                var player = (Player) entitiesById.get(entry.getKey());
 
                 grid.remove(player);
                 player.getNode().setLocalTranslation(entry.getValue());
@@ -185,14 +188,14 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
         if(levelIndex == 3 || levelIndex == 5){
             var hostsByPlayerId = ServerGameAppState.getInstance().getHostsByPlayerId();
 
-            var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
-            cardChoiceSessionsByIndex.add(cardSession);
+            var cardSession = new CardChoiceSession(cardChoiceSessions.size());
+            cardChoiceSessions.add(cardSession);
 
             for(var player : players){
                 var cardIdsChosenByPlayer = new HashSet<Integer>();
 
-                for(int i = 0; i < cardChoiceSessionsByIndex.size()-1; i++) {
-                    var cardChoiceSession = cardChoiceSessionsByIndex.get(i);
+                for(int i = 0; i < cardChoiceSessions.size()-1; i++) {
+                    var cardChoiceSession = cardChoiceSessions.get(i);
                     cardIdsChosenByPlayer.add(cardChoiceSession.getCardPickedByPlayer(player.getId()).getCardId());
                 }
                 int registrySize = AugmentCardsTemplateRegistry.getSize();
@@ -491,7 +494,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
                 .map(entity -> (DestructibleDecoration) entity)
                 .toList();
 
-        List<IndestructibleDecoration> indestructibleDecorationsInGame = mobs.entrySet().stream()
+        List<IndestructibleDecoration> indestructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof IndestructibleDecoration)
                 .map(entity -> (IndestructibleDecoration) entity.getValue())
                 .toList();
@@ -537,8 +540,8 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
 
     }
 
-    public void notifyAllPlayersAboutNonMobEntities(){
-        List<Item> itemsInGame = mobs.entrySet().stream()
+    public void notifyPlayersAboutNonMobEntities(){
+        List<Item> itemsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof Item)
                 .map(entity -> (Item) entity.getValue())
                 .toList();
@@ -550,17 +553,17 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
         });
 
 
-        List<Chest> chestsInGame = mobs.entrySet().stream()
+        List<Chest> chestsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof Chest)
                 .map(entity -> (Chest) entity.getValue())
                 .toList();
 
-        List<DestructibleDecoration> destructibleDecorationsInGame = mobs.entrySet().stream()
+        List<DestructibleDecoration> destructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof DestructibleDecoration)
                 .map(entity -> (DestructibleDecoration) entity.getValue())
                 .toList();
 
-        List<IndestructibleDecoration> indestructibleDecorationsInGame = mobs.entrySet().stream()
+        List<IndestructibleDecoration> indestructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof IndestructibleDecoration)
                 .map(entity -> (IndestructibleDecoration) entity.getValue())
                 .toList();
@@ -589,7 +592,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     }
 
     public void notifyPlayerAboutInitialGameState(int playerId, HostedConnection hc) {
-        List<Mob> notThisPlayerMobs = mobs.entrySet().stream()
+        List<Mob> notThisPlayerMobs = entitiesById.entrySet().stream()
                 .filter(entry -> {
                     // temporary fix, because currently every player is a mob so you get a duplicate on players
                     return entry.getValue() instanceof Mob nonPlayer && !(nonPlayer instanceof Player) ;
@@ -606,7 +609,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
             sendNewEntityEquipmentInfo(mob, Filters.in(hc));
         });
 
-        Player notifiedPlayer = (Player) mobs.get(playerId);
+        Player notifiedPlayer = (Player) entitiesById.get(playerId);
 
         int playerClassIndex = (int) hc.getAttribute("class");
 
@@ -658,7 +661,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
 
     private void clearEntities() {
         var itemsToKeep = getItemsTokeep();
-        mobs.forEach((id, entity) -> {
+        entitiesById.forEach((id, entity) -> {
             if (isNotItemToKeep(entity, itemsToKeep) && isNotPlayer(entity)) { // if not an item to keep
                 System.out.println("destroying " + entity);
                 entity.destroyOnServerAndNotify();
@@ -713,7 +716,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     }
 
     private <T extends Entity> T registerEntityLocal(T entity) {
-        mobs.put(entity.getId(), entity);
+        entitiesById.put(entity.getId(), entity);
         return entity;
     }
 

@@ -36,7 +36,7 @@ public class TrainingDummy extends Mob {
         setHealth(100);
         setMaxHealth(100);
         cachedSpeed = 6;
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
 
         createHitbox();
 
