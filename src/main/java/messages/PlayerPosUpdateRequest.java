@@ -11,7 +11,7 @@ import game.entities.mobs.player.Player;
 import game.map.collision.MovementCollisionUtils;
 import game.map.collision.WorldGrid;
 import java.util.ArrayList;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class PlayerPosUpdateRequest extends EntityUpdateMessage {
@@ -41,12 +41,12 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         if(server.getCurrentGamemode().getLevelManager().getCurrentLevelIndex() != levelIndex){
             return;
         }
         if (entityExistsLocallyServer(id)) {
-            var serverApp = ServerMain.getInstance();
+            var serverApp = ServerGameAppState.getInstance();
             Player p = (Player) serverApp.getLevelManagerMobs().get(id);
             if(!p.isAbleToMove()){
                 return;
@@ -63,7 +63,7 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
                 grid.remove(p);
 
                 Main.getInstance().enqueue(() -> {
-                    if (!ServerMain.getInstance().containsEntityWithId(id)) {
+                    if (!ServerGameAppState.getInstance().containsEntityWithId(id)) {
                         return;
                     }
                     var newPos = getPos();

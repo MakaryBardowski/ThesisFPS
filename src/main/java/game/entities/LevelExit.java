@@ -28,7 +28,7 @@ public class LevelExit extends IndestructibleDecoration {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -43,7 +43,7 @@ public class LevelExit extends IndestructibleDecoration {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

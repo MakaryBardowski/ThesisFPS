@@ -45,8 +45,8 @@ import lombok.Getter;
 import lombok.Setter;
 import messages.DestructibleDamageReceiveMessage;
 import messages.NewMobMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class HumanMob extends Mob {
     private static final Random RANDOM = new Random();
@@ -93,8 +93,8 @@ public class HumanMob extends Mob {
 
     public HumanMob(MobSpawnType mobSpawnType,int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
         super(mobSpawnType,id, node, name);
-        maxHealth = 24;
-        health = 24;
+        setHealth(24);
+        setMaxHealth(24);
         armatureNode = (Node) node.getChild("Armature");
         thirdPersonHandsNode = new Node();
         armatureNode.attachChild(thirdPersonHandsNode); // attach it to the Node holding the base mesh
@@ -151,7 +151,7 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -209,12 +209,12 @@ public class HumanMob extends Mob {
             onDamageReceivedEffect.applyClient(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
         var notMe = this != ClientGameAppState.getInstance().getPlayer();
         ParticleEmitter blood = EmitterPooler.getBlood();
         Vector3f bloodPos = node.getWorldTranslation().clone().add(0, 2, 0);
         blood.setLocalTranslation(bloodPos);
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             if (notMe) {
                 blood.emitParticles(RANDOM.nextInt(30,50));
             }
@@ -233,8 +233,9 @@ public class HumanMob extends Mob {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
-        if (health <= 0) {
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
+
+        if (getHealth() <= 0) {
             destroyServer();
             onDeathServer();
             return;
@@ -250,10 +251,6 @@ public class HumanMob extends Mob {
         DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
-    }
-
-    @Override
-    public void onCollision() {
     }
 
     public Holdable getEquippedRightHand() {
@@ -336,7 +333,7 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         setServerLocation(newPos);
         setPosInterpolationValue(1.f);
         WorldGrid grid = ClientGameAppState.getInstance().getGrid();
@@ -348,7 +345,7 @@ public class HumanMob extends Mob {
 
     @Override
     public void setPositionServer(Vector3f newPos) {
-        WorldGrid grid = ServerMain.getInstance().getGrid();
+        WorldGrid grid = ServerGameAppState.getInstance().getGrid();
         grid.remove(this);
         node.setLocalTranslation(newPos);
         grid.insert(this);
@@ -441,25 +438,26 @@ public class HumanMob extends Mob {
 
     @Override
     public void destroyServer() {
-        removeEntityByIdServer(id);
-//        System.out.println("destroying "+this);
-        var server = ServerMain.getInstance();
-        server.getGrid().remove(this);
-        if (node.getParent() != null) {
-            Main.getInstance().enqueue(() -> {
+        Main.getInstance().enqueue(() -> {
+            removeEntityByIdServer(id);
+            var server = ServerGameAppState.getInstance();
+            server.getGrid().remove(this);
+            if (node.getParent() != null) {
                 node.removeFromParent();
-            });
-        }
+            }
+        });
     }
 
     @Override
     public void destroyClient() {
-        var client = ClientGameAppState.getInstance();
-        client.getGrid().remove(this);
         Main.getInstance().enqueue(() -> {
-            node.removeFromParent();
+            removeEntityByIdClient(id);
+            var client = ClientGameAppState.getInstance();
+            client.getGrid().remove(this);
+            if(node.getParent() != null) {
+                node.removeFromParent();
+            }
         });
-        removeEntityByIdClient(id);
     }
 
     @Override

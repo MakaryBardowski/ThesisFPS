@@ -1,11 +1,11 @@
 package Utils;
 
 import com.jme3.math.Vector3f;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class GridUtils {
 
-    private static final int BLOCK_SIZE = ServerMain.getInstance().getBLOCK_SIZE();
+    private static final int BLOCK_SIZE = ServerGameAppState.getInstance().getBLOCK_SIZE();
 //    private static final byte[][][] grid = ServerMain.getInstance().getMap();
 
     public static int worldToGridCoordinate(float coordinate) {

@@ -1,5 +1,5 @@
 package events;
 
-public abstract class EventSubscriber {
-    public abstract void receiveEventNotification(GameEvent gameEvent);
+public interface EventSubscriber {
+    void receiveEventNotification(GameEvent gameEvent);
 }

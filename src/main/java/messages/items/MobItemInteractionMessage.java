@@ -10,8 +10,8 @@ import game.entities.mobs.player.Player;
 import game.items.Item;
 import lombok.Getter;
 import messages.TwoWayMessage;
-import server.ServerMain;
-import static server.ServerMain.removeItemFromMobEquipmentServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeItemFromMobEquipmentServer;
 
 @Serializable
 public class MobItemInteractionMessage extends TwoWayMessage {
@@ -41,7 +41,7 @@ public class MobItemInteractionMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         if(getMobByIdServer(mobId) == null){
             System.err.println("Provided mob with id "+mobId + " doesnt exist on server. It requested item interaction "+getInteractionType());
             return;

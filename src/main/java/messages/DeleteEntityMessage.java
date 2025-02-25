@@ -3,7 +3,7 @@ package messages;
 import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class DeleteEntityMessage extends EntityUpdateMessage {
@@ -17,7 +17,7 @@ public class DeleteEntityMessage extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
     }
 
     @Override

@@ -25,8 +25,8 @@ import com.jme3.texture.Texture;
 import game.effects.TimedSpatialRemoveControl;
 import game.entities.Collidable;
 import messages.ThrownGrenadeExplodedMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class ThrownSmokeGrenade extends ThrownGrenade {
 
@@ -80,7 +80,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -109,7 +109,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     public void explodeServer() {
         ThrownGrenadeExplodedMessage gemsg = new ThrownGrenadeExplodedMessage(id, node.getWorldTranslation());
         gemsg.setReliable(true);
-        ServerMain.getInstance().getServer().broadcast(gemsg);
+        ServerGameAppState.getInstance().getServer().broadcast(gemsg);
         node.removeFromParent();
 
         removeEntityByIdServer(id);
@@ -186,7 +186,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

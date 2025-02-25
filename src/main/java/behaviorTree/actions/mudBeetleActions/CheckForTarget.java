@@ -12,7 +12,7 @@ import com.jme3.scene.Spatial;
 import game.entities.Destructible;
 import game.entities.mobs.HumanMob;
 import game.entities.mobs.MudBeetle;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -56,7 +56,7 @@ public class CheckForTarget extends NodeAction {
             targetsHeard.clear();
         }
 
-        var mobsClose = ServerMain.getInstance().getGrid().getNearbyInRadius(mudBeetle.getNode().getWorldTranslation(), TEST_SIGHT_RANGE);
+        var mobsClose = ServerGameAppState.getInstance().getGrid().getNearbyInRadius(mudBeetle.getNode().getWorldTranslation(), TEST_SIGHT_RANGE);
         for (var mob : mobsClose) {
             if (mob instanceof HumanMob d) {
                 if ((humanSeesMob(mudBeetle, d))) {

@@ -12,7 +12,7 @@ import com.jme3.scene.Spatial;
 import game.cameraAndInput.InputController;
 import game.entities.mobs.player.Player;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class SetPlayerMessage extends TwoWayMessage {
@@ -45,7 +45,7 @@ public class SetPlayerMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

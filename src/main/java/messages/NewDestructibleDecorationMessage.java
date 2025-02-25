@@ -8,7 +8,7 @@ import game.entities.DecorationTemplates;
 import game.entities.DestructibleDecoration;
 import game.entities.factories.DecorationFactory;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class NewDestructibleDecorationMessage extends TwoWayMessage {
@@ -44,7 +44,7 @@ public class NewDestructibleDecorationMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

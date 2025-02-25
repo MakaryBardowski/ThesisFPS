@@ -9,11 +9,7 @@ import com.jme3.input.FlyByCamera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
-import lombok.Getter;
-import menu.MenuStateMachine;
 import networkingUtils.NetworkingInitialization;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main extends SimpleApplication {
     private static final String IDE_MODE = System.getenv("IDE_MODE");

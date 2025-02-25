@@ -2,7 +2,6 @@ package server;
 
 import com.jme3.app.Application;
 import com.jme3.network.serializing.Serializer;
-import com.jme3.network.service.serializer.ServerSerializerRegistrationsService;
 import game.entities.mobs.Mob;
 import game.map.blocks.Map;
 import lombok.Setter;
@@ -36,7 +35,7 @@ import lombok.Getter;
 import messages.GrenadePosUpdateMessage;
 import messages.lobby.GameStartedMessage;
 
-public class ServerMain extends AbstractAppState implements ConnectionListener {
+public class ServerGameAppState extends AbstractAppState {
     private static final String SERVER_CLOSE_MESSAGE = "Host player has quit the game.";
 
     public static final byte MAX_PLAYERS = 4;
@@ -50,7 +49,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
 
     @Getter
     @Setter
-    private static ServerMain instance;
+    private static ServerGameAppState instance;
 
     @Getter
     private final int TICKS_PER_SECOND = 64;
@@ -77,7 +76,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     @Getter
     private final ServerGameManager currentGamemode;
 
-    public ServerMain(AssetManager assetManager, RenderManager renderManager) {
+    public ServerGameAppState(AssetManager assetManager, RenderManager renderManager) {
 
         instance = this;
         currentGamemode = new ServerStoryGameManager();
@@ -153,14 +152,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
         serverPaused = false;
     }
 
-    @Override
-    public void connectionAdded(Server server, HostedConnection hc) {
 
-    }
-
-    @Override
-    public void connectionRemoved(Server server, HostedConnection hc) {
-    }
 
     private void startServer() {
         try {
@@ -169,11 +161,11 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
             NetworkingInitialization.initializeSerializables();
 
             server = Network.createServer(NetworkingInitialization.PORT);
-            server.addConnectionListener(this);
+            server.addConnectionListener(new ServerConnectionListener());
             server.addMessageListener(new ServerMessageListener(this));
             server.start();
         } catch (IOException ex) {
-            Logger.getLogger(ServerMain.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerGameAppState.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -216,13 +208,13 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     public void stateDetached(AppStateManager stateManager) {
         super.stateDetached(stateManager);
 
-        var server = ServerMain.getInstance().getServer();
+        var server = ServerGameAppState.getInstance().getServer();
         server.getConnections().forEach(hc -> hc.close(SERVER_CLOSE_MESSAGE));
 
 //        ServerSerializerRegistrationsService ssr = server.getServices().getService( ServerSerializerRegistrationsService.class );
 //        server.getServices().removeService(ssr);
         server.close();
         currentGamemode.getLevelManager().cleanup();
-        ServerMain.setInstance(null);
+        ServerGameAppState.setInstance(null);
     }
 }

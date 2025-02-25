@@ -2,11 +2,8 @@ package statusEffects.onDamagedEffects;
 
 import com.jme3.network.AbstractMessage;
 import data.DamageReceiveData;
-import game.entities.Destructible;
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
 import statusEffects.EffectProcType;
-import statusEffects.onHitEffects.OnHitEffect;
 
 public class HardnessCardEffect extends OnDamagedEffect {
     private static final float FLAT_DAMAGE_BLOCK = 1f;

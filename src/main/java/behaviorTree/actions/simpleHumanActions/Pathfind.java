@@ -15,12 +15,12 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pathfinding.AStar;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class Pathfind extends NodeAction{
         private final Random random = new Random();
     
-        private static final int BLOCK_SIZE = ServerMain.getInstance().getBLOCK_SIZE();
+        private static final int BLOCK_SIZE = ServerGameAppState.getInstance().getBLOCK_SIZE();
 
         @Override
         public NodeCompletionStatus execute(Context context) {
@@ -49,7 +49,7 @@ public class Pathfind extends NodeAction{
                 return setRandomDestinationFromCellCenter(path);
             };
 
-            Future pf = ServerMain.pathfindingExecutor.submit(c);
+            Future pf = ServerGameAppState.pathfindingExecutor.submit(c);
 //            Future pf = Main.getInstance().enqueue(c);
 
             context.setPathfindingFuture(pf);
@@ -63,7 +63,7 @@ public class Pathfind extends NodeAction{
                 var path = AStar.findPath(mobPos, pathfindPos);
                 return path;
             };
-            Future pf = ServerMain.pathfindingExecutor.submit(c);
+            Future pf = ServerGameAppState.pathfindingExecutor.submit(c);
 //            Future pf = Main.getInstance().enqueue(c);
 
             context.setPathfindingFuture(pf);

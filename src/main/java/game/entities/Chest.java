@@ -19,8 +19,8 @@ import game.map.collision.WorldGrid;
 import lombok.Getter;
 import messages.DestructibleDamageReceiveMessage;
 import messages.NewChestMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class Chest extends StatusEffectContainer {
     @Getter
@@ -89,9 +89,9 @@ public class Chest extends StatusEffectContainer {
             onDamageReceivedEffect.applyClient(damageData);
         }
 
-        health = health - damageData.getRawDamage();
+        setHealth(getHealth()-damageData.getRawDamage());
 
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             die();
             destroyClient();
             onDeathClient();
@@ -104,9 +104,9 @@ public class Chest extends StatusEffectContainer {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health = health - damageData.getRawDamage();
+        setHealth(getHealth()-damageData.getRawDamage());
 
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             destroyServer();
             onDeathServer();
         }
@@ -155,7 +155,7 @@ public class Chest extends StatusEffectContainer {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         ClientGameAppState.getInstance().getGrid().remove(this);
         node.setLocalTranslation(newPos);
         ClientGameAppState.getInstance().getGrid().insert(this);
@@ -163,14 +163,14 @@ public class Chest extends StatusEffectContainer {
 
     @Override
     public void setPositionServer(Vector3f newPos) {
-        WorldGrid grid = ServerMain.getInstance().getGrid();
+        WorldGrid grid = ServerGameAppState.getInstance().getGrid();
         grid.remove(this);
         node.setLocalTranslation(newPos);
         grid.insert(this);
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -198,7 +198,7 @@ public class Chest extends StatusEffectContainer {
 
     @Override
     public void destroyServer() {
-        var server = ServerMain.getInstance();
+        var server = ServerGameAppState.getInstance();
         server.getGrid().remove(this);
         if (node.getParent() != null) {
             Main.getInstance().enqueue(() -> {

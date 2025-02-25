@@ -1,12 +1,12 @@
 package cards;
 
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectTemplates;
 
-public class GoodLuckProtection extends AugmentCardTemplate {
+public class GoodLuckProtectionCard extends AugmentCardTemplate {
 
-    public GoodLuckProtection() {
+    public GoodLuckProtectionCard() {
         super(3,"Good Luck\nProtection", "All damage you deal has \na random multiplier of \n\\#FF0000#85\\#FFFFFF#%-\\#FF0000#120\\#FFFFFF#%.","Textures/GUI/Cards/cutdown.png");
     }
 
@@ -17,7 +17,7 @@ public class GoodLuckProtection extends AugmentCardTemplate {
 
     @Override
     public void chooseCardServer(StatusEffectContainer statusEffectContainer) {
-        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.GOOD_LUCK_PROTECTION,statusEffectContainer);
+        var effect = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.GOOD_LUCK_PROTECTION,statusEffectContainer);
         statusEffectContainer.addEffect(effect);
     }
 }

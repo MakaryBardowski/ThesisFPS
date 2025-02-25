@@ -4,7 +4,7 @@ import com.jme3.math.Vector3f;
 import data.DamageReceiveData;
 import events.DamageReceivedEvent;
 import events.GameEvent;
-import game.AttachedEntity;
+import game.entities.AttachedEntity;
 import game.entities.Destructible;
 import java.util.List;
 import java.util.Random;
@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import game.entities.mobs.MudBeetle;
 import lombok.Getter;
 import lombok.Setter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class MudBeetleContext extends Context {
 
@@ -188,7 +188,7 @@ public class MudBeetleContext extends Context {
     }
 
     public void handleDamageReceivedEvent(DamageReceivedEvent dre) {
-        var attacker = ServerMain.getInstance().getLevelManagerMobs().get(dre.getDamageData().getAttackerId());
+        var attacker = ServerGameAppState.getInstance().getLevelManagerMobs().get(dre.getDamageData().getAttackerId());
         if (!(attacker instanceof Destructible destructibleTarget)) {
             return;
         }

@@ -13,7 +13,7 @@ public class WorldGrid {
 
     public WorldGrid(int mapSize, int blockSize, int cellSize) {
         this.cellSize = cellSize;
-        contents = new ConcurrentHashMap();
+        contents = new ConcurrentHashMap<>();
 
         int cellNum = (int) Math.ceil((float) mapSize / (float) cellSize) * blockSize;
         for (int x = 0; x < cellNum; x++) {

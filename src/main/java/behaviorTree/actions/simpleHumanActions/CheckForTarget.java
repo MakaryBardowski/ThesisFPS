@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class CheckForTarget extends NodeAction {
 
@@ -56,7 +56,7 @@ public class CheckForTarget extends NodeAction {
             targetsHeard.clear();
         }
 
-        var mobsClose = ServerMain.getInstance().getGrid().getNearbyInRadius(human.getNode().getWorldTranslation(), TEST_SIGHT_RANGE);
+        var mobsClose = ServerGameAppState.getInstance().getGrid().getNearbyInRadius(human.getNode().getWorldTranslation(), TEST_SIGHT_RANGE);
         for (var mob : mobsClose) {
             if (mob instanceof Destructible d && (mob instanceof MudBeetle || mob instanceof Player)) {
                 if ((humanSeesMob(human, d))) {

@@ -10,16 +10,16 @@ import lombok.Setter;
 @Setter
 public abstract class Destructible extends Collidable {
 
-    protected static final int HEALTH_ATTRIBUTE = 0;
-    protected static final int MAX_HEALTH_ATTRIBUTE = 1;
+    public static final int HEALTH_ATTRIBUTE = 0;
+    public static final int MAX_HEALTH_ATTRIBUTE = 1;
 
-    protected float health = 12;
-    protected float maxHealth = 12;
+    protected float initialHealth = 12;
+    protected float initialMaximumHealth = 12;
 
     public Destructible(int id, String name, Node node) {
         super(id, name, node);
-        attributes.put(HEALTH_ATTRIBUTE, new FloatAttribute(health));
-        attributes.put(MAX_HEALTH_ATTRIBUTE, new FloatAttribute(maxHealth));
+        setHealth(initialHealth);
+        setMaxHealth(initialHealth);
     }
 
     public abstract void onAttacked(Mob shooter, DamageReceiveData damage);
@@ -34,7 +34,7 @@ public abstract class Destructible extends Collidable {
     public abstract void notifyServerAboutReceivingDamage(DamageReceiveData damageReceiveData);
 
     public void receiveHealClient(float heal) {
-        health += heal;
+        setHealth(getHealth()+heal);
     }
 
     public abstract void die();
@@ -42,4 +42,21 @@ public abstract class Destructible extends Collidable {
     public abstract float getArmorValue();
 
     public abstract float calculateDamage(float damage);
+
+    public float getMaxHealth(){
+        return ((FloatAttribute)attributes.get(MAX_HEALTH_ATTRIBUTE)).getValue();
+    }
+
+    public void setMaxHealth(float value){
+        attributes.put(MAX_HEALTH_ATTRIBUTE,new FloatAttribute(value));
+    }
+
+    public float getHealth(){
+        return ((FloatAttribute)attributes.get(HEALTH_ATTRIBUTE)).getValue();
+    }
+
+    public void setHealth(float value){
+        attributes.put(HEALTH_ATTRIBUTE,new FloatAttribute(value));
+    }
+
 }

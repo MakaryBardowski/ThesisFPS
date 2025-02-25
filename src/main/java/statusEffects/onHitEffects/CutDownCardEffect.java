@@ -4,7 +4,7 @@ import com.jme3.network.AbstractMessage;
 import data.DamageReceiveData;
 import game.entities.Destructible;
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
 
 public class CutDownCardEffect extends OnHitEffect{
@@ -16,10 +16,12 @@ public class CutDownCardEffect extends OnHitEffect{
 
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
-        var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
+        var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
+        var attacker = (Destructible) serverLevelManager.getMobs().get(input.getAttackerId());
+
         var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
 
-        if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= victim.getMaxHealth()*EXECUTE_THRESHOLD){
+        if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= attacker.getMaxHealth()*EXECUTE_THRESHOLD){
             input.setRawDamage(victim.getMaxHealth()*99);
         }
         return input;

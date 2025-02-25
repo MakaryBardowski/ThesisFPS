@@ -4,7 +4,7 @@ import behaviorTree.NodeAction;
 import behaviorTree.NodeCompletionStatus;
 import behaviorTree.context.Context;
 import behaviorTree.context.MudBeetleContext;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import java.util.Random;
 
@@ -18,7 +18,7 @@ public class ShouldLookIntoRandomDirection extends NodeAction {
     @Override
     public NodeCompletionStatus execute(Context context) {
         var hc = (MudBeetleContext) context;
-        hc.setLookInRandomDirectionTimer(hc.getLookInRandomDirectionTimer() - ServerMain.getTimePerFrame());
+        hc.setLookInRandomDirectionTimer(hc.getLookInRandomDirectionTimer() - ServerGameAppState.getTimePerFrame());
         if (hc.getCurrentPath() == null && hc.getCurrentTarget() == null && hc.getLookInRandomDirectionTimer() <= 0) {
             return SUCCESS;
         }

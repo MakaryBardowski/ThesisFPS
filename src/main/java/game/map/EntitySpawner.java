@@ -1,15 +1,11 @@
 package game.map;
 
 import LevelLoadSystem.entitySpawnData.EntitySpawnData;
-import Utils.GridUtils;
-import com.jme3.math.Vector3f;
-import game.entities.factories.MobSpawnType;
-import game.entities.mobs.HumanMob;
 
 import java.util.List;
 import java.util.Random;
 
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class EntitySpawner {
 
@@ -24,7 +20,7 @@ public class EntitySpawner {
 
     public void spawnNewLevelEntities(List<EntitySpawnData> entitySpawnData){
         for(var entitySpawnInfo : entitySpawnData){
-            var server = ServerMain.getInstance();
+            var server = ServerGameAppState.getInstance();
             var serverLevelManager = server.getCurrentGamemode().getLevelManager();
             entitySpawnInfo.getPosition().multLocal(blockSize);
             serverLevelManager.broadcastEntityOnNextLevel(entitySpawnInfo.serverSpawn(serverLevelManager));

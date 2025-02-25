@@ -4,7 +4,7 @@ import com.jme3.network.AbstractMessage;
 import data.DamageReceiveData;
 import game.entities.Destructible;
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
 
 import java.util.Random;
@@ -20,7 +20,7 @@ public class GoodLuckProtectionCardEffect extends OnHitEffect{
 
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
-        var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
+        var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
         var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
 
         input.setRawDamage(input.getRawDamage()*random.nextFloat(MIN_MULTIPLIER,MAX_MULTIPLIER));

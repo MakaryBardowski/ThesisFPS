@@ -20,8 +20,8 @@ import game.map.collision.RectangleAABB;
 import lombok.Getter;
 import messages.DestructibleDamageReceiveMessage;
 import messages.NewMobMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class TrainingDummy extends Mob {
 
@@ -33,9 +33,8 @@ public class TrainingDummy extends Mob {
     public TrainingDummy(int id, Node node, String name) {
         super(MobSpawnType.TRAINING_DUMMY, id, node, name);
         
-        maxHealth = 100;
-        health = 100;
-
+        setHealth(100);
+        setMaxHealth(100);
         cachedSpeed = 6;
         attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
 
@@ -100,7 +99,7 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         setServerLocation(newPos);
         setPosInterpolationValue(1.f);
         WorldGrid grid = ClientGameAppState.getInstance().getGrid();
@@ -111,7 +110,7 @@ public class TrainingDummy extends Mob {
 
     @Override
     public void setPositionServer(Vector3f newPos) {
-        WorldGrid grid = ServerMain.getInstance().getGrid();
+        WorldGrid grid = ServerGameAppState.getInstance().getGrid();
         grid.remove(this);
         node.setLocalTranslation(newPos);
         grid.insert(this);
@@ -130,10 +129,10 @@ public class TrainingDummy extends Mob {
         for(var onDamageReceivedEffect : onDamageReceivedEffects){
             onDamageReceivedEffect.applyClient(damageData);
         }
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
 
-        health -= calculateDamage(damageData.getRawDamage());
-        if (health <= 0) {
-            health = 1;
+        if (getHealth() <= 0) {
+            setHealth(1);
         }
     }
     
@@ -143,9 +142,10 @@ public class TrainingDummy extends Mob {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
-        if (health <= 0) {
-            health = 1;
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
+
+        if (getHealth() <= 0) {
+            setHealth(1);
         }
     }
 
@@ -166,11 +166,6 @@ public class TrainingDummy extends Mob {
     @Override
     public float calculateDamage(float damage) {
         return damage > 0 ? damage : 0;
-    }
-
-    @Override
-    public void onCollision() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
@@ -206,7 +201,7 @@ public class TrainingDummy extends Mob {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -219,7 +214,7 @@ public class TrainingDummy extends Mob {
     @Override
     public void destroyServer() {
         removeEntityByIdServer(id);
-        var server = ServerMain.getInstance();
+        var server = ServerGameAppState.getInstance();
         server.getGrid().remove(this);
         if (node.getParent() != null) {
             Main.getInstance().enqueue(() -> {

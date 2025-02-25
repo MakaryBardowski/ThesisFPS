@@ -9,7 +9,7 @@ import game.entities.factories.MobSpawnType;
 import game.entities.mobs.Mob;
 import game.map.blocks.VoxelLighting;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class NewMobMessage extends TwoWayMessage {
@@ -42,7 +42,7 @@ public class NewMobMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

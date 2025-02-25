@@ -4,7 +4,7 @@ import data.jumpToLevelData.BaseJumpToLevelData;
 
 public class ServerStoryGameManager extends ServerGameManager {
 
-    private static final int LEVEL_COUNT = 7;
+    private static final int LEVEL_COUNT = 13;
 
     public ServerStoryGameManager() {
         gamemodeId = 1;
@@ -20,7 +20,7 @@ public class ServerStoryGameManager extends ServerGameManager {
     public void updateMainLoop(float tpf) {}
 
     private void setupLevelManager() {
-        levelManager = new ServerLevelManager(LEVEL_COUNT, ServerMain.getInstance().getServer());
+        levelManager = new ServerLevelManager(LEVEL_COUNT, ServerGameAppState.getInstance().getServer());
         levelManager.setupLevelSeeds();
     }
 

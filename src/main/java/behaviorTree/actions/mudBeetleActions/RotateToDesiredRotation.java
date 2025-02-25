@@ -7,7 +7,7 @@ import behaviorTree.context.MudBeetleContext;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import static behaviorTree.NodeCompletionStatus.SUCCESS;
 
@@ -34,7 +34,7 @@ public class RotateToDesiredRotation extends NodeAction{
                 if (dotProduct < 0.999f) { // 2.5 degrees difference
 
                     float angleDiff = FastMath.acos(dotProduct);
-                    float rotationStep = Math.min(rotationSpeedPerSecond * ServerMain.getTimePerFrame(), angleDiff);
+                    float rotationStep = Math.min(rotationSpeedPerSecond * ServerGameAppState.getTimePerFrame(), angleDiff);
                     rotationAxis = currentDir.cross(desiredDir).normalize();
                     stepRotation = new Quaternion().fromAngleAxis(rotationStep, rotationAxis);
 

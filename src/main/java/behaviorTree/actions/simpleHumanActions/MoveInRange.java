@@ -9,7 +9,7 @@ import client.Main;
 import com.jme3.math.Vector3f;
 import game.entities.Destructible;
 import game.entities.mobs.HumanMob;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class MoveInRange extends NodeAction {
 
@@ -32,7 +32,7 @@ public class MoveInRange extends NodeAction {
         target = hc.getCurrentTarget();
         direction = target.getNode().getWorldTranslation()
                 .subtract(human.getNode().getWorldTranslation());
-        var moveDistance = human.getCachedSpeed() * ServerMain.getTimePerFrame();
+        var moveDistance = human.getCachedSpeed() * ServerGameAppState.getTimePerFrame();
 
         if (moveDistance > direction.length() - TEST_WEAPON_RANGE) {
             moveDistance = direction.length() - TEST_WEAPON_RANGE;

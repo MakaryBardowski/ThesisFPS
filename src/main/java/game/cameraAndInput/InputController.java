@@ -1,7 +1,7 @@
 package game.cameraAndInput;
 
 import com.jme3.math.*;
-import game.AttachedEntity;
+import game.entities.AttachedEntity;
 import game.entities.mobs.player.Player;
 import client.appStates.ClientGameAppState;
 import client.Main;
@@ -26,7 +26,7 @@ import game.items.weapons.RangedWeapon;
 import menu.states.InventoryMenuState;
 import menu.states.PauseMenuState;
 import messages.MobRotUpdateMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class InputController {
     private float MAX_VERTICAL_ROTATION_DEG = 80;
@@ -171,8 +171,8 @@ public class InputController {
 //                }
                 if (name.equals("K") && !keyPressed) {
 //                    GlobalSettings.isAiDebug = !GlobalSettings.isAiDebug;
-                    if(ServerMain.getInstance() != null) {
-                        ServerMain.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
+                    if(ServerGameAppState.getInstance() != null) {
+                        ServerGameAppState.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
                     }
 
                     System.gc();

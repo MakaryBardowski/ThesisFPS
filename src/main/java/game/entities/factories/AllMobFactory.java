@@ -1,5 +1,6 @@
 package game.entities.factories;
 
+import data.ChanceEntry;
 import game.entities.mobs.Mob;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.SkinningControl;
@@ -19,20 +20,21 @@ import game.items.armor.Helmet;
 import game.items.armor.Vest;
 import game.items.weapons.Knife;
 import generators.PercentageRandomGenerator;
-import java.util.HashMap;
-import java.util.Map;
-import server.ServerMain;
-import statusEffects.EffectFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import server.ServerGameAppState;
 import statusEffects.EffectTemplates;
 
 import static game.entities.factories.MobSpawnType.*;
 
 public class AllMobFactory extends MobFactory {
 
-    private static final Map<Float, ItemTemplate> helmetsByChance = new HashMap<>();
-    private static final Map<Float, ItemTemplate> vestsByChance = new HashMap<>();
-    private static final Map<Float, ItemTemplate> bootsByChance = new HashMap<>();
-    private static final Map<Float, ItemTemplate> weaponsByChance = new HashMap<>();
+    private static final List<ChanceEntry<ItemTemplate>> helmetsByChance = new ArrayList<>();
+    private static final List<ChanceEntry<ItemTemplates.ItemTemplate>> vestsByChance = new ArrayList<>();
+    private static final List<ChanceEntry<ItemTemplates.ItemTemplate>> bootsByChance = new ArrayList<>();
+    private static final List<ChanceEntry<ItemTemplates.ItemTemplate>> weaponsByChance = new ArrayList<>();
     
     private static final PercentageRandomGenerator<ItemTemplate> helmetGenerator;
     private static final PercentageRandomGenerator<ItemTemplate> vestGenerator;
@@ -40,20 +42,20 @@ public class AllMobFactory extends MobFactory {
     private static final PercentageRandomGenerator<ItemTemplate> weaponGenerator;
 
     static {
-        helmetsByChance.put(3f, ItemTemplates.GAS_MASK);
-        helmetsByChance.put(17f, ItemTemplates.TRENCH_HELMET);
-        helmetsByChance.put(80f, null);
+        helmetsByChance.add(new ChanceEntry<>(3f, ItemTemplates.GAS_MASK));
+        helmetsByChance.add(new ChanceEntry<>(17f, ItemTemplates.TRENCH_HELMET));
+        helmetsByChance.add(new ChanceEntry<>(80f, null));
 
-        vestsByChance.put(5f, ItemTemplates.VEST_TRENCH);
-        vestsByChance.put(95f, null);
+        vestsByChance.add(new ChanceEntry<>(5f, ItemTemplates.VEST_TRENCH));
+        vestsByChance.add(new ChanceEntry<>(95f, null));
 
-        bootsByChance.put(10f, ItemTemplates.BOOTS_TRENCH);
-        bootsByChance.put(90f, null);
+        bootsByChance.add(new ChanceEntry<>(10f, ItemTemplates.BOOTS_TRENCH));
+        bootsByChance.add(new ChanceEntry<>(90f, null));
 
-        weaponsByChance.put(1f, ItemTemplates.LMG_HOTCHKISS);
-        weaponsByChance.put(75f, ItemTemplates.KNIFE);
-        weaponsByChance.put(9f, ItemTemplates.AXE);
-        weaponsByChance.put(15f, ItemTemplates.PISTOL_C96);
+        weaponsByChance.add(new ChanceEntry<>(1f, ItemTemplates.LMG_HOTCHKISS));
+        weaponsByChance.add(new ChanceEntry<>(75f, ItemTemplates.KNIFE));
+        weaponsByChance.add(new ChanceEntry<>(9f, ItemTemplates.AXE));
+        weaponsByChance.add(new ChanceEntry<>(15f, ItemTemplates.PISTOL_C96));
         
         helmetGenerator = new PercentageRandomGenerator<>(helmetsByChance);
         vestGenerator = new PercentageRandomGenerator<>(vestsByChance);
@@ -75,7 +77,7 @@ public class AllMobFactory extends MobFactory {
         if (spawnType == MUD_BEETLE) {
             MudBeetle p = createMudBeetle();
             return p;
-        } else if (spawnType == HUMAN) {
+        } else if (spawnType == SOLDIER) {
             HumanMob p = createHumanMob(spawnType,"Soldier "+id);
             return p;
         } else if (spawnType == RED_HAND_1) {
@@ -95,11 +97,11 @@ public class AllMobFactory extends MobFactory {
             DestructibleUtils.attachDestructibleToNode(p, mobsNode, new Vector3f(10, 4, 10));
             p.addAi();
             return p;
-        } else if (spawnType == HUMAN) {
+        } else if (spawnType == SOLDIER) {
             HumanMob p = createHumanMob(spawnType,"Soldier "+id);
             DestructibleUtils.attachDestructibleToNode(p, mobsNode, new Vector3f(10, 4, 10));
 
-            var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
+            var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
             Helmet defaultHead = (Helmet) serverLevelManager.registerItemLocal(ItemTemplates.HEAD_1, false);
             Vest defaultVest = (Vest) serverLevelManager.registerItemLocal(ItemTemplates.TORSO_1, false);
             Gloves defaultGloves = (Gloves) serverLevelManager.registerItemLocal(ItemTemplates.HAND_1, false);
@@ -159,10 +161,10 @@ public class AllMobFactory extends MobFactory {
             HumanMob p = createHumanMob(spawnType,"Emissary "+id);
             p.setMaxHealth(40);
             p.setHealth(40);
-            p.setCachedSpeed(10.25f);
+            p.setCachedSpeed(8.75f);
             DestructibleUtils.attachDestructibleToNode(p, mobsNode, new Vector3f(10, 4, 10));
 
-            var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
+            var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
             Helmet defaultHead = (Helmet) serverLevelManager.registerItemLocal(ItemTemplates.HEAD_1, false);
             Vest defaultVest = (Vest) serverLevelManager.registerItemLocal(ItemTemplates.TORSO_1, false);
             Gloves defaultGloves = (Gloves) serverLevelManager.registerItemLocal(ItemTemplates.HAND_1, false);
@@ -222,7 +224,7 @@ public class AllMobFactory extends MobFactory {
 
     private MudBeetle createMudBeetle() {
         Node playerNode = loadBeetleModel();
-        String name = "Mud Beetle " + id;
+        String name = "Beetle " + id;
         SkinningControl skinningControl = getSkinningControl(playerNode);
         AnimComposer composer = getAnimComposer(playerNode);
 //        System.out.println("[AnimalMobFactory] create mud beetle id " + id);

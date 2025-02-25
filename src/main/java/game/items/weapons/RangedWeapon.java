@@ -49,8 +49,8 @@ public abstract class RangedWeapon extends Weapon {
     }
 
     @Override
-    public void attributeChangedNotification(int attributeId, Attribute copyOfNewAttribute) {
-        super.attributeChangedNotification(attributeId, copyOfNewAttribute); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    public void attributeChangedNotification(int attributeId, Attribute oldAttributeCopy, Attribute copyOfNewAttribute) {
+        super.attributeChangedNotification(attributeId,oldAttributeCopy, copyOfNewAttribute); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         if (attributeId == AMMO_ATTRIBUTE || attributeId == MAX_AMMO_ATTRIBUTE) {
             String text = (int) getAmmo() + "/" + (int) getMaxAmmo();
             ClientGameAppState.getInstance().getNifty().getCurrentScreen().findControl("ammo", LabelControl.class).setText(text);

@@ -31,8 +31,8 @@ import game.map.collision.WorldGrid;
 import lombok.Getter;
 import lombok.Setter;
 import messages.PlayerPosUpdateRequest;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class Player extends HumanMob {
     private static boolean isPlayerControlsEnabled = true;
@@ -120,21 +120,21 @@ public class Player extends HumanMob {
     }
 
     public Player(int id, Node node, String name, Camera mainCamera, SkinningControl skinningControl, AnimComposer composer, PlayerClass playerClass) {
-        super(MobSpawnType.HUMAN, id, node, name, skinningControl, composer);
+        super(MobSpawnType.SOLDIER, id, node, name, skinningControl, composer);
         this.playerClass = playerClass;
         this.mainCamera = mainCamera;
         firstPersonHands = new FirstPersonHands(this);
         hotbar = new Hotbar(new Item[HOTBAR_SIZE]);
 
         if (playerClass instanceof AssaultClass) {
-            health = 25;
-            maxHealth = 25;
+            setHealth(25);
+            setMaxHealth(25);
         } else if (playerClass instanceof MedicClass) {
-            health = 20;
-            maxHealth = 20;
+            setHealth(20);
+            setMaxHealth(20);
         } else {
-            health = 35;
-            maxHealth = 35;
+            setHealth(35);
+            setMaxHealth(35);
         }
 
         cachedSpeed = 11.25f;
@@ -202,7 +202,7 @@ public class Player extends HumanMob {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         var cm = ClientGameAppState.getInstance();
 
         if ((forward || backward || left || right) && !isMovementControlLocked()) {
@@ -220,7 +220,7 @@ public class Player extends HumanMob {
             }
             if (backward) {
 
-                Vector3f moveVec = getNode().getLocalRotation().getRotationColumn(2).mult(cachedSpeed * tpf).clone().negateLocal();
+                Vector3f moveVec = getNode().getLocalRotation().getRotationColumn(2).mult(0.5f*cachedSpeed * tpf).clone().negateLocal();
                 movementVector.addLocal(moveVec);
 
             }
@@ -237,11 +237,11 @@ public class Player extends HumanMob {
 
             movementVector.setY(0);
 
-            if (wouldNotCollideWithSolidEntitiesAfterMove(new Vector3f(0, 0, movementVector.getZ()))) {
+            if (wouldNotCollideWithSolidEntitiesAfterMoveClient(new Vector3f(0, 0, movementVector.getZ()))) {
                 node.move(0, 0, movementVector.getZ());
             }
 
-            if (wouldNotCollideWithSolidEntitiesAfterMove(new Vector3f(movementVector.getX(), 0, 0))) {
+            if (wouldNotCollideWithSolidEntitiesAfterMoveClient(new Vector3f(movementVector.getX(), 0, 0))) {
                 node.move(movementVector.getX(), 0, 0);
             }
 //            if (node.getWorldTranslation().distance(serverLocation) > cachedSpeed * tpf) {
@@ -306,9 +306,17 @@ public class Player extends HumanMob {
     }
 
     @Override
-    public void attributeChangedNotification(int attributeId, Attribute copy) {
+    public void attributeChangedNotification(int attributeId, Attribute oldAttributeCopy, Attribute copyOfNewAttribute) {
+        super.attributeChangedNotification(attributeId, oldAttributeCopy, copyOfNewAttribute);
         if (attributeId == SPEED_ATTRIBUTE) {
-            cachedSpeed = ((FloatAttribute) copy).getValue();
+            cachedSpeed = ((FloatAttribute) copyOfNewAttribute).getValue();
+        } else if(attributeId == MAX_HEALTH_ATTRIBUTE){
+            if (playerHealthbar != null) {
+                float normalizedPercentHealth = getHealth() / getMaxHealth();
+                float maxHealthChangePercent = ((FloatAttribute)oldAttributeCopy).getValue()/((FloatAttribute)copyOfNewAttribute).getValue();
+                playerHealthbar.setHealthbarParams(normalizedPercentHealth, 0);
+                playerHealthbar.getNormalizedHealthPercentAndChange().setY(playerHealthbar.getNormalizedHealthPercentAndChange().getY()*maxHealthChangePercent);
+            }
         }
     }
 
@@ -317,7 +325,7 @@ public class Player extends HumanMob {
         /* cant leak player into grid because it removes the player from mob list immediately, and re-insert on move checks if the mobs still is in hashmap
         and the mob hashmap is thread safe */
         removeEntityByIdServer(id);
-        var server = ServerMain.getInstance();
+        var server = ServerGameAppState.getInstance();
         server.getGrid().remove(this);
         if (node.getParent() != null) {
             Main.getInstance().enqueue(() -> {

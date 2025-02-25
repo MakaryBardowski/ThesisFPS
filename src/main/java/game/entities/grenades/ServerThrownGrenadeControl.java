@@ -11,7 +11,7 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
 import static game.map.collision.MovementCollisionUtils.calculateNewPosInLogicMap;
 import java.io.IOException;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class ServerThrownGrenadeControl extends AbstractControl implements Savable, Cloneable {
 
@@ -65,11 +65,11 @@ public class ServerThrownGrenadeControl extends AbstractControl implements Savab
         moveVec.addLocal(dragForce);
         moveVec.subtractLocal(0, gravity * tpf, 0);
 
-        var posInMapNow = calculateNewPosInLogicMap(spatial, new Vector3f(), ServerMain.getInstance().getBLOCK_SIZE());
-        var posInMapAfterMove = calculateNewPosInLogicMap(spatial, moveVec, ServerMain.getInstance().getBLOCK_SIZE());
+        var posInMapNow = calculateNewPosInLogicMap(spatial, new Vector3f(), ServerGameAppState.getInstance().getBLOCK_SIZE());
+        var posInMapAfterMove = calculateNewPosInLogicMap(spatial, moveVec, ServerGameAppState.getInstance().getBLOCK_SIZE());
 
 
-        if (ServerMain.getInstance().getMap().isPositionNotEmpty((int) posInMapNow.getX(),(int) posInMapAfterMove.getY(),(int) posInMapNow.getZ()) && bounces <= maxBounces) {
+        if (ServerGameAppState.getInstance().getMap().isPositionNotEmpty((int) posInMapNow.getX(),(int) posInMapAfterMove.getY(),(int) posInMapNow.getZ()) && bounces <= maxBounces) {
             moveVec.setY(-moveVec.getY() * BOUNCE_ELASTICITY);
             bounces++;
         }

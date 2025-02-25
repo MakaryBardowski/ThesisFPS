@@ -3,13 +3,12 @@ package client;
 import client.appStates.ClientGameAppState;
 import client.appStates.LobbyTeamViewAppState;
 import client.appStates.MainMenuAppState;
-import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class MainMenuController implements ScreenController {
 
@@ -32,7 +31,7 @@ public class MainMenuController implements ScreenController {
         goToLobbyScreenHost();
 
         Main instance = Main.getInstance();
-        ServerMain sm = new ServerMain(instance.getAssetManager(), instance.getRenderManager());
+        ServerGameAppState sm = new ServerGameAppState(instance.getAssetManager(), instance.getRenderManager());
         instance.getStateManager().attach(sm);
 
         var clientGameState = new ClientGameAppState(Main.getInstance(), "localhost");
@@ -99,7 +98,7 @@ public class MainMenuController implements ScreenController {
     }
 
     public static void startGame() {
-        ServerMain.getInstance().startGame();
+        ServerGameAppState.getInstance().startGame();
     }
 
     public static void leaveLobby() {

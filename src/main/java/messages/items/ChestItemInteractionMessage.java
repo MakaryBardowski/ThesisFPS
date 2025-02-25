@@ -7,7 +7,7 @@ import game.entities.Chest;
 import game.items.Item;
 import lombok.Getter;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class ChestItemInteractionMessage extends TwoWayMessage {
@@ -30,7 +30,7 @@ public class ChestItemInteractionMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

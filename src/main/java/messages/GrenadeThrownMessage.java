@@ -19,8 +19,8 @@ import lombok.Getter;
 import lombok.Setter;
 import messages.items.MobItemInteractionMessage;
 import static messages.messageListeners.ServerMessageListener.enqueueExecutionServer;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 @Serializable
 public class GrenadeThrownMessage extends TwoWayMessage {
@@ -67,7 +67,7 @@ public class GrenadeThrownMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         System.out.println("got id "+id);
         int grenadeId = server.getAndIncreaseNextEntityId();
                 System.out.println("new grenade id "+grenadeId);
@@ -90,7 +90,7 @@ public class GrenadeThrownMessage extends TwoWayMessage {
             gnode.addControl(grenadeControl);
         });
 
-        ServerMain.removeItemFromMobEquipmentServer(throwingMobId, id);
+        ServerGameAppState.removeItemFromMobEquipmentServer(throwingMobId, id);
         removeEntityByIdServer(originGrenade.getId());
         server.getLevelManagerMobs().put(thrownGrenade.getId(), thrownGrenade);
 

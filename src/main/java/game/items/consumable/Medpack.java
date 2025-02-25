@@ -10,11 +10,10 @@ import game.entities.mobs.player.Player;
 import game.items.ItemTemplates;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewGrenadeMessage;
-import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import com.jme3.network.Filters;
 import messages.DestructibleHealReceiveMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class Medpack extends ThrowableWeapon {
 
@@ -139,7 +138,7 @@ public class Medpack extends ThrowableWeapon {
 
     @Override
     public void serverEquip(HumanMob m) {
-        var sm = ServerMain.getInstance();
+        var sm = ServerGameAppState.getInstance();
         var hc = sm.getHostsByPlayerId().get(m.getId());
         Filters.notEqualTo(hc);
 
@@ -150,7 +149,7 @@ public class Medpack extends ThrowableWeapon {
         msg.setReliable(true);
         sm.getServer().broadcast(msg);
 
-        ServerMain.removeItemFromMobEquipmentServer(m.getId(), id);
+        ServerGameAppState.removeItemFromMobEquipmentServer(m.getId(), id);
         removeEntityByIdServer(id);
 
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(id, m.getId(), MobItemInteractionMessage.ItemInteractionType.DESTROY);

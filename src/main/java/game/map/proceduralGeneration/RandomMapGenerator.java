@@ -10,18 +10,10 @@ import java.util.Random;
 import game.map.blocks.Map;
 import jme3utilities.math.Vector3i;
 
-public class RandomMapGenerator {
-
-    private final Random random;
-    private final int mapSizeX;
-    private final int mapSizeZ;
-    private final int mapSizeY;
+public class RandomMapGenerator extends MapGenerator{
 
     public RandomMapGenerator(long seed, int mapSizeX,int mapSizeY, int mapSizeZ) {
-        this.random = new Random(seed);
-        this.mapSizeX = mapSizeX;
-        this.mapSizeY = mapSizeY;
-        this.mapSizeZ = mapSizeZ;
+        super(seed,mapSizeX,mapSizeY,mapSizeZ);
     }
 
     public MapGenerationResult createRandomMap() {
@@ -116,8 +108,6 @@ public class RandomMapGenerator {
 
             int startZ = currentRoomConnectionPoint.z();
             int endZ = nextRoomConnectionPoint.z();
-            System.out.println("ABCDE connecting: [" + startX + "][" + startZ + "]");
-            System.out.println("to: [" + endX + "][" + endZ + "]");
 
             if (startX <= endX) {
                 for (int x = startX; x <= endX; x++) {

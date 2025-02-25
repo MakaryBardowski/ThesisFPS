@@ -9,7 +9,7 @@ import com.jme3.network.serializing.Serializable;
 import de.lessvoid.nifty.controls.Label;
 import lombok.Setter;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class HostJoinedLobbyMessage extends TwoWayMessage {
@@ -31,8 +31,8 @@ public class HostJoinedLobbyMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain serverMain,HostedConnection senderHc) {
-        var server = ServerMain.getInstance().getServer();
+    public void handleServer(ServerGameAppState serverGameAppState, HostedConnection senderHc) {
+        var server = ServerGameAppState.getInstance().getServer();
         var newHc = server.getConnection(connectionId);
         if (server.getConnections().size() >= 5) {
             newHc.close("Lobby is full.");

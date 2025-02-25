@@ -7,9 +7,8 @@ import game.map.collision.WorldGrid;
 import lombok.Getter;
 import lombok.Setter;
 import messages.DestructibleDamageReceiveMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
-import statusEffects.temporaryEffects.RepeatedTemporaryEffect;
 
 public class DamageOverTimeEffect extends RepeatedTemporaryEffect {
 
@@ -46,15 +45,15 @@ public class DamageOverTimeEffect extends RepeatedTemporaryEffect {
             target.setHealth(target.getHealth() - target.calculateDamage(damage));
 
             if (target.getHealth() <= 0) {
-                WorldGrid grid = ServerMain.getInstance().getGrid();
+                WorldGrid grid = ServerGameAppState.getInstance().getGrid();
                 grid.remove(target);
-                ServerMain.getInstance().getLevelManagerMobs().remove(target.getId());
+                ServerGameAppState.getInstance().getLevelManagerMobs().remove(target.getId());
 
             }
 
             DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(target.getId(),target.getId(), damage);
             hpUpd.setReliable(true);
-            ServerMain.getInstance().getServer().broadcast(hpUpd);
+            ServerGameAppState.getInstance().getServer().broadcast(hpUpd);
         }
 
         return null;

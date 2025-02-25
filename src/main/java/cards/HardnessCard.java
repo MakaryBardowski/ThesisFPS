@@ -1,7 +1,7 @@
 package cards;
 
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectTemplates;
 
 public class HardnessCard extends AugmentCardTemplate {
@@ -17,7 +17,7 @@ public class HardnessCard extends AugmentCardTemplate {
 
     @Override
     public void chooseCardServer(StatusEffectContainer statusEffectContainer) {
-        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.HARDNESS_CARD_ARMOR,statusEffectContainer);
+        var effect = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.HARDNESS_CARD_ARMOR,statusEffectContainer);
         statusEffectContainer.addEffect(effect);
     }
 }

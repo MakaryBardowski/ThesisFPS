@@ -15,8 +15,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import data.jumpToLevelData.BaseJumpToLevelData;
 import data.jumpToLevelData.ClientJumpToLevelData;
 import game.entities.Entity;
 import game.entities.factories.AllMobFactory;
@@ -76,7 +74,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
     private final int CHUNK_SIZE = 16;
 
     @Getter
-    private final int MAP_SIZE_XZ = 39;
+    private final int MAP_SIZE_XZ = 20;
 
     @Getter
     private final int MAP_SIZE_Y = 20;
@@ -156,7 +154,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
                 currentLevelIndex = levelIndex;
                 var clientLevelGenerator = new ClientLevelGenerator(newLevelSeed, newLevelType, BLOCK_SIZE, CHUNK_SIZE, mapNode);
 
-                if (newLevelType.equals(MapType.STATIC)) {
+                if (newLevelType.equals(MapType.FILE)) {
                     if (nextStaticMap != null) {
                         destroyCurrentLevel();
                         level = clientLevelGenerator.generateFromMap(nextStaticMap);
@@ -165,7 +163,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
                         for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
                             var entity =  getMobs().get(playerSpawnpointById.getKey());
                             if(entity instanceof Player player){
-                                player.setPosition(playerSpawnpointById.getValue());
+                                player.setPositionClient(playerSpawnpointById.getValue());
                             }
                         }
 
@@ -187,7 +185,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
                                 for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
                                     var entity =  getMobs().get(playerSpawnpointById.getKey());
                                     if(entity instanceof Player player){
-                                        player.setPosition(playerSpawnpointById.getValue());
+                                        player.setPositionClient(playerSpawnpointById.getValue());
                                     }
                                 }
                             });
@@ -204,7 +202,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
                 for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
                     var entity =  getMobs().get(playerSpawnpointById.getKey());
                     if(entity instanceof Player player){
-                        player.setPosition(playerSpawnpointById.getValue());
+                        player.setPositionClient(playerSpawnpointById.getValue());
                     }
                 }
             } catch (IOException e){
@@ -228,7 +226,7 @@ public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
             if(player.getPlayerHealthbar() != null){
                 player.getPlayerHealthbar().updateHealthbar(tpf);
             }
-            player.move(tpf);
+            player.moveClient(tpf);
             player.updateTemporaryEffectsClient();
             if (player.isHoldsTrigger() && player.getEquippedRightHand() != null) {
                 player.getEquippedRightHand().playerUseInRightHand(player);

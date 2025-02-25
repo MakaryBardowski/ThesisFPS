@@ -4,6 +4,7 @@ import client.appStates.ClientGameAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import game.map.blocks.Map;
+import game.map.proceduralGeneration.BspMapGenerator;
 import game.map.proceduralGeneration.RandomMapGenerator;
 
 import java.io.IOException;
@@ -27,12 +28,19 @@ public class ClientLevelGenerator {
 
     public Level generateLevel(int generatedMapSizeX, int generatedMapSizeY, int generatedMapSizeZ) throws IOException {
         switch (mapType) {
-            case STATIC: {
+            case FILE: {
                 return null;
             }
-            case CASUAL: {
+            case NAIVE: {
                 var mapGenResult =  new RandomMapGenerator(levelSeed, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ).createRandomMap();
                 return new Level(blockSize, chunkSize, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ, mapGenResult.getMap(), assetManager, mapNode);
+            }
+            case BSP: {
+                var mapGenResult =  new BspMapGenerator(levelSeed, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ).createRandomMap();
+                return new Level(blockSize, chunkSize, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ, mapGenResult.getMap(), assetManager, mapNode);
+            }
+            case CELLULAR_AUTOMATA: {
+                return null;
             }
             default: {
                 return null;

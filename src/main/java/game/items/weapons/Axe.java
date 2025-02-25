@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import messages.AnimationPlayedMessage;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewMeleeWeaponMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class Axe extends MeleeWeapon {
 
@@ -271,7 +271,7 @@ public class Axe extends MeleeWeapon {
     @Override
     public void attack(Mob m) {
         var apm = new AnimationPlayedMessage(m.getId(), HUMAN_ATTACK_MELEE);
-        ServerMain.getInstance().getServer().broadcast(apm);
+        ServerGameAppState.getInstance().getServer().broadcast(apm);
         slashMob(m);
     }
 

@@ -1,13 +1,12 @@
 package messages.cardChoice;
 
 import client.appStates.ClientGameAppState;
-import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import lombok.Getter;
 import menu.states.CardChoiceMenuState;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Getter
 @Serializable
@@ -17,7 +16,9 @@ public class CardSelectionMessage extends TwoWayMessage {
     private int cardId2;
     private int cardId3;
 
-    public CardSelectionMessage(){}
+    public CardSelectionMessage(){
+        setReliable(true);
+    }
 
     public CardSelectionMessage(int cardSessionId, int cardId1, int cardId2, int cardId3){
         this.cardSessionId = cardSessionId;
@@ -28,7 +29,7 @@ public class CardSelectionMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection sender) {
+    public void handleServer(ServerGameAppState server, HostedConnection sender) {
         throw new UnsupportedOperationException("Only server can decide card choice screen!");
     }
 

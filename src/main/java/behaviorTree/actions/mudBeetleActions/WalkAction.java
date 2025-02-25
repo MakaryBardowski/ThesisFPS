@@ -7,13 +7,13 @@ import behaviorTree.context.MudBeetleContext;
 import client.Main;
 import com.jme3.math.Vector3f;
 import game.entities.mobs.MudBeetle;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import static behaviorTree.NodeCompletionStatus.STOP_TREE_EXECUTION;
 
 public class WalkAction extends NodeAction {
 
-    private static final int BLOCK_SIZE = ServerMain.getInstance().getBLOCK_SIZE();
+    private static final int BLOCK_SIZE = ServerGameAppState.getInstance().getBLOCK_SIZE();
     private Vector3f currentNode;
 
     @Override
@@ -53,7 +53,7 @@ public class WalkAction extends NodeAction {
 
         hc.setDesiredLookDirection(currentNode.subtract(human.getNode().getWorldTranslation()));
 
-        if (distance < human.getCachedSpeed() * ServerMain.getTimePerFrame() * 2 || canMarkCurrentNodeAsVisited(hc, currentNodeIndex, currentNode, human.getNode().getWorldTranslation())) {
+        if (distance < human.getCachedSpeed() * ServerGameAppState.getTimePerFrame() * 2 || canMarkCurrentNodeAsVisited(hc, currentNodeIndex, currentNode, human.getNode().getWorldTranslation())) {
             hc.setCurrentNodeIndex(++currentNodeIndex);
             if (currentNodeIndex >= hc.getCurrentPath().size()) {
                 achievedDestination = true;
@@ -62,7 +62,7 @@ public class WalkAction extends NodeAction {
         } else {
 
             var moveVec = currentNode.subtract(human.getNode().getWorldTranslation()).normalizeLocal();
-            moveVec.multLocal(human.getCachedSpeed() * ServerMain.getTimePerFrame());
+            moveVec.multLocal(human.getCachedSpeed() * ServerGameAppState.getTimePerFrame());
             Main.getInstance().enqueue(() -> {
 //                // mobs pushing out of the way
 //                float avoidanceForce = 5 * tpf;

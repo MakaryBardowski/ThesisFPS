@@ -6,10 +6,9 @@ import static behaviorTree.NodeCompletionStatus.FAILURE;
 import static behaviorTree.NodeCompletionStatus.SUCCESS;
 import behaviorTree.context.Context;
 import behaviorTree.context.SimpleHumanMobContext;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
+
 import java.util.Random;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class ShouldLookIntoRandomDirection extends NodeAction {
 
@@ -18,7 +17,7 @@ public class ShouldLookIntoRandomDirection extends NodeAction {
     @Override
     public NodeCompletionStatus execute(Context context) {
         var hc = (SimpleHumanMobContext) context;
-        hc.setLookInRandomDirectionTimer(hc.getLookInRandomDirectionTimer() - ServerMain.getTimePerFrame());
+        hc.setLookInRandomDirectionTimer(hc.getLookInRandomDirectionTimer() - ServerGameAppState.getTimePerFrame());
         if (hc.getCurrentPath() == null && hc.getCurrentTarget() == null && hc.getLookInRandomDirectionTimer() <= 0) {
             return SUCCESS;
         }

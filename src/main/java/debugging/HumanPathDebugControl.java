@@ -18,7 +18,7 @@ import client.appStates.ClientGameAppState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import game.entities.mobs.HumanMob;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class HumanPathDebugControl extends AbstractControl {
 
@@ -34,7 +34,7 @@ public class HumanPathDebugControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
         try {
-            var serverSideHumanMob = (HumanMob) ServerMain.getInstance().getLevelManagerMobs().get(human.getId());
+            var serverSideHumanMob = (HumanMob) ServerGameAppState.getInstance().getLevelManagerMobs().get(human.getId());
             if (serverSideHumanMob == null) {
                 human.getNode().removeControl(this);
             }

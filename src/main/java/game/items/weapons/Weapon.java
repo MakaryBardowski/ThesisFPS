@@ -69,10 +69,10 @@ public abstract class Weapon extends Item implements Attacks, Holdable {
     }
 
     @Override
-    public void attributeChangedNotification(int attributeId, Attribute copyOfAttribute) {
-        super.attributeChangedNotification(attributeId, copyOfAttribute); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    public void attributeChangedNotification(int attributeId, Attribute oldAttributeCopy, Attribute copyOfNewAttribute) {
+        super.attributeChangedNotification(attributeId,oldAttributeCopy, copyOfNewAttribute); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         if (attributeId == ATTACKS_PER_SEC_ATTRIBUTE) {
-            attackCooldown = (1f / ((FloatAttribute) copyOfAttribute).getValue());
+            attackCooldown = (1f / ((FloatAttribute) copyOfNewAttribute).getValue());
         }
     }
 

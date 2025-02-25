@@ -2,13 +2,12 @@ package messages.cardChoice;
 
 import cards.AugmentCardsTemplateRegistry;
 import client.appStates.ClientGameAppState;
-import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.StatusEffectContainer;
 import lombok.Getter;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Getter
 @Serializable
@@ -27,7 +26,7 @@ public class ChooseCardMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection sender) {
+    public void handleServer(ServerGameAppState server, HostedConnection sender) {
         if(entityNotExistsLocallyServer(playerId)) {
             System.err.println("[SERVER]" + playerId + " does not exist in registered mobs to choose a card!");
             return;

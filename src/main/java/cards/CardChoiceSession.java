@@ -15,8 +15,12 @@ public class CardChoiceSession {
         this.cardChoiceSessionId = cardChoiceSessionId;
     }
 
-    public boolean isPlayerAlreadyChosenCard(int id){
-        return cardsChosenByPlayerId.get(id) != null;
+    public boolean isPlayerAlreadyChosenCard(int playerId){
+        return cardsChosenByPlayerId.get(playerId) != null;
+    }
+
+    public AugmentCardTemplate getCardPickedByPlayer(int playerId){
+        return cardsChosenByPlayerId.get(playerId);
     }
 
     public void registerCardChosenByPlayer(int id, AugmentCardTemplate card){

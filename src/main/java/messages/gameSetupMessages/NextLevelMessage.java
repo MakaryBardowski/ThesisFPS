@@ -8,7 +8,7 @@ import data.jumpToLevelData.BaseJumpToLevelData;
 import data.jumpToLevelData.ClientJumpToLevelData;
 import game.map.MapType;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class NextLevelMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         var levelManager = server.getCurrentGamemode().getLevelManager();
         var currentLevelIndexOnServer = levelManager.getCurrentLevelIndex();
         // ignore if old message arrived (lagged user)

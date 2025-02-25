@@ -13,9 +13,11 @@ import com.simsilica.lemur.Container;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.core.GuiControl;
 import game.entities.mobs.player.Player;
+import lombok.Getter;
 
 public class LemurPlayerHealthbar {
 
+    @Getter
     private final Vector2f normalizedHealthPercentAndChange = new Vector2f();
     private final Player player;
 

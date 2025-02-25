@@ -42,6 +42,13 @@ import lombok.Setter;
 import messages.lobby.HostJoinedLobbyMessage;
 
 public class ClientGameAppState extends AbstractAppState implements ClientStateListener {
+
+    @Getter
+    private Client client;
+
+    @Getter
+    private final String serverIp;
+
     @Getter
     private final AppStateManager stateManager;
 
@@ -51,8 +58,6 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
 
     private final AppSettings applicationSettings;
 
-    @Getter
-    private Client client;
 
     @Getter
     @Setter
@@ -65,9 +70,6 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
     @Getter
     @Setter
     private Nifty nifty;
-
-    @Getter
-    private final String serverIp;
 
     @Getter
     private boolean debug;

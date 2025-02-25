@@ -36,8 +36,8 @@ import java.util.Random;
 import lombok.Getter;
 import messages.DestructibleDamageReceiveMessage;
 import messages.NewMobMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class MudBeetle extends Mob {
 
@@ -49,8 +49,8 @@ public class MudBeetle extends Mob {
     public MudBeetle(int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
         super(MobSpawnType.MUD_BEETLE, id, node, name);
 
-        maxHealth = 8;
-        health = 8;
+        setHealth(8);
+        setMaxHealth(8);
         
         cachedSpeed = 6;
         attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
@@ -176,7 +176,7 @@ public class MudBeetle extends Mob {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         setServerLocation(newPos);
         setPosInterpolationValue(1.f);
         WorldGrid grid = ClientGameAppState.getInstance().getGrid();
@@ -187,7 +187,7 @@ public class MudBeetle extends Mob {
 
     @Override
     public void setPositionServer(Vector3f newPos) {
-        WorldGrid grid = ServerMain.getInstance().getGrid();
+        WorldGrid grid = ServerGameAppState.getInstance().getGrid();
         grid.remove(this);
         node.setLocalTranslation(newPos);
         grid.insert(this);
@@ -207,13 +207,13 @@ public class MudBeetle extends Mob {
             onDamageReceivedEffect.applyClient(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
 
         ParticleEmitter blood = EmitterPooler.getBlood();
         Vector3f bloodPos = node.getWorldTranslation().clone().add(0, 1, 0);
         blood.setLocalTranslation(bloodPos);
 
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             blood.emitParticles(2);
             Main.getInstance().enqueue(() -> {
                 projectFromTo(ClientGameAppState.getInstance(), node.getWorldTranslation().clone().add(0, 1, 0), new Vector3f(0, -1, 0), "Textures/Gameplay/Decals/testBlood" + new Random().nextInt(2) + ".png", new Random().nextInt(2) + 2f);
@@ -233,9 +233,9 @@ public class MudBeetle extends Mob {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
 
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             destroyServer();
             onDeathServer();
         }
@@ -263,17 +263,8 @@ public class MudBeetle extends Mob {
     }
 
     @Override
-    public void onCollision() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-//    @Override
-//    public boolean wouldNotCollideWithSolidEntitiesAfterMoveClient(Vector3f moveVec) {
-//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-//    }
-    @Override
     public void attack() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -285,27 +276,27 @@ public class MudBeetle extends Mob {
 
     @Override
     public void equip(Item e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void unequip(Item e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void equipServer(Item e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void unequipServer(Item e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void move(float tpf) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void moveClient(float tpf) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -317,7 +308,7 @@ public class MudBeetle extends Mob {
     @Override
     public void destroyServer() {
         removeEntityByIdServer(id);
-        var server = ServerMain.getInstance();
+        var server = ServerGameAppState.getInstance();
         server.getGrid().remove(this);
         if (node.getParent() != null) {
             Main.getInstance().enqueue(() -> {

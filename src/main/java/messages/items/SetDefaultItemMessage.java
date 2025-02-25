@@ -11,7 +11,7 @@ import game.items.armor.Helmet;
 import game.items.armor.Vest;
 import lombok.Getter;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class SetDefaultItemMessage extends TwoWayMessage {
@@ -33,7 +33,7 @@ public class SetDefaultItemMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

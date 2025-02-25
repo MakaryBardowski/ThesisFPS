@@ -1,33 +1,12 @@
 package networkingUtils;
 
+import messages.*;
 import messages.cardChoice.CardSelectionMessage;
 import messages.cardChoice.ChooseCardMessage;
 import messages.gameSetupMessages.MapMessage;
 import messages.items.*;
 import messages.messageListeners.ServerMessageListener;
-import messages.SystemHealthUpdateMessage;
-import messages.EntityUpdateMessage;
-import messages.MobPosRotUpdateMessage;
-import messages.MobRotUpdateMessage;
-import messages.NewMobMessage;
-import messages.PlayerJoinedMessage;
-import messages.SetPlayerMessage;
 import com.jme3.network.serializing.Serializer;
-import messages.AnimationPlayedMessage;
-import messages.DeleteEntityMessage;
-import messages.DestructibleDamageReceiveMessage;
-import messages.DestructibleHealReceiveMessage;
-import messages.EntitySetFloatAttributeMessage;
-import messages.EntitySetIntegerAttributeMessage;
-import messages.GrenadePosUpdateMessage;
-import messages.GrenadeThrownMessage;
-import messages.HitscanTrailMessage;
-import messages.NewChestMessage;
-import messages.PlayerPosUpdateRequest;
-import messages.InstantEntityPosCorrectionMessage;
-import messages.NewDestructibleDecorationMessage;
-import messages.NewIndestructibleDecorationMessage;
-import messages.ThrownGrenadeExplodedMessage;
 import messages.gameSetupMessages.NextLevelMessage;
 import messages.lobby.GameStartedMessage;
 import messages.lobby.HostChangedNicknameMessage;
@@ -64,6 +43,8 @@ public class NetworkingInitialization {
                 Serializer.registerClass(GrenadePosUpdateMessage.class);
                 Serializer.registerClass(EntitySetIntegerAttributeMessage.class);
                 Serializer.registerClass(EntitySetFloatAttributeMessage.class);
+                Serializer.registerClass(BatchSetFloatAttributeMessage.class);
+                Serializer.registerClass(BatchSetIntegerAttributeMessage.class);
                 Serializer.registerClass(NextLevelMessage.class);
                 Serializer.registerClass(AnimationPlayedMessage.class);
 

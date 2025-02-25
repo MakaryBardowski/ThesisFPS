@@ -1,5 +1,6 @@
 package server;
 
+import cards.AugmentCardsTemplateRegistry;
 import cards.CardChoiceSession;
 import client.Main;
 import com.jme3.asset.AssetManager;
@@ -45,7 +46,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Setter;
-import messages.InstantEntityPosCorrectionMessage;
 import messages.PlayerJoinedMessage;
 import messages.SetPlayerMessage;
 import messages.cardChoice.CardSelectionMessage;
@@ -61,7 +61,7 @@ import statusEffects.EffectFactory;
 import statusEffects.EffectTemplates;
 import statusEffects.StatusEffect;
 
-import static server.ServerMain.MAX_PLAYERS;
+import static server.ServerGameAppState.MAX_PLAYERS;
 
 public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
@@ -92,7 +92,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     private final int COLLISION_GRID_CELL_SIZE = 18;
 
     @Getter
-    private final int MAP_SIZE_XZ = 39;
+    private final int MAP_SIZE_XZ = 20;
 
     @Getter
     private final int MAP_SIZE_Y = 20;
@@ -127,14 +127,20 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
             levelSeeds[i] = RANDOM.nextLong();
         }
 
-        levelTypes[0] = MapType.STATIC;
+        levelTypes[0] = MapType.FILE;
         for (int i = 1; i < levelTypes.length; i++) {
             if (i % 6 == 0) {
-                levelTypes[i] = MapType.STATIC;
+                levelTypes[i] = MapType.FILE;
                 continue;
             }
 
-            levelTypes[i] = MapType.CASUAL;
+            var type = MapType.values()[RANDOM.nextInt(MapType.values().length)];
+
+            while(type.equals(MapType.FILE)) {
+                type = MapType.values()[RANDOM.nextInt(MapType.values().length)];
+            }
+            levelTypes[i] = type;
+//            levelTypes[i] = MapType.BSP;
         }
 
     }
@@ -176,20 +182,28 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
 
         clearEntities();
 
-        if(levelIndex == 3){
-            var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
+        if(levelIndex == 3 || levelIndex == 5){
+            var hostsByPlayerId = ServerGameAppState.getInstance().getHostsByPlayerId();
 
             var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
             cardChoiceSessionsByIndex.add(cardSession);
 
             for(var player : players){
-                int cardId1 = RANDOM.nextInt(4);
-                int cardId2 = RANDOM.nextInt(4);
-                int cardId3 = RANDOM.nextInt(4);
-                while(cardId1 == cardId2 || cardId1 == cardId3 || cardId2 == cardId3){
-                     cardId1 = RANDOM.nextInt(4);
-                     cardId2 = RANDOM.nextInt(4);
-                     cardId3 = RANDOM.nextInt(4);
+                var cardIdsChosenByPlayer = new HashSet<Integer>();
+
+                for(int i = 0; i < cardChoiceSessionsByIndex.size()-1; i++) {
+                    var cardChoiceSession = cardChoiceSessionsByIndex.get(i);
+                    cardIdsChosenByPlayer.add(cardChoiceSession.getCardPickedByPlayer(player.getId()).getCardId());
+                }
+                int registrySize = AugmentCardsTemplateRegistry.getSize();
+                int cardId1 = RANDOM.nextInt(registrySize);
+                int cardId2 = RANDOM.nextInt(registrySize);
+                int cardId3 = RANDOM.nextInt(registrySize);
+                while(cardId1 == cardId2 || cardId1 == cardId3 || cardId2 == cardId3
+                        || cardIdsChosenByPlayer.contains(cardId1) || cardIdsChosenByPlayer.contains(cardId2) || cardIdsChosenByPlayer.contains(cardId3)){
+                     cardId1 = RANDOM.nextInt(registrySize);
+                     cardId2 = RANDOM.nextInt(registrySize);
+                     cardId3 = RANDOM.nextInt(registrySize);
                 }
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
@@ -214,7 +228,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
                 var levelGenerationResult = levelGenerator.generateLevel(MAP_SIZE_XZ,MAP_SIZE_Y,MAP_SIZE_XZ);
                 this.map = levelGenerationResult.getLogicMap();
 
-                if(newLevelType.equals(MapType.STATIC)) {
+                if(newLevelType.equals(MapType.FILE)) {
                     notifyAboutMap(map);
                 }
                 var playerSpawnpoints = levelGenerationResult.getPlayerSpawnpoints();
@@ -451,7 +465,7 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     }
 
     public void notifyPlayersAboutNewLevelEntities() {
-        var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
+        var hostsByPlayerId = ServerGameAppState.getInstance().getHostsByPlayerId();
 
         List<Item> itemsInGame = entitiesBroadcastedAtNextLevel.stream()
                 .filter(entry -> entry instanceof Item)
