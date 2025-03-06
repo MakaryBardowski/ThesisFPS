@@ -1,6 +1,6 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
@@ -8,7 +8,7 @@ import com.jme3.network.serializing.Serializable;
 import game.entities.mobs.Mob;
 import game.items.weapons.Rifle;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class HitscanTrailMessage extends EntityUpdateMessage {
@@ -34,9 +34,9 @@ public class HitscanTrailMessage extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
 //            HostedConnection hc = ServerMain.getInstance().getServer().getConnection(clientId);
-            ServerMain.getInstance().getServer().broadcast(Filters.notIn(hc), this);
+            ServerGameAppState.getInstance().getServer().broadcast(Filters.notIn(hc), this);
     }
 
     @Override

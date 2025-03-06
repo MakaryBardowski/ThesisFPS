@@ -1,5 +1,7 @@
 package client;
 
+import client.appStates.ClientGameAppState;
+import client.appStates.MainMenuAppState;
 import com.jme3.app.DetailedProfilerState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.ScreenshotAppState;
@@ -7,22 +9,19 @@ import com.jme3.input.FlyByCamera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
-import com.simsilica.lemur.style.BaseStyles;
-import lombok.Getter;
-import menu.MenuStateMachine;
 import networkingUtils.NetworkingInitialization;
 
 public class Main extends SimpleApplication {
     private static final String IDE_MODE = System.getenv("IDE_MODE");
     private static Main instance;
 
-    private static final short STARTING_RESOLUTION_WIDTH = 1920;
-    private static final short STARTING_RESOLUTION_HEIGHT = 1080;
-    private static final boolean FULLSCREEN = true;
+//    private static final short STARTING_RESOLUTION_WIDTH = 1920;
+//    private static final short STARTING_RESOLUTION_HEIGHT = 1080;
+//    private static final boolean FULLSCREEN = true;
 
-//    private static final short STARTING_RESOLUTION_WIDTH = 1000;
-//    private static final short STARTING_RESOLUTION_HEIGHT = 800;
-//    private static final boolean FULLSCREEN = false;
+    private static final short STARTING_RESOLUTION_WIDTH = 1000;
+    private static final short STARTING_RESOLUTION_HEIGHT = 800;
+    private static final boolean FULLSCREEN = false;
     public static final boolean WIREFRAME = false;
     public static final float CAM__MOVE_SPEED = 30;
     public static final float CAM_ROT_SPEED = 1.0f;
@@ -31,9 +30,6 @@ public class Main extends SimpleApplication {
     private double max_mem_debug = 0;
     private static double previous_max_mem_debug = 0;
     private double time_from_start_millis_debug = 0;
-
-    @Getter
-    private MenuStateMachine menuStateMachine;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -45,16 +41,12 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
         GuiGlobals.initialize(this);
-//        BaseStyles.loadGlassStyle();
-//        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
-
-        this.menuStateMachine = new MenuStateMachine(guiNode, settings.getWidth(),settings.getHeight());
 
         setDisplayFps(false);
         setDisplayStatView(false);
-        System.out.println("app camera" + cam);
-        
+
         flyCam.setMoveSpeed(0); //30
         flyCam.setRotationSpeed(0); //1.0
         speed = 1f;

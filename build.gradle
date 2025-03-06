@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.mygame'
-version '0.0.88'
+version '0.0.91'
 
 mainClassName = "client.Main"
 
@@ -40,7 +40,7 @@ project(":assets") {
 }
 
 dependencies {
-    implementation  ('org.example:McCurryRandom:0.1') {
+    implementation  ('org.example:McCurryRandom:0.2') {
         version {
             branch = "master"
         }

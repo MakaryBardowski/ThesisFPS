@@ -1,7 +1,7 @@
 package game.entities.grenades;
 
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import com.epagagames.particles.Emitter;
 import com.epagagames.particles.emittershapes.EmitterCircle;
@@ -13,7 +13,6 @@ import com.epagagames.particles.valuetypes.ColorValueType;
 import com.epagagames.particles.valuetypes.Gradient;
 import com.epagagames.particles.valuetypes.ValueType;
 import com.epagagames.particles.valuetypes.VectorValueType;
-import com.jme3.asset.DesktopAssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.material.RenderState.BlendMode;
@@ -22,16 +21,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 import game.effects.TimedSpatialRemoveControl;
 import game.entities.Collidable;
-import game.entities.Movable;
-import game.entities.mobs.Mob;
 import messages.ThrownGrenadeExplodedMessage;
-import static messages.messageListeners.ServerMessageListener.enqueueExecutionServer;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class ThrownSmokeGrenade extends ThrownGrenade {
 
@@ -85,7 +80,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -114,7 +109,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     public void explodeServer() {
         ThrownGrenadeExplodedMessage gemsg = new ThrownGrenadeExplodedMessage(id, node.getWorldTranslation());
         gemsg.setReliable(true);
-        ServerMain.getInstance().getServer().broadcast(gemsg);
+        ServerGameAppState.getInstance().getServer().broadcast(gemsg);
         node.removeFromParent();
 
         removeEntityByIdServer(id);
@@ -191,7 +186,7 @@ public class ThrownSmokeGrenade extends ThrownGrenade {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

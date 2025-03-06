@@ -1,18 +1,17 @@
 package game.entities.grenades;
 
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import game.entities.Collidable;
-import game.entities.mobs.Mob;
 import lombok.Getter;
 import lombok.Setter;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public abstract class ThrownGrenade extends Collidable {
 
@@ -59,7 +58,7 @@ public abstract class ThrownGrenade extends Collidable {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -85,7 +84,7 @@ public abstract class ThrownGrenade extends Collidable {
 
     @Override
     public void destroyServer() {
-        var server = ServerMain.getInstance();
+        var server = ServerGameAppState.getInstance();
         if (node.getParent() != null) {
             Main.getInstance().enqueue(() -> {
 //                server.getGrid().remove(this);

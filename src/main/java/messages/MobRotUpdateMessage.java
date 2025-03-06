@@ -1,14 +1,13 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
-import game.AttachedEntity;
+import game.entities.AttachedEntity;
 import game.entities.Movable;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class MobRotUpdateMessage extends EntityUpdateMessage {
@@ -39,10 +38,10 @@ public class MobRotUpdateMessage extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         if (entityExistsLocallyServer(id) ) {
             Main.getInstance().enqueue(() -> {
-                var entity = (AttachedEntity) ServerMain.getInstance().getLevelManagerMobs().get(id);
+                var entity = (AttachedEntity) ServerGameAppState.getInstance().getLevelManagerMobs().get(id);
                 if (entity != null) {
                     entity.getNode().setLocalRotation(getRot());
                     if (entity instanceof Movable movable) {

@@ -1,7 +1,7 @@
 package game.items.consumable;
 
 import game.items.weapons.*;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import game.entities.mobs.HumanMob;
@@ -10,11 +10,10 @@ import game.entities.mobs.player.Player;
 import game.items.ItemTemplates;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewGrenadeMessage;
-import static client.ClientGameAppState.removeEntityByIdClient;
 import com.jme3.network.Filters;
 import messages.DestructibleHealReceiveMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class Medpack extends ThrowableWeapon {
 
@@ -121,19 +120,12 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerEquip(Player p) {
-//        Holdable unequippedItem = p.getEquippedRightHand();
-//        if (unequippedItem != null) {
-//            unequippedItem.playerUnequip(p);
-//        }
-//        p.setHoldsTrigger(false);
-//        playerHoldInRightHand(p);
-        p.getEquipment().removeItem(this);
-        removeEntityByIdClient(id);
+    public void playerEquipClient(Player p) {
+
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
         if (p.getEquippedRightHand() != this) {
             return;
         }
@@ -145,8 +137,8 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
-        var sm = ServerMain.getInstance();
+    public void serverEquip(HumanMob m) {
+        var sm = ServerGameAppState.getInstance();
         var hc = sm.getHostsByPlayerId().get(m.getId());
         Filters.notEqualTo(hc);
 
@@ -157,7 +149,7 @@ public class Medpack extends ThrowableWeapon {
         msg.setReliable(true);
         sm.getServer().broadcast(msg);
 
-        ServerMain.removeItemFromMobEquipmentServer(m.getId(), id);
+        ServerGameAppState.removeItemFromMobEquipmentServer(m.getId(), id);
         removeEntityByIdServer(id);
 
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(id, m.getId(), MobItemInteractionMessage.ItemInteractionType.DESTROY);
@@ -166,7 +158,7 @@ public class Medpack extends ThrowableWeapon {
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
+    public void serverUnequip(HumanMob m) {
 //        m.setEquippedRightHand(null);
     }
 

@@ -1,6 +1,5 @@
 package FirstPersonHands;
 
-import client.ClientGameAppState;
 import client.Main;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.SkinningControl;
@@ -14,12 +13,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.debug.custom.ArmatureDebugger;
-import com.jme3.scene.shape.Box;
-import com.jme3.util.BufferUtils;
 import game.entities.mobs.player.Player;
 import game.items.armor.Gloves;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import lombok.Getter;
 
 public class FirstPersonHands {

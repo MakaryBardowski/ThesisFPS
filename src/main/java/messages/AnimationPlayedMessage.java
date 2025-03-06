@@ -1,12 +1,12 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.Animated;
 import game.entities.Animation;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class AnimationPlayedMessage extends EntityUpdateMessage {
@@ -26,7 +26,7 @@ public class AnimationPlayedMessage extends EntityUpdateMessage {
 
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         server.getServer().broadcast(Filters.notEqualTo(hc),this);
     }
 

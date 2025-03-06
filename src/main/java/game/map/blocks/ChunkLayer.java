@@ -73,9 +73,6 @@ public class ChunkLayer {
         Texture texture = mat.getTextureParam("DiffuseMap").getTextureValue();
         texture.getImage().setColorSpace(ColorSpace.sRGB);
 
-        System.out.println("tile color space "+bw.getTextureAtlas().getAtlasTexture("DiffuseMap").getImage().getColorSpace());
-        System.out.println("tile format "+bw.getTextureAtlas().getAtlasTexture("DiffuseMap").getImage().getFormat());
-
 
 
 //        mat.setBoolean("UseVertexColor", true);

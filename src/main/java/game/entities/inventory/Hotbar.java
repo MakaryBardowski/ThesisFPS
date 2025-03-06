@@ -63,6 +63,14 @@ public class Hotbar {
         }
     }
 
+    public synchronized void removeItem(Item item){
+        for(int i = 0; i < items.length; i++){
+            if(items[i] == item){
+                removeItemAt(i);
+            }
+        }
+    }
+
     public synchronized boolean isEmptySlot(int index){
         return items[index] == null;
     }

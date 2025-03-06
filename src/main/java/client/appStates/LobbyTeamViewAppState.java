@@ -1,5 +1,6 @@
-package client;
+package client.appStates;
 
+import client.Main;
 import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
@@ -17,9 +18,6 @@ import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
-import de.lessvoid.nifty.tools.SizeValue;
-import de.lessvoid.nifty.tools.SizeValueType;
-import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
 import game.items.ItemTemplates;
 import game.items.ItemTemplates.HelmetTemplate;
@@ -41,13 +39,13 @@ public class LobbyTeamViewAppState extends BaseAppState {
     private static String currentNickname = "";
     private static ClientGameAppState client;
 
+    private final AmbientLight light = new AmbientLight();
+
     @Override
     protected void initialize(Application app) {
         client = MainMenuAppState.getClient();
         assetManager = app.getAssetManager();
         setupTeamViewScene();
-        System.out.println("TEAM VIEWRER!");
-
     }
 
     @Override
@@ -55,11 +53,11 @@ public class LobbyTeamViewAppState extends BaseAppState {
         app.getViewPort().setBackgroundColor(ColorRGBA.Black);
         backgroundNode.removeFromParent();
         teamNode.removeFromParent();
+        backgroundNode.removeLight(light);
     }
 
     @Override
     protected void onEnable() {
-//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
@@ -68,9 +66,8 @@ public class LobbyTeamViewAppState extends BaseAppState {
     }
 
     private void setupTeamViewScene() {
-        AmbientLight al = new AmbientLight();
-        al.setColor(ColorRGBA.White.mult(0.5f));
-        backgroundNode.addLight(al);
+        light.setColor(ColorRGBA.White.mult(0.5f));
+        backgroundNode.addLight(light);
 
         getApplication().getViewPort().setBackgroundColor(ColorRGBA.Cyan);
 
@@ -81,7 +78,7 @@ public class LobbyTeamViewAppState extends BaseAppState {
 
         var startCamLoc = getApplication().getCamera().getLocation().clone().setY(6).setZ(6.1f);
         getApplication().getCamera().setLocation(startCamLoc);
-
+        System.out.println(getApplication().getCamera().getRotation());
         changeClass(0);
     }
 

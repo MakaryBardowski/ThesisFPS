@@ -1,6 +1,8 @@
 package game.map;
 
 public enum MapType {
-    STATIC,
-    CASUAL
+    FILE,
+    NAIVE,
+    BSP,
+    CELLULAR_AUTOMATA
 }

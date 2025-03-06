@@ -2,7 +2,7 @@ package messages;
 
 import guiComponents.LemurPlayerInventoryGui;
 import guiComponents.LemurPlayerHealthbar;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.PlayerHUD;
 import com.jme3.math.Vector3f;
 import com.jme3.network.HostedConnection;
@@ -12,7 +12,7 @@ import com.jme3.scene.Spatial;
 import game.cameraAndInput.InputController;
 import game.entities.mobs.player.Player;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class SetPlayerMessage extends TwoWayMessage {
@@ -45,7 +45,7 @@ public class SetPlayerMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -78,7 +78,9 @@ public class SetPlayerMessage extends TwoWayMessage {
     }
 
     private void addInputListeners() {
-        new InputController().createInputListeners(ClientGameAppState.getInstance());
+        var inputController = new InputController();
+        inputController.createInputListeners(ClientGameAppState.getInstance());
+        ClientGameAppState.getInstance().setInputController(inputController);
     }
 
     private void addPlayerHUD(Player player) {

@@ -1,6 +1,6 @@
 package game.entities;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -13,7 +13,7 @@ import game.map.collision.RectangleOBB;
 import game.map.collision.WorldGrid;
 import lombok.Getter;
 import lombok.Setter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Getter
 @Setter
@@ -33,13 +33,11 @@ public abstract class Collidable extends Movable {
     protected void createHitbox() {
     }
 
-    ;
-
     public abstract void onCollisionClient(Collidable other);
 
     public abstract void onCollisionServer(Collidable other);
 
-    public boolean wouldNotCollideWithSolidEntitiesAfterMove(Vector3f moveVec) {
+    public boolean wouldNotCollideWithSolidEntitiesAfterMoveClient(Vector3f moveVec) {
         var newPos = collisionShape.getPosition().add(moveVec);
         float centerX = newPos.getX();
         float centerY = newPos.getY();
@@ -69,7 +67,7 @@ public abstract class Collidable extends Movable {
         // above is wall collision
 
         for (Collidable m : ClientGameAppState.getInstance().getGrid().getNearbyAfterMove(this, moveVec)) {
-            if (m.getClass() != this.getClass() && isNotCollisionShapePassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
+            if (m.getClass() != this.getClass() && isNotPassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
                 return false;
             }
         }
@@ -94,20 +92,20 @@ public abstract class Collidable extends Movable {
         corners[5] = new float[]{centerX + width, centerY, centerZ - depth};
         corners[6] = new float[]{centerX - width, centerY, centerZ + depth};
         corners[7] = new float[]{centerX + width, centerY, centerZ + depth};
-        var cellSize = ServerMain.getInstance().getBLOCK_SIZE();
+        var cellSize = ServerGameAppState.getInstance().getBLOCK_SIZE();
         for (var corner : corners) {
             int x = (int) (Math.floor(corner[0] / cellSize));
             int y = (int) (Math.floor(corner[1] / cellSize));
             int z = (int) (Math.floor(corner[2] / cellSize));
 
-            if (ServerMain.getInstance().getMap().isPositionNotEmpty(x,y,z)) {
+            if (ServerGameAppState.getInstance().getMap().isPositionNotEmpty(x,y,z)) {
                 return false;
             }
         }
         // above is wall collision
 
-        for (Collidable m : ServerMain.getInstance().getGrid().getNearbyAfterMove(this, moveVec)) {
-            if (m.getClass() != this.getClass() && isNotCollisionShapePassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
+        for (Collidable m : ServerGameAppState.getInstance().getGrid().getNearbyAfterMove(this, moveVec)) {
+            if (m.getClass() != this.getClass() && isNotPassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
                 return false;
             }
         }
@@ -127,22 +125,22 @@ public abstract class Collidable extends Movable {
         }
     }
 
-    public static boolean isNotCollisionShapePassable(Collidable c) {
+    public static boolean isNotPassable(Collidable c) {
         return c.getCollisionShape() instanceof RectangleAABB;
     }
 
-    public static boolean isCollisionShapePassable(Collidable c) {
+    public static boolean isPassable(Collidable c) {
         return c.getCollisionShape() instanceof RectangleOBB;
     }
 
     @Override
     public void moveServer(Vector3f moveVec) {
-        if (isAbleToMove() && ServerMain.getInstance().containsEntityWithId(id)) {
+        if (isAbleToMove() && ServerGameAppState.getInstance().containsEntityWithId(id)) {
             /*
             if registered, then we can remove it from the grid and insert it again - this means we wont re-insert a mob that is deleted.
             Because list of mobs is a concurent hashmap, it means either deletion or the check will occur first (not at the same time meaning proper removal
              */
-            WorldGrid grid = ServerMain.getInstance().getGrid();
+            WorldGrid grid = ServerGameAppState.getInstance().getGrid();
             grid.remove(this);
 
             if (wouldNotCollideWithSolidEntitiesAfterMoveServer(new Vector3f(0, 0, moveVec.getZ()))) {
@@ -170,7 +168,7 @@ public abstract class Collidable extends Movable {
     protected void checkCollisionWithPassableEntitiesClient() {
         Vector3f newPos = collisionShape.getPosition();
         for (Collidable m : ClientGameAppState.getInstance().getGrid().getNearby(this)) {
-            if (isCollisionShapePassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
+            if (isPassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
                 m.onCollisionClient(this); // mine explodes etc
             }
         }
@@ -179,8 +177,8 @@ public abstract class Collidable extends Movable {
 
     protected void checkCollisionWithPassableEntitiesServer() {
         Vector3f newPos = collisionShape.getPosition();
-        for (Collidable m : ServerMain.getInstance().getGrid().getNearby(this)) {
-            if (isCollisionShapePassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
+        for (Collidable m : ServerGameAppState.getInstance().getGrid().getNearby(this)) {
+            if (isPassable(m) && this != m && collisionShape.wouldCollideAtPosition(m.getCollisionShape(), newPos)) {
                 m.onCollisionServer(this); // mine explodes etc
             }
         }

@@ -1,7 +1,7 @@
 package game.items;
 
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.Main;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -9,7 +9,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import static debugging.DebugUtils.createUnshadedBoxNode;
 
-import game.AttachedEntity;
+import game.entities.AttachedEntity;
 import game.effects.ParticleUtils;
 
 import static game.entities.DestructibleUtils.setupModelShootability;
@@ -19,7 +19,7 @@ import lombok.Getter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static server.ServerMain.removeEntityByIdServer;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 @Getter
 public abstract class Item extends AttachedEntity {
@@ -60,12 +60,11 @@ public abstract class Item extends AttachedEntity {
         parentNode.scale(template.getDropData().getScale());
         parentNode.setLocalTranslation(itemSpawnpoint);
         droppedItemNode = parentNode;
-        System.out.println("dropped item node set for item "+this);
         ClientGameAppState.getInstance().getPickableNode().attachChild(parentNode);
         ParticleUtils.spawnStaticItemPhysicalParticleShaded(parentNode, itemSpawnpoint, this);
     }
 
-    public void drop(Vector3f itemSpawnpoint, Vector3f dropeVelocity) {
+    public void drop(Vector3f itemSpawnpoint, Vector3f dropVelocity) {
         if (!droppable) {
             return;
         }
@@ -83,7 +82,7 @@ public abstract class Item extends AttachedEntity {
         parentNode.setLocalTranslation(itemSpawnpoint);
         droppedItemNode = parentNode;
         ClientGameAppState.getInstance().getPickableNode().attachChild(parentNode);
-        ParticleUtils.spawnItemPhysicalParticleShadedWithVelocity(parentNode, itemSpawnpoint, this, dropeVelocity);
+        ParticleUtils.spawnItemPhysicalParticleShadedWithVelocity(parentNode, itemSpawnpoint, this, dropVelocity);
     }
 
     private void applyInitialDropRotation(Node childNode) {
@@ -93,7 +92,7 @@ public abstract class Item extends AttachedEntity {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         if (droppedItemNode != null) {
             droppedItemNode.setLocalTranslation(newPos);
         } else {

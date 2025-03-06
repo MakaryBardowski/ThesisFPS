@@ -15,6 +15,7 @@ public class ArmorItemStatTemplate {
     public static HelmetStatTemplate DEFAULT_HEAD_DEFAULT_STATS = new HelmetStatTemplate(0f);
     public static HelmetStatTemplate TRENCH_HELMET_DEFAULT_STATS = new HelmetStatTemplate(0.5f);
     public static HelmetStatTemplate GAS_MASK_DEFAULT_STATS = new HelmetStatTemplate(0.1f);
+    public static HelmetStatTemplate SECRET_SOCIETY_HOOD_1_DEFAULT_STATS = new HelmetStatTemplate(0.75f);
 
         public HelmetStatTemplate(float armorValue) {
             super(armorValue);
@@ -24,6 +25,8 @@ public class ArmorItemStatTemplate {
     public static class VestStatTemplate extends ArmorStatTemplate {
     public static VestStatTemplate DEFAULT_TORSO_DEFAULT_STATS = new VestStatTemplate(0f);
     public static VestStatTemplate TRENCH_VEST_DEFAULT_STATS = new VestStatTemplate(0.75f);
+    public static VestStatTemplate SECRET_SOCIETY_VEST_1_DEFAULT_STATS = new VestStatTemplate(1f);
+
         public VestStatTemplate(float armorValue) {
             super(armorValue);
         }

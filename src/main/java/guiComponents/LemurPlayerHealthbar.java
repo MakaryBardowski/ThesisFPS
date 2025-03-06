@@ -1,6 +1,6 @@
 package guiComponents;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -13,39 +13,40 @@ import com.simsilica.lemur.Container;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.core.GuiControl;
 import game.entities.mobs.player.Player;
+import lombok.Getter;
 
 public class LemurPlayerHealthbar {
 
+    @Getter
     private final Vector2f normalizedHealthPercentAndChange = new Vector2f();
     private final Player player;
 
     float timeSinceLastHealthbarChange = 0;
     float waitTimeForHealthbarColorUpdate = 0.65f;
 
+    private Container healthbarContainer;
+
     static {
-        // causes huge lag at startup
         GuiGlobals.getInstance().setCursorEventsEnabled(false);
-       // causes huge lag
     }
 
     public LemurPlayerHealthbar(Player player) {
         this.player = player;
-        // healthbar setup
-        addHealthbar(Main.getInstance().getGuiNode());
-        // healthbar setup
+        healthbarContainer = addHealthbar(Main.getInstance().getGuiNode());
     }
 
-    private void addHealthbar(Node guiNode) {
-        var myWindow = new Container();
-        guiNode.attachChild(myWindow);
+    private Container addHealthbar(Node guiNode) {
+        var healthbarContainer = new Container();
+        guiNode.attachChild(healthbarContainer);
         GuiControl gc = new GuiControl("");
 
         var healthbarNode = createHealthbarNode();
         healthbarNode.addControl(gc);
 //        myWindow.setLocalTranslation(30, 440, 0);
-        myWindow.setLocalTranslation(0, 0, 0);
+        healthbarContainer.setLocalTranslation(0, 0, 0);
 
-        myWindow.addChild(healthbarNode);
+        healthbarContainer.addChild(healthbarNode);
+        return healthbarContainer;
     }
 
     public void setHealthbarParams(float healthPercent, float healthPercentChange) {
@@ -108,5 +109,9 @@ public class LemurPlayerHealthbar {
         if (normalizedHealthPercentAndChange.getY() == 0) {
             timeSinceLastHealthbarChange = 0;
         }
+    }
+
+    public void cleanup(){
+        healthbarContainer.removeFromParent();
     }
 }

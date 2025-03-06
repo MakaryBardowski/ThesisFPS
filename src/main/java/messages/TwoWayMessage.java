@@ -1,6 +1,6 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
@@ -12,12 +12,12 @@ import game.entities.Entity;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
 import game.items.Item;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public abstract class TwoWayMessage extends AbstractMessage {
 
-    public abstract void handleServer(ServerMain server,HostedConnection sender);
+    public abstract void handleServer(ServerGameAppState server, HostedConnection sender);
 
     public abstract void handleClient(ClientGameAppState client);
 
@@ -26,23 +26,23 @@ public abstract class TwoWayMessage extends AbstractMessage {
     }
 
     protected Chest getChestByIdServer(int id) {
-        return ((Chest) ServerMain.getInstance().getLevelManagerMobs().get(id));
+        return ((Chest) ServerGameAppState.getInstance().getLevelManagerMobs().get(id));
     }
 
     protected Entity getEntityByIdServer(int id) {
-        return ServerMain.getInstance().getLevelManagerMobs().get(id);
+        return ServerGameAppState.getInstance().getLevelManagerMobs().get(id);
     }
 
     protected Mob getMobByIdServer(int id) {
-        return ((Mob) ServerMain.getInstance().getLevelManagerMobs().get(id));
+        return ((Mob) ServerGameAppState.getInstance().getLevelManagerMobs().get(id));
     }
 
     protected Item getItemByIdServer(int id) {
-        return ((Item) ServerMain.getInstance().getLevelManagerMobs().get(id));
+        return ((Item) ServerGameAppState.getInstance().getLevelManagerMobs().get(id));
     }
 
     protected Destructible getDestructibleByIdServer(int id) {
-        return ((Destructible) ServerMain.getInstance().getLevelManagerMobs().get(id));
+        return ((Destructible) ServerGameAppState.getInstance().getLevelManagerMobs().get(id));
     }
 
     protected Entity getEntityByIdClient(int id) {
@@ -73,7 +73,7 @@ public abstract class TwoWayMessage extends AbstractMessage {
     }
 
     protected boolean entityExistsLocallyServer(int mobId) {
-        return  null != ServerMain.getInstance().getLevelManagerMobs().get(mobId);
+        return  null != ServerGameAppState.getInstance().getLevelManagerMobs().get(mobId);
     }
 
     protected boolean entityNotExistsLocallyClient(int mobId) {
@@ -81,11 +81,11 @@ public abstract class TwoWayMessage extends AbstractMessage {
     }
 
     protected boolean entityNotExistsLocallyServer(int mobId) {
-        return ServerMain.getInstance().getLevelManagerMobs().get(mobId) == null;
+        return ServerGameAppState.getInstance().getLevelManagerMobs().get(mobId) == null;
     }
 
     protected HostedConnection getHostedConnectionByPlayer(Player p) {
-        return ServerMain.getInstance().getHostsByPlayerId().get(p.getId());
+        return ServerGameAppState.getInstance().getHostsByPlayerId().get(p.getId());
     }
 
     protected void placeMob(Vector3f pos, Mob p) {

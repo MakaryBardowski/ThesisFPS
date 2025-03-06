@@ -1,8 +1,10 @@
 package server;
 
 import com.jme3.app.Application;
+import com.jme3.network.serializing.Serializer;
 import game.entities.mobs.Mob;
 import game.map.blocks.Map;
+import lombok.Setter;
 import messages.messageListeners.ServerMessageListener;
 import messages.MobPosRotUpdateMessage;
 
@@ -10,7 +12,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 
-import com.jme3.network.ConnectionListener;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
@@ -33,7 +34,8 @@ import lombok.Getter;
 import messages.GrenadePosUpdateMessage;
 import messages.lobby.GameStartedMessage;
 
-public class ServerMain extends AbstractAppState implements ConnectionListener {
+public class ServerGameAppState extends AbstractAppState {
+    private static final String SERVER_CLOSE_MESSAGE = "Host player has quit the game.";
 
     public static final byte MAX_PLAYERS = 4;
 
@@ -45,7 +47,8 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     private final HashMap<Integer, HostedConnection> hostsByPlayerId = new HashMap<>(MAX_PLAYERS);
 
     @Getter
-    private static ServerMain instance;
+    @Setter
+    private static ServerGameAppState instance;
 
     @Getter
     private final int TICKS_PER_SECOND = 64;
@@ -70,9 +73,9 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     private boolean serverPaused = true;
 
     @Getter
-    private final ServerGameManager currentGamemode;
+    private ServerGameManager currentGamemode;
 
-    public ServerMain(AssetManager assetManager, RenderManager renderManager) {
+    public ServerGameAppState(AssetManager assetManager, RenderManager renderManager) {
 
         instance = this;
         currentGamemode = new ServerStoryGameManager();
@@ -80,13 +83,12 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-
+        super.initialize(stateManager,app);
         startServer();
 
     }
 
     @Override // the whole update method should be on another thread
-
     public void update(float tpf) {
         timePerFrame = tpf;
 
@@ -138,7 +140,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
             System.out.println("[SERVER] added player " + newPlayer.getId());
         });
 
-        currentGamemode.levelManager.notifyAllPlayersAboutNonMobEntities();
+        currentGamemode.levelManager.notifyPlayersAboutNonMobEntities();
 
         hostsByPlayerId.forEach( (id,hc) -> {
             currentGamemode.levelManager.notifyPlayerAboutInitialGameState(id,hc);
@@ -149,23 +151,20 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
         serverPaused = false;
     }
 
-    @Override
-    public void connectionAdded(Server server, HostedConnection hc) {
 
-    }
-
-    @Override
-    public void connectionRemoved(Server server, HostedConnection hc) {
-    }
 
     private void startServer() {
         try {
+
+            Serializer.initialize();
+            NetworkingInitialization.initializeSerializables();
+
             server = Network.createServer(NetworkingInitialization.PORT);
-            server.addConnectionListener(this);
+            server.addConnectionListener(new ServerConnectionListener());
             server.addMessageListener(new ServerMessageListener(this));
             server.start();
         } catch (IOException ex) {
-            Logger.getLogger(ServerMain.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerGameAppState.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -189,7 +188,7 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     }
 
     public ConcurrentHashMap<Integer, Entity> getLevelManagerMobs() {
-        return currentGamemode.getLevelManager().getMobs();
+        return currentGamemode.getLevelManager().getEntitiesById();
     }
 
     public WorldGrid getGrid() {
@@ -201,7 +200,20 @@ public class ServerMain extends AbstractAppState implements ConnectionListener {
     }
 
     public boolean containsEntityWithId(int id) {
-        return currentGamemode.getLevelManager().getMobs().get(id) != null;
+        return currentGamemode.getLevelManager().getEntitiesById().get(id) != null;
     }
 
+    @Override
+    public void stateDetached(AppStateManager stateManager) {
+        super.stateDetached(stateManager);
+
+        var server = ServerGameAppState.getInstance().getServer();
+        server.getConnections().forEach(hc -> hc.close(SERVER_CLOSE_MESSAGE));
+
+//        ServerSerializerRegistrationsService ssr = server.getServices().getService( ServerSerializerRegistrationsService.class );
+//        server.getServices().removeService(ssr);
+        server.close();
+        currentGamemode.getLevelManager().cleanup();
+        ServerGameAppState.setInstance(null);
+    }
 }

@@ -1,12 +1,11 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
-import game.entities.IntegerAttribute;
 import game.entities.Entity;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class EntitySetIntegerAttributeMessage extends TwoWayMessage {
@@ -30,18 +29,15 @@ public class EntitySetIntegerAttributeMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         var entity = server.getLevelManagerMobs().get(entityId);
         entity.setIntegerAttributeAndNotifyClients(attributeId, attributeValue);
-        server.getServer().broadcast(this);
-
     }
 
     @Override
     public void handleClient(ClientGameAppState client) {
         var entity = client.getMobs().get(entityId);
         entity.setIntegerAttribute(attributeId, attributeValue);
-        entity.attributeChangedNotification(attributeId, new IntegerAttribute(attributeValue));
     }
 
 }

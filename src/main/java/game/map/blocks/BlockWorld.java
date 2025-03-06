@@ -176,9 +176,9 @@ public class BlockWorld {
                     int y = logicMap.getYFromIndex(index);
                     int z = logicMap.getZFromIndex(index);
 
-                    if (logicMap.getBlockIdAtIndex(index) == 1 || logicMap.getBlockIdAtIndex(index) == 9) {
+                    if (logicMap.getBlockIdAtIndex(index) == BlockType.STONE.blockId || logicMap.getBlockIdAtIndex(index) == 9) {
                         addBlockDataToChunk(x, y, z, BlockType.STONE);
-                    } else if (logicMap.getBlockIdAtIndex(index) == 2) {
+                    } else if (logicMap.getBlockIdAtIndex(index) == BlockType.DIRT.blockId) {
                         var bt = BlockType.DIRT;
                         if (r.nextInt(5) == 1) {
                             bt = BlockType.DIRT_STONES;
@@ -186,11 +186,11 @@ public class BlockWorld {
 
                         addBlockDataToChunk(x, y, z, bt);
 
-                    } else if (logicMap.getBlockIdAtIndex(index) == 3){
+                    } else if (logicMap.getBlockIdAtIndex(index) == BlockType.OFFICE_BOTTOM.blockId){
                         addBlockDataToChunk(x, y, z, BlockType.OFFICE_BOTTOM);
-                    }else if (logicMap.getBlockIdAtIndex(index) == 4){
+                    }else if (logicMap.getBlockIdAtIndex(index) == BlockType.OFFICE_TOP.blockId){
                         addBlockDataToChunk(x, y, z, BlockType.OFFICE_TOP);
-                    }else if (logicMap.getBlockIdAtIndex(index) == 5){
+                    }else if (logicMap.getBlockIdAtIndex(index) == BlockType.OFFICE_FLOOR.blockId){
                         addBlockDataToChunk(x, y, z, BlockType.OFFICE_FLOOR);
                     }
 

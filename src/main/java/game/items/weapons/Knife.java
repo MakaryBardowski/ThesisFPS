@@ -4,7 +4,7 @@ import FirstPersonHands.FirstPersonHandAnimationData;
 import game.items.ItemTemplates.ItemTemplate;
 import game.entities.mobs.Mob;
 import game.entities.mobs.player.Player;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.ClipAction;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import messages.AnimationPlayedMessage;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewMeleeWeaponMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class Knife extends MeleeWeapon {
 
@@ -43,16 +43,19 @@ public class Knife extends MeleeWeapon {
     }
 
     @Override
-    public void playerEquip(Player p) {
+    public void playerEquipClient(Player p) {
         Holdable unequippedItem = p.getEquippedRightHand();
+        if(unequippedItem == this){
+            return;
+        }
         if (unequippedItem != null) {
-            unequippedItem.playerUnequip(p);
+            unequippedItem.playerUnequipClient(p);
         }
         playerHoldInRightHand(p);
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
         if (p.getEquippedRightHand() != this) {
             return;
         }
@@ -255,19 +258,21 @@ public class Knife extends MeleeWeapon {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setEquippedRightHand(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        m.setEquippedRightHand(null);
+    public void serverUnequip(HumanMob m) {
+        if(m.getEquippedRightHand() == this) {
+            m.setEquippedRightHand(null);
+        }
     }
 
     @Override
     public void attack(Mob m) {
         var apm = new AnimationPlayedMessage(m.getId(), HUMAN_ATTACK_MELEE);
-        ServerMain.getInstance().getServer().broadcast(apm);
+        ServerGameAppState.getInstance().getServer().broadcast(apm);
         slashMob(m);
     }
 
@@ -282,17 +287,17 @@ public class Knife extends MeleeWeapon {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
+    public void humanMobUnequipClient(HumanMob m) {
         if (m.getEquippedRightHand() == this) {
             m.setEquippedRightHand(null);
         }
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         Holdable unequippedItem = m.getEquippedRightHand();
         if (unequippedItem != null) {
-            unequippedItem.humanMobUnequip(m);
+            unequippedItem.humanMobUnequipClient(m);
         }
         m.setEquippedRightHand(this);
         humanEquipInThirdPerson(m, Main.getInstance().getAssetManager());

@@ -1,5 +1,6 @@
 package server;
 
+import cards.AugmentCardsTemplateRegistry;
 import cards.CardChoiceSession;
 import client.Main;
 import com.jme3.asset.AssetManager;
@@ -12,6 +13,7 @@ import com.jme3.network.Server;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import data.jumpToLevelData.BaseJumpToLevelData;
 import game.entities.*;
 import game.entities.factories.AllMobFactory;
 import game.entities.factories.DecorationFactory;
@@ -43,11 +45,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import messages.InstantEntityPosCorrectionMessage;
+import lombok.Setter;
 import messages.PlayerJoinedMessage;
 import messages.SetPlayerMessage;
 import messages.cardChoice.CardSelectionMessage;
 import messages.gameSetupMessages.MapMessage;
+import messages.gameSetupMessages.NextLevelMessage;
 import messages.items.ChestItemInteractionMessage;
 import static messages.items.ChestItemInteractionMessage.ChestItemInteractionType.INSERT;
 import messages.items.MobItemInteractionMessage;
@@ -58,16 +61,33 @@ import statusEffects.EffectFactory;
 import statusEffects.EffectTemplates;
 import statusEffects.StatusEffect;
 
-import static server.ServerMain.MAX_PLAYERS;
+import static server.ServerGameAppState.MAX_PLAYERS;
 
-public class ServerLevelManager extends LevelManager {
-
+public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
     private final Server server;
-    private final Random RANDOM = new Random();
+
+    @Getter
+    private final ConcurrentHashMap<Integer, Entity> entitiesById = new ConcurrentHashMap<>();
+    private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
+
+    @Getter
+    private Map map;
+
+    @Getter
+    @Setter
+    protected long[] levelSeeds;
+
+    @Getter
+    @Setter
+    protected MapType[] levelTypes;
+
     private static final String LEVEL_INDEX_OUT_OF_BOUNDS_MESSAGE = "Level index out of bounds. Provided: ";
+
+    private final Random RANDOM = new Random();
     private final AssetManager assetManager;
     private final RenderManager renderManager;
-    private final List<Player> players = new ArrayList<>(MAX_PLAYERS);
+
+
 
     @Getter
     private final Node rootNode;
@@ -81,7 +101,7 @@ public class ServerLevelManager extends LevelManager {
     private final int COLLISION_GRID_CELL_SIZE = 18;
 
     @Getter
-    private final int MAP_SIZE_XZ = 39;
+    private final int MAP_SIZE_XZ = 20;
 
     @Getter
     private final int MAP_SIZE_Y = 20;
@@ -89,16 +109,10 @@ public class ServerLevelManager extends LevelManager {
     @Getter
     private WorldGrid grid;
 
-    @Getter
-    private Map map;
-
-    @Getter
-    private final ConcurrentHashMap<Integer, Entity> mobs = new ConcurrentHashMap<>();
-
     private final Vector<Entity> entitiesBroadcastedAtNextLevel = new Vector<>();
 
     @Getter
-    private final List<CardChoiceSession> cardChoiceSessionsByIndex = new ArrayList<>(10);
+    private final List<CardChoiceSession> cardChoiceSessions = new ArrayList<>(10);
 
     public ServerLevelManager(int levelCount, Server server) {
         this.assetManager = Main.getInstance().getAssetManager();
@@ -116,29 +130,31 @@ public class ServerLevelManager extends LevelManager {
             levelSeeds[i] = RANDOM.nextLong();
         }
 
-        levelTypes[0] = MapType.STATIC;
-        for (int i = 1; i < levelTypes.length; i++) {
-            if (i % 6 == 0) {
-                levelTypes[i] = MapType.STATIC;
-                continue;
-            }
+//        levelTypes[0] = MapType.FILE;
+        for (int i = 0; i < levelTypes.length; i++) {
+//            if (i % 6 == 0) {
+//                levelTypes[i] = MapType.FILE;
+//                continue;
+//            }
 
-            levelTypes[i] = MapType.CASUAL;
+            var type = MapType.values()[RANDOM.nextInt(MapType.values().length)];
+
+            while(type.equals(MapType.FILE)) {
+                type = MapType.values()[RANDOM.nextInt(MapType.values().length)];
+            }
+            levelTypes[i] = type;
+//            levelTypes[i] = MapType.BSP;
         }
 
     }
 
-    public void movePlayersToSpawnpointsAndNotify(List<Vector3f> playerSpawnpoints){
-            for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
-                Player player = players.get(playerIndex);
-                var playerSpawnpointInWorld = playerSpawnpoints.get(playerIndex).mult(BLOCK_SIZE);
+    public void movePlayersToSpawnpoints(java.util.Map<Integer,Vector3f> playerSpawnpoints){
+            for(var entry : playerSpawnpoints.entrySet()){
+                var player = (Player) entitiesById.get(entry.getKey());
 
                 grid.remove(player);
-                player.getNode().setLocalTranslation(playerSpawnpointInWorld);
+                player.getNode().setLocalTranslation(entry.getValue());
                 grid.insert(player);
-                InstantEntityPosCorrectionMessage corrMsg = new InstantEntityPosCorrectionMessage(player, playerSpawnpointInWorld);
-                corrMsg.setReliable(true);
-                server.broadcast(corrMsg);
             }
     }
 
@@ -162,19 +178,36 @@ public class ServerLevelManager extends LevelManager {
     }
 
     @Override
-    public final void jumpToLevel(int levelIndex) {
+    public final void jumpToLevel(BaseJumpToLevelData jumpToLevelData) {
+        var levelIndex = jumpToLevelData.getLevelIndex();
+        var newLevelSeed = jumpToLevelData.getLevelSeed();
+        var newLevelType = jumpToLevelData.getLevelType();
+
         clearEntities();
 
-        if(levelIndex == 2){
-            var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
+        if(levelIndex == 3 || levelIndex == 5){
+            var hostsByPlayerId = ServerGameAppState.getInstance().getHostsByPlayerId();
 
-            var cardSession = new CardChoiceSession(cardChoiceSessionsByIndex.size());
-            cardChoiceSessionsByIndex.add(cardSession);
+            var cardSession = new CardChoiceSession(cardChoiceSessions.size());
+            cardChoiceSessions.add(cardSession);
 
             for(var player : players){
-                int cardId1 = 0;
-                int cardId2 = 1;
-                int cardId3 = 1;
+                var cardIdsChosenByPlayer = new HashSet<Integer>();
+
+                for(int i = 0; i < cardChoiceSessions.size()-1; i++) {
+                    var cardChoiceSession = cardChoiceSessions.get(i);
+                    cardIdsChosenByPlayer.add(cardChoiceSession.getCardPickedByPlayer(player.getId()).getCardId());
+                }
+                int registrySize = AugmentCardsTemplateRegistry.getSize();
+                int cardId1 = RANDOM.nextInt(registrySize);
+                int cardId2 = RANDOM.nextInt(registrySize);
+                int cardId3 = RANDOM.nextInt(registrySize);
+                while(cardId1 == cardId2 || cardId1 == cardId3 || cardId2 == cardId3
+                        || cardIdsChosenByPlayer.contains(cardId1) || cardIdsChosenByPlayer.contains(cardId2) || cardIdsChosenByPlayer.contains(cardId3)){
+                     cardId1 = RANDOM.nextInt(registrySize);
+                     cardId2 = RANDOM.nextInt(registrySize);
+                     cardId3 = RANDOM.nextInt(registrySize);
+                }
 
                 var thisConnectionFilter =  Filters.in(hostsByPlayerId.get(player.getId()));
 
@@ -192,30 +225,51 @@ public class ServerLevelManager extends LevelManager {
             initializeCollisionGrid();
         }
 
-        var newLevelSeed = levelSeeds[levelIndex];
-        var newLevelType = levelTypes[levelIndex];
-
         Main.getInstance().enqueue(() -> {
             try {
                 var levelGenerator = new ServerLevelGenerator(newLevelSeed,newLevelType,levelIndex);
                 var levelGenerationResult = levelGenerator.generateLevel(MAP_SIZE_XZ,MAP_SIZE_Y,MAP_SIZE_XZ);
                 this.map = levelGenerationResult.getLogicMap();
 
-                if(newLevelType.equals(MapType.STATIC)) {
+                if(newLevelType.equals(MapType.FILE)) {
                     notifyAboutMap(map);
                 }
+                var playerSpawnpoints = levelGenerationResult.getPlayerSpawnpoints();
+                var spawnpointsByPlayerId = assignSpawnpointsToPlayerIds(playerSpawnpoints);
 
-                movePlayersToSpawnpointsAndNotify(levelGenerationResult.getPlayerSpawnpoints());
+                movePlayersToSpawnpoints(spawnpointsByPlayerId);
 
                 AStar.setPathfindingMap(map,MAP_SIZE_XZ,MAP_SIZE_Y,MAP_SIZE_XZ);
                 EntitySpawner mg = new EntitySpawner(newLevelSeed, BLOCK_SIZE);
                 mg.spawnNewLevelEntities(levelGenerationResult.getEntitySpawnData());
                 notifyPlayersAboutNewLevelEntities();
+
+                server.broadcast(new NextLevelMessage(currentLevelIndex,newLevelSeed,newLevelType,spawnpointsByPlayerId));
+
             }catch (IOException exception){
                 System.err.println("Server could not load level of type "+newLevelType +" with seed "+newLevelSeed+". Reason: "+exception.getMessage());
+                server.getConnections().forEach(hostedConnection -> hostedConnection.close("Server failed to load next level no. "+currentLevelIndex+" seed "+newLevelSeed));
             }
 
         });
+    }
+
+    @Override
+    public void cleanup() {
+        this.rootNode.removeFromParent();
+    }
+
+    private java.util.Map<Integer,Vector3f> assignSpawnpointsToPlayerIds(List<Vector3f> playerSpawnpoints) {
+        var spawnpointsByPlayerId = new HashMap<Integer,Vector3f>();
+        for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
+            Player player = players.get(playerIndex);
+            if(player.isDead()){
+                continue;
+            }
+            var playerSpawnpointInWorld = playerSpawnpoints.get(playerIndex).mult(BLOCK_SIZE);
+            spawnpointsByPlayerId.put(player.getId(),playerSpawnpointInWorld);
+        }
+        return spawnpointsByPlayerId;
     }
 
     public void registerRandomDestructibleDecoration(Vector3f pos) {
@@ -264,7 +318,6 @@ public class ServerLevelManager extends LevelManager {
         Player player = new PlayerFactory(currentMaxId++, assetManager, rootNode, renderManager).createServerSide(null, playerClassIndex);
 
         player.setName(hc.getAttribute("nick"));
-        System.out.println("ustawiono nazwe " + player.getName());
 
         Helmet defaultHead = (Helmet) registerItemLocal(ItemTemplates.HEAD_1, false);
         Vest defaultVest = (Vest) registerItemLocal(ItemTemplates.TORSO_1, false);
@@ -415,7 +468,7 @@ public class ServerLevelManager extends LevelManager {
     }
 
     public void notifyPlayersAboutNewLevelEntities() {
-        var hostsByPlayerId = ServerMain.getInstance().getHostsByPlayerId();
+        var hostsByPlayerId = ServerGameAppState.getInstance().getHostsByPlayerId();
 
         List<Item> itemsInGame = entitiesBroadcastedAtNextLevel.stream()
                 .filter(entry -> entry instanceof Item)
@@ -441,7 +494,7 @@ public class ServerLevelManager extends LevelManager {
                 .map(entity -> (DestructibleDecoration) entity)
                 .toList();
 
-        List<IndestructibleDecoration> indestructibleDecorationsInGame = mobs.entrySet().stream()
+        List<IndestructibleDecoration> indestructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof IndestructibleDecoration)
                 .map(entity -> (IndestructibleDecoration) entity.getValue())
                 .toList();
@@ -487,8 +540,8 @@ public class ServerLevelManager extends LevelManager {
 
     }
 
-    public void notifyAllPlayersAboutNonMobEntities(){
-        List<Item> itemsInGame = mobs.entrySet().stream()
+    public void notifyPlayersAboutNonMobEntities(){
+        List<Item> itemsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof Item)
                 .map(entity -> (Item) entity.getValue())
                 .toList();
@@ -500,17 +553,17 @@ public class ServerLevelManager extends LevelManager {
         });
 
 
-        List<Chest> chestsInGame = mobs.entrySet().stream()
+        List<Chest> chestsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof Chest)
                 .map(entity -> (Chest) entity.getValue())
                 .toList();
 
-        List<DestructibleDecoration> destructibleDecorationsInGame = mobs.entrySet().stream()
+        List<DestructibleDecoration> destructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof DestructibleDecoration)
                 .map(entity -> (DestructibleDecoration) entity.getValue())
                 .toList();
 
-        List<IndestructibleDecoration> indestructibleDecorationsInGame = mobs.entrySet().stream()
+        List<IndestructibleDecoration> indestructibleDecorationsInGame = entitiesById.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof IndestructibleDecoration)
                 .map(entity -> (IndestructibleDecoration) entity.getValue())
                 .toList();
@@ -539,7 +592,7 @@ public class ServerLevelManager extends LevelManager {
     }
 
     public void notifyPlayerAboutInitialGameState(int playerId, HostedConnection hc) {
-        List<Mob> notThisPlayerMobs = mobs.entrySet().stream()
+        List<Mob> notThisPlayerMobs = entitiesById.entrySet().stream()
                 .filter(entry -> {
                     // temporary fix, because currently every player is a mob so you get a duplicate on players
                     return entry.getValue() instanceof Mob nonPlayer && !(nonPlayer instanceof Player) ;
@@ -556,7 +609,7 @@ public class ServerLevelManager extends LevelManager {
             sendNewEntityEquipmentInfo(mob, Filters.in(hc));
         });
 
-        Player notifiedPlayer = (Player) mobs.get(playerId);
+        Player notifiedPlayer = (Player) entitiesById.get(playerId);
 
         int playerClassIndex = (int) hc.getAttribute("class");
 
@@ -608,7 +661,7 @@ public class ServerLevelManager extends LevelManager {
 
     private void clearEntities() {
         var itemsToKeep = getItemsTokeep();
-        mobs.forEach((id, entity) -> {
+        entitiesById.forEach((id, entity) -> {
             if (isNotItemToKeep(entity, itemsToKeep) && isNotPlayer(entity)) { // if not an item to keep
                 System.out.println("destroying " + entity);
                 entity.destroyOnServerAndNotify();
@@ -663,7 +716,7 @@ public class ServerLevelManager extends LevelManager {
     }
 
     private <T extends Entity> T registerEntityLocal(T entity) {
-        mobs.put(entity.getId(), entity);
+        entitiesById.put(entity.getId(), entity);
         return entity;
     }
 

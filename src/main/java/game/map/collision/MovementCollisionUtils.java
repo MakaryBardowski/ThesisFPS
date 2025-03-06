@@ -20,7 +20,7 @@ public class MovementCollisionUtils {
 
     public static void sortByPassability(Set<Collidable> all, ArrayList<Collidable> solid, ArrayList<Collidable> passable) {
         for (Collidable c : all) {
-            if (Collidable.isCollisionShapePassable(c)) {
+            if (Collidable.isPassable(c)) {
                 passable.add(c);
             } else {
                 solid.add(c);

@@ -1,16 +1,13 @@
 package messages.cardChoice;
 
 import cards.AugmentCardsTemplateRegistry;
-import client.ClientGameAppState;
-import client.Main;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.StatusEffectContainer;
-import game.entities.mobs.player.Player;
-import game.map.blocks.Map;
 import lombok.Getter;
 import messages.TwoWayMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Getter
 @Serializable
@@ -29,7 +26,7 @@ public class ChooseCardMessage extends TwoWayMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection sender) {
+    public void handleServer(ServerGameAppState server, HostedConnection sender) {
         if(entityNotExistsLocallyServer(playerId)) {
             System.err.println("[SERVER]" + playerId + " does not exist in registered mobs to choose a card!");
             return;
@@ -39,7 +36,7 @@ public class ChooseCardMessage extends TwoWayMessage {
                 System.err.println("[SERVER]" + playerId + " is not a player, but wants to choose a card!");
                 return;
             }
-        var currentCardChoice = server.getCurrentGamemode().getLevelManager().getCardChoiceSessionsByIndex().get(cardChoiceSessionId);
+        var currentCardChoice = server.getCurrentGamemode().getLevelManager().getCardChoiceSessions().get(cardChoiceSessionId);
         if(currentCardChoice.isPlayerAlreadyChosenCard(playerId)){
             System.err.println("[SERVER]" + playerId + " has already chosen a card!!");
             return;
@@ -68,7 +65,7 @@ public class ChooseCardMessage extends TwoWayMessage {
 
         if(playerId == client.getPlayer().getId()) {
             enqueueExecution(() -> {
-                Main.getInstance().getMenuStateMachine().forceState(null);
+                client.getMenuStateMachine().forceState(null);
             });
         }
     }

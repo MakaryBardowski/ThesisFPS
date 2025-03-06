@@ -4,8 +4,7 @@ import com.jme3.network.AbstractMessage;
 import data.DamageReceiveData;
 import game.entities.Destructible;
 import game.entities.StatusEffectContainer;
-import game.entities.mobs.MudBeetle;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
 
 import java.util.Random;
@@ -23,9 +22,9 @@ public class DeadeyeCardEffect extends OnHitEffect{
 
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
-        var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
-        var attacker = (Destructible) serverLevelManager.getMobs().get(input.getAttackerId());
-        var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
+        var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
+        var attacker = (Destructible) serverLevelManager.getEntitiesById().get(input.getAttackerId());
+        var victim = (Destructible) serverLevelManager.getEntitiesById().get(input.getVictimId());
 
         // additional 1 percent per tile
         var additionalCritChanceForDistance = (

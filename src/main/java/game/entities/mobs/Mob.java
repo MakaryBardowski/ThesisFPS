@@ -3,9 +3,9 @@ package game.entities.mobs;
 import behaviorTree.BehaviorTree;
 import data.DamageReceiveData;
 import game.entities.Destructible;
+import game.entities.factories.MobSpawnType;
 import game.entities.inventory.Equipment;
 import game.items.Item;
-import game.map.collision.CollidableInterface;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -21,17 +21,18 @@ import lombok.Getter;
 import lombok.Setter;
 import settings.GlobalSettings;
 
-public abstract class Mob extends StatusEffectContainer implements CollidableInterface, MobInterface, Animated {
+public abstract class Mob extends StatusEffectContainer implements MobInterface, Animated {
+    public static final int SPEED_ATTRIBUTE_KEY = 2;
+
+    protected static final float MOB_ROTATION_RATE = 6f;
+    protected static final int EQUIPMENT_SIZE = 20;
+
+    private static final float DEFAULT_SPEED = 8.75f;
+
+    protected final MobSpawnType mobSpawnType; // original template that spawned this mob
 
     @Getter
     protected BehaviorTree behaviorTree;
-
-    protected static final float MOB_ROTATION_RATE = 6f;
-
-    public static final int SPEED_ATTRIBUTE = 2;
-
-    private static final float DEFAULT_SPEED = 8.75f;
-    protected static final int EQUIPMENT_SIZE = 20;
 
     protected Equipment equipment = new Equipment(new Item[EQUIPMENT_SIZE]); // 6 rows 3 cols
 
@@ -56,11 +57,12 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     @Setter
     protected float rotInterpolationValue;
 
-    public Mob(int id, Node node, String name) {
+    public Mob(MobSpawnType mobSpawnType, int id, Node node, String name) {
         super(id, name, node);
+        this.mobSpawnType = mobSpawnType;
         this.serverLocation = node.getWorldTranslation();
         this.serverRotation = node.getLocalRotation();
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
     }
 
     public boolean doesNotCollideWithEntitiesAtPositionServer(Vector3f newPos, WorldGrid grid, ArrayList<Collidable> solidCollidables) {
@@ -89,7 +91,7 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     }
 
     public boolean isDead() {
-        return health <= 0;
+        return getHealth() <= 0;
     }
 
     public Destructible getCurrentTarget() {
@@ -119,7 +121,9 @@ public abstract class Mob extends StatusEffectContainer implements CollidableInt
     protected void dropEquipment() {
         Random r = new Random();
         equipment.removeAllItems().forEach(item -> {
-            item.drop(node.getWorldTranslation().add(r.nextFloat(-0.25f, 0.25f), 2 + r.nextFloat(-1, 1), r.nextFloat(-0.25f, 0.25f)));
+            item.drop(node.getWorldTranslation().add(r.nextFloat(-0.25f, 0.25f), 2 + r.nextFloat(-1, 1), r.nextFloat(-0.25f, 0.25f)),
+                    new Vector3f(r.nextFloat(-2,2),r.nextFloat(3,8),r.nextFloat(-2,2))
+                    );
         });
     }
 

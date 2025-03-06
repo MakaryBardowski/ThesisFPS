@@ -13,9 +13,11 @@ import messages.TwoWayMessage;
 @Getter
 public abstract class NewItemMessage extends TwoWayMessage {
     public static final ItemFactory ifa = new ItemFactory();
+
     protected int id;
     protected int templateIndex;
     protected boolean droppable;
+    protected String name;
 
     // Todo: dropped item
     protected boolean alreadyDropped;
@@ -37,6 +39,8 @@ public abstract class NewItemMessage extends TwoWayMessage {
         this.droppedX = dropLocationOnServer.x;
         this.droppedY = dropLocationOnServer.y;
         this.droppedZ = dropLocationOnServer.z;
+
+        this.name = item.getName();
     }
     
     public ItemTemplate getTemplate(){

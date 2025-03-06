@@ -1,11 +1,14 @@
 package client;
 
+import client.appStates.ClientGameAppState;
+import client.appStates.LobbyTeamViewAppState;
+import client.appStates.MainMenuAppState;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class MainMenuController implements ScreenController {
 
@@ -28,7 +31,7 @@ public class MainMenuController implements ScreenController {
         goToLobbyScreenHost();
 
         Main instance = Main.getInstance();
-        ServerMain sm = new ServerMain(instance.getAssetManager(), instance.getRenderManager());
+        ServerGameAppState sm = new ServerGameAppState(instance.getAssetManager(), instance.getRenderManager());
         instance.getStateManager().attach(sm);
 
         var clientGameState = new ClientGameAppState(Main.getInstance(), "localhost");
@@ -42,10 +45,12 @@ public class MainMenuController implements ScreenController {
     }
 
     public static void joinLobby() {
-        
+
         MainMenuController.goToLobbyScreenClient();
 
-        System.out.println("joining lobby");
+//        System.out.println("joining lobby "+Main.getInstance().getCamera().getRotation());
+//        Main.getInstance().getCamera().setLocation(new Vector3f(0,0,0));
+
         Element textFieldElement = MainMenuAppState.getNifty().getCurrentScreen().findElementById("ip-textfield");
         TextField textFieldControl = textFieldElement.getNiftyControl(TextField.class);
         String serverIpAddress = textFieldControl.getDisplayedText();
@@ -93,7 +98,7 @@ public class MainMenuController implements ScreenController {
     }
 
     public static void startGame() {
-        ServerMain.getInstance().startGame();
+        ServerGameAppState.getInstance().startGame();
     }
 
     public static void leaveLobby() {

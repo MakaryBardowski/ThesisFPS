@@ -1,8 +1,7 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
-import com.jme3.network.AbstractMessage;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.entities.DestructibleUtils;
@@ -10,7 +9,7 @@ import game.entities.factories.MobSpawnType;
 import game.entities.mobs.Mob;
 import game.map.blocks.VoxelLighting;
 import lombok.Getter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class NewMobMessage extends TwoWayMessage {
@@ -21,9 +20,12 @@ public class NewMobMessage extends TwoWayMessage {
     private int id;
     @Getter
     private float health;
+    @Getter
+    private float maxHealth;
     private float x;
     private float y;
     private float z;
+    private float speed;
 
     public NewMobMessage() {
     }
@@ -32,13 +34,15 @@ public class NewMobMessage extends TwoWayMessage {
         this.id = mob.getId();
         this.mobType = mobType;
         this.health = mob.getHealth();
+        this.maxHealth = mob.getMaxHealth();
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
+        this.speed = mob.getCachedSpeed();
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -59,8 +63,9 @@ public class NewMobMessage extends TwoWayMessage {
                 VoxelLighting.setupModelLight(p.getNode());
                 DestructibleUtils.setupModelShootability(p.getNode(), p.getId());
                 placeMob(nmsg.getPos(), p);
-
+                p.setMaxHealth(nmsg.getMaxHealth());
                 p.setHealth(nmsg.getHealth());
+                p.setCachedSpeed(speed);
             }
             );
         }

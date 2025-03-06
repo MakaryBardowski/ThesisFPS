@@ -4,9 +4,8 @@ import com.jme3.network.AbstractMessage;
 import game.entities.StatusEffectContainer;
 import lombok.Getter;
 import messages.DestructibleHealReceiveMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
-import statusEffects.temporaryEffects.RepeatedTemporaryEffect;
 
 public class HealOverTimeEffect extends RepeatedTemporaryEffect {
 
@@ -43,7 +42,7 @@ public class HealOverTimeEffect extends RepeatedTemporaryEffect {
 
             DestructibleHealReceiveMessage hpUpd = new DestructibleHealReceiveMessage(target.getId(), healingDone);
             hpUpd.setReliable(true);
-            ServerMain.getInstance().getServer().broadcast(hpUpd);
+            ServerGameAppState.getInstance().getServer().broadcast(hpUpd);
         }
         return null;
     }

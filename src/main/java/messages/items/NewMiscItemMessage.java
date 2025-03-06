@@ -1,11 +1,11 @@
 package messages.items;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.items.Item;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class NewMiscItemMessage extends NewItemMessage{
@@ -18,7 +18,7 @@ public class NewMiscItemMessage extends NewItemMessage{
     }
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection sender) {
+    public void handleServer(ServerGameAppState server, HostedConnection sender) {
     }
 
     @Override

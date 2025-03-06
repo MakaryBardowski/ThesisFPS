@@ -1,7 +1,7 @@
 package cards;
 
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectTemplates;
 
 public class PinpointCard extends AugmentCardTemplate {
@@ -17,7 +17,7 @@ public class PinpointCard extends AugmentCardTemplate {
 
     @Override
     public void chooseCardServer(StatusEffectContainer statusEffectContainer) {
-        var effect = ServerMain.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.DEADEYE_CARD_CRIT,statusEffectContainer);
+        var effect = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager().createAndRegisterStatusEffect(EffectTemplates.DEADEYE_CARD_CRIT,statusEffectContainer);
         statusEffectContainer.addEffect(effect);
     }
 }

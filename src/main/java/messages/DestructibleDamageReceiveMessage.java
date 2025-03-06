@@ -1,6 +1,6 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import data.DamageReceiveData;
@@ -10,7 +10,7 @@ import game.entities.mobs.Mob;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 @Getter
@@ -37,14 +37,14 @@ public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
         Entity victim = getEntityByIdServer(id);
         Entity attacker = getEntityByIdServer(attackerId);
-        if (victim != null) { // if the mob doesnt exist, it means the
+        if (victim != null && attacker != null) { // if the mob doesnt exist, it means the
             // info was sent from a lagged user - dont forward it to others
             Mob attackerMob = ((Mob) attacker);
             Destructible victimMob = ((Destructible) victim);
-            applyDestructibleDamageAndNotifyClients(victimMob,attackerMob, ServerMain.getInstance());
+            applyDestructibleDamageAndNotifyClients(victimMob,attackerMob, ServerGameAppState.getInstance());
 
         }
     }
@@ -60,7 +60,7 @@ public class DestructibleDamageReceiveMessage extends EntityUpdateMessage {
         );
     }
 
-    public void applyDestructibleDamageAndNotifyClients(Destructible target, Mob attacker, ServerMain serverApp) {
+    public void applyDestructibleDamageAndNotifyClients(Destructible target, Mob attacker, ServerGameAppState serverApp) {
             enqueueExecution(()->{
                 var damageReceiveData = getDamageReceiveData();
                 attacker.dealDamageServer(damageReceiveData,target); // can be modified inside

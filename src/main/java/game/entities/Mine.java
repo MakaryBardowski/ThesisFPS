@@ -1,6 +1,6 @@
 package game.entities;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.epagagames.particles.Emitter;
 import com.epagagames.particles.emittershapes.EmitterCircle;
 import com.epagagames.particles.influencers.ColorInfluencer;
@@ -21,10 +21,9 @@ import com.jme3.texture.Texture;
 import data.DamageReceiveData;
 import game.effects.TimedSpatialRemoveControl;
 import game.map.collision.CollisionDebugUtils;
-import game.map.collision.RectangleAABB;
 import game.map.collision.RectangleOBB;
 import messages.DestructibleDamageReceiveMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 import static game.effects.DecalProjector.projectFromTo;
 
 public class Mine extends DestructibleDecoration {
@@ -71,7 +70,7 @@ public class Mine extends DestructibleDecoration {
 
     @Override
     public float calculateDamage(float damage) {
-        return damage * 2;
+        return damage * 2 > 0 ? damage * 2 : 0;
     }
 
     @Override
@@ -80,9 +79,8 @@ public class Mine extends DestructibleDecoration {
             onDamageReceivedEffect.applyClient(damageData);
         }
 
-        health = health - calculateDamage(damageData.getRawDamage());
-
-        if (health <= 0) {
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
+        if (getHealth() <= 0) {
             spawnExplosionVisuals();
             die();
             destroyClient();
@@ -96,9 +94,10 @@ public class Mine extends DestructibleDecoration {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health = health - calculateDamage(damageData.getRawDamage());
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
 
-        if (health <= 0) {
+
+        if (getHealth() <= 0) {
             destroyServer();
             onDeathServer();
         }
@@ -129,7 +128,7 @@ public class Mine extends DestructibleDecoration {
     }
 
     private void selfDestruct() {
-        ServerMain serverApp = ServerMain.getInstance();
+        ServerGameAppState serverApp = ServerGameAppState.getInstance();
         Destructible d = this;
         float selfDestructDmg = 5000;
 

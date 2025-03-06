@@ -2,12 +2,13 @@ package menu.states;
 
 import cards.AugmentCardTemplate;
 import cards.AugmentCardsTemplateRegistry;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.scene.Node;
 import com.simsilica.lemur.GuiGlobals;
 import game.entities.mobs.player.Player;
-import guiComponents.menuComponents.CardChoiceComponent;
+import menu.menuComponents.cardChoice.CardChoiceComponent;
 import messages.cardChoice.ChooseCardMessage;
 
 import java.util.ArrayList;
@@ -47,6 +48,14 @@ public class CardChoiceMenuState implements MenuState {
     public void open(Node guiNode,float resolutionX, float resolutionY) {
         Player.disablePlayerControls();
         GuiGlobals.getInstance().setCursorEventsEnabled(true,true);
+
+        var player = ClientGameAppState.getInstance().getPlayer();
+        if(player != null){
+            player.setForward(false);
+            player.setBackward(false);
+            player.setLeft(false);
+            player.setRight(false);
+        }
 
         float cardMarginSide = resolutionX*0.15f;
         float cardMarginBot = resolutionY*0.8f;

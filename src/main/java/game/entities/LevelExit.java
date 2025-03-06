@@ -1,10 +1,9 @@
 package game.entities;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import game.entities.DecorationTemplates.DecorationTemplate;
-import game.entities.mobs.Mob;
 import messages.gameSetupMessages.NextLevelMessage;
 
 public class LevelExit extends IndestructibleDecoration {
@@ -29,7 +28,7 @@ public class LevelExit extends IndestructibleDecoration {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -44,7 +43,7 @@ public class LevelExit extends IndestructibleDecoration {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

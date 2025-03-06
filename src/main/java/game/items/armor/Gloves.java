@@ -1,22 +1,19 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
-import game.items.ItemTemplates;
+import client.appStates.ClientGameAppState;
+
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
-import com.jme3.util.BufferUtils;
-import debugging.DebugUtils;
+
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
 import game.items.ItemTemplates.GlovesTemplate;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -36,20 +33,31 @@ public class Gloves extends Armor {
     }
 
     @Override
-    public void playerEquip(Player m) {
-        humanMobEquip(m);
+    public void playerEquipClient(Player m) {
+        Gloves unequippedItem = m.getGloves();
+        if(unequippedItem == this) {
+            return;
+        }
+        if (unequippedItem != null) {
+            unequippedItem.playerUnequipClient(m);
+        }
+        humanMobEquipClient(m);
         m.getFirstPersonHands().setFpHands(this);
     }
 
     @Override
-    public void playerUnequip(Player m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void playerUnequipClient(Player p) {
+        if (p.getGloves() != this) {
+            return;
+        }
+
+        humanMobUnequipClient(p);
+        p.getDefaultGloves().playerEquipClient(p);
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         m.setGloves(this);
-        System.out.println(m.getNode().getChildren());
 
 //        r.detachAllChildren();
         Node gloveR = (Node) Main.getInstance().getAssetManager().loadModel(template.getFpPath().replace("?", "R"));
@@ -67,8 +75,8 @@ public class Gloves extends Armor {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void humanMobUnequipClient(HumanMob m) {
+        m.getDefaultGloves().humanMobEquipClient(m);
     }
 
     @Override
@@ -87,13 +95,15 @@ public class Gloves extends Armor {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setGloves(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getGloves() == this) {
+            m.setGloves(m.getGloves());
+        }
     }
 
     @Override

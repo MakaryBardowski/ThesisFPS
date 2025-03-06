@@ -4,11 +4,11 @@ import com.jme3.network.AbstractMessage;
 import data.DamageReceiveData;
 import game.entities.Destructible;
 import game.entities.StatusEffectContainer;
-import server.ServerMain;
+import server.ServerGameAppState;
 import statusEffects.EffectProcType;
 
 public class CutDownCardEffect extends OnHitEffect{
-    private float EXECUTE_THRESHOLD = 15f/100;
+    private float EXECUTE_THRESHOLD = 7.5f/100;
 
     public CutDownCardEffect(int id, String name, StatusEffectContainer target, EffectProcType procType) {
         super(id, name, target, procType);
@@ -16,10 +16,12 @@ public class CutDownCardEffect extends OnHitEffect{
 
     @Override
     public DamageReceiveData applyServer(DamageReceiveData input) {
-        var serverLevelManager = ServerMain.getInstance().getCurrentGamemode().getLevelManager();
-        var victim = (Destructible) serverLevelManager.getMobs().get(input.getVictimId());
+        var serverLevelManager = ServerGameAppState.getInstance().getCurrentGamemode().getLevelManager();
+        var attacker = (Destructible) serverLevelManager.getEntitiesById().get(input.getAttackerId());
 
-        if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= victim.getMaxHealth()*EXECUTE_THRESHOLD){
+        var victim = (Destructible) serverLevelManager.getEntitiesById().get(input.getVictimId());
+
+        if( ( victim.getHealth() - victim.calculateDamage(input.getRawDamage()) ) <= attacker.getMaxHealth()*EXECUTE_THRESHOLD){
             input.setRawDamage(victim.getMaxHealth()*99);
         }
         return input;

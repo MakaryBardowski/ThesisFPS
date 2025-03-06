@@ -4,14 +4,14 @@ import behaviorTree.NodeAction;
 import behaviorTree.NodeCompletionStatus;
 import behaviorTree.context.Context;
 import behaviorTree.context.SimpleHumanMobContext;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class IsPathfindingNeeded extends NodeAction {
 
     @Override
     public NodeCompletionStatus execute(Context context) {
         var hc = (SimpleHumanMobContext) context;
-        hc.setFindRandomPathTimer(hc.getFindRandomPathTimer() - ServerMain.getTimePerFrame());
+        hc.setFindRandomPathTimer(hc.getFindRandomPathTimer() - ServerGameAppState.getTimePerFrame());
         if (shouldPathfind(hc)) {
             hc.setLookInRandomDirectionTimer(hc.getLookInRandomDirectionCooldown());
             hc.setFindRandomPathTimer(hc.getFindRandomPathCooldown());

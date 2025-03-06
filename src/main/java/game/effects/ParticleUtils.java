@@ -1,6 +1,6 @@
 package game.effects;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
@@ -11,7 +11,7 @@ import game.effects.particleStrategies.DroppedItem;
 import game.effects.particleStrategies.GoreParticle;
 import game.effects.particleStrategies.ParticleMovementStrategy;
 import game.items.Item;
-import java.util.List;
+
 import java.util.Random;
 
 public class ParticleUtils {

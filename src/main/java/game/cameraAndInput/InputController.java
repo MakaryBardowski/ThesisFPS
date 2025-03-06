@@ -1,8 +1,9 @@
 package game.cameraAndInput;
 
-import game.AttachedEntity;
+import com.jme3.math.*;
+import game.entities.AttachedEntity;
 import game.entities.mobs.player.Player;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import static client.Main.CAM_ROT_SPEED;
 import static client.Main.CAM__MOVE_SPEED;
@@ -17,24 +18,20 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
-import de.lessvoid.nifty.render.NiftyImage;
-import game.entities.Entity;
 import game.items.Item;
 import game.items.weapons.Grenade;
 import game.items.weapons.MeleeWeapon;
 import game.items.weapons.RangedWeapon;
 import menu.states.InventoryMenuState;
+import menu.states.PauseMenuState;
 import messages.MobRotUpdateMessage;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 public class InputController {
+    private float MAX_VERTICAL_ROTATION_DEG = 80;
+    private float MIN_VERTICAL_ROTATION_DEG = -80;
 
-    private NiftyImage guiElement;
     private InputManager m;
     private HeadBobControl headBob;
     private static final float ONE_DEGREE = 0.0174f;
@@ -42,8 +39,8 @@ public class InputController {
     /*
     JME cursor position cannot be altered externally
      */
-    private final Vector2f prevJMEcursorPos = new Vector2f();
-    private final Vector2f cursorPositionForPlayerRotation = new Vector2f();
+    private Vector2f prevJMEcursorPos;
+    private Vector2f cursorPositionForPlayerRotation;
     private float deltaX;
     private float deltaY;
     private float centeredX;
@@ -51,6 +48,7 @@ public class InputController {
     private Quaternion newRotationQuat;
     private float currentMaxDeviationX = 0;
     private float currentMaxDeviationY = 0;
+    private float proposedRotationY = 0;
 
     private boolean updatePlayersThirdPersonHandsRot = false;
 
@@ -67,6 +65,16 @@ public class InputController {
         ActionListener actionListener = new ActionListener() {
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
+                if(name.equals("Esc") && !keyPressed){
+                    var menus = gs.getMenuStateMachine();
+                    if(menus.getCurrentState() == null) {
+                        menus.requestState(new PauseMenuState());
+                    } else {
+                        System.out.println("request old state");
+                        menus.requestPreviousState();
+                    }
+                }
+
                 if(!Player.isPlayerControlsEnabled()){
                     return;
                 }
@@ -110,8 +118,8 @@ public class InputController {
                 }
 
                 if (!player.isDead() && isHotbarName(name) && !keyPressed) {
-                    System.out.println("hotbar name ======== "+name);
-                    Item equippedItem = player.getHotbar().getItemAt(Integer.parseInt(name));
+                    int hotbarIndex = Integer.parseInt(name);
+                    Item equippedItem = player.getHotbar().getItemAt(hotbarIndex);
                     player.equip(equippedItem);
                     PlayerHUDController.sendEquipMessageToServer(equippedItem);
                 }
@@ -130,7 +138,7 @@ public class InputController {
                 }
 
                 if (name.equals("I") && !gs.getPlayer().isDead() && !keyPressed) {
-                    var menuStateMachine = Main.getInstance().getMenuStateMachine();
+                    var menuStateMachine = gs.getMenuStateMachine();
                     if(menuStateMachine.isStateNull()) {
                         menuStateMachine.requestState(new InventoryMenuState(gs.getPlayer()));
                     } else {
@@ -163,9 +171,10 @@ public class InputController {
 //                }
                 if (name.equals("K") && !keyPressed) {
 //                    GlobalSettings.isAiDebug = !GlobalSettings.isAiDebug;
-                    if(ServerMain.getInstance() != null) {
-                        ServerMain.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
+                    if(ServerGameAppState.getInstance() != null) {
+                        ServerGameAppState.getInstance().getLevelManagerMobs().forEach((key, value) -> System.err.println(value));
                     }
+
                     System.gc();
                     player.setRight(false);
                     player.setLeft(false);
@@ -203,8 +212,10 @@ public class InputController {
     private AnalogListener initAnalogListener(final ClientGameAppState gs) {
         final Player player = gs.getPlayer();
 
-//        prevJMEcursorPos.set(gs.getInputManager().getCursorPosition());
+        initializeParamsAfterMouseEnable();
+
         AnalogListener analogListener = new AnalogListener() {
+            Vector2f currentCursorPos = new Vector2f();
             @Override
             public void onAnalog(String name, float value, float tpf) {
                 if(!Player.isPlayerControlsEnabled()){
@@ -215,13 +226,11 @@ public class InputController {
                     deltaX = gs.getInputManager().getCursorPosition().x - prevJMEcursorPos.x;
                     if (!gs.getPlayer().isViewingEquipment()) {
                         cursorPositionForPlayerRotation.setX(cursorPositionForPlayerRotation.x + deltaX);
-                        centeredX = cursorPositionForPlayerRotation.x - 0.5f * gs.getSettings().getWidth();
+                        centeredX = cursorPositionForPlayerRotation.x;
                         newRotationQuat = new Quaternion();
 
                         centeredX = -0.005f * centeredX;
-
                         newRotationQuat.fromAngles(0, centeredX, 0);
-
                         currentMaxDeviationX += centeredX;
 
                         player.getNode().setLocalRotation(newRotationQuat);
@@ -230,23 +239,26 @@ public class InputController {
 
                 }
                 if (name.equals("MouseMovedY")) {
-                    deltaY = gs.getInputManager().getCursorPosition().y - prevJMEcursorPos.y;
+                    float cursorY = gs.getInputManager().getCursorPosition().y;
+                    deltaY = cursorY - prevJMEcursorPos.y;
+
                     if (!gs.getPlayer().isViewingEquipment()) {
+                        centeredY += deltaY;
+                        float proposedRotationDeg = centeredY * -0.005f * FastMath.RAD_TO_DEG;
+                        if (proposedRotationDeg > MAX_VERTICAL_ROTATION_DEG) {
+                            proposedRotationDeg = MAX_VERTICAL_ROTATION_DEG;
+                        } else if (proposedRotationDeg < MIN_VERTICAL_ROTATION_DEG) {
+                            proposedRotationDeg = MIN_VERTICAL_ROTATION_DEG;
+                        }
 
-                        cursorPositionForPlayerRotation.setY(cursorPositionForPlayerRotation.y + deltaY);
-                        centeredY = cursorPositionForPlayerRotation.y - 0.5f * gs.getSettings().getWidth();
                         newRotationQuat = new Quaternion();
-
-                        centeredY = -0.005f * centeredY; //reusingVariable
-                        newRotationQuat.fromAngles(centeredY, 0, 0);
-
-                        currentMaxDeviationY += centeredY;
-
+                        newRotationQuat.fromAngles(proposedRotationDeg * FastMath.DEG_TO_RAD, 0, 0);
                         player.getRotationNode().setLocalRotation(newRotationQuat);
 
+                        centeredY = proposedRotationDeg / -0.005f / FastMath.RAD_TO_DEG;
                     }
-                    prevJMEcursorPos.setY(gs.getInputManager().getCursorPosition().y);
 
+                    prevJMEcursorPos.setY(cursorY);
                 }
                 if (currentMaxDeviationX >= NOTIFY_SERVER_THRESHOLD || currentMaxDeviationX <= -NOTIFY_SERVER_THRESHOLD || currentMaxDeviationY >= NOTIFY_SERVER_THRESHOLD || currentMaxDeviationY <= -NOTIFY_SERVER_THRESHOLD) {
                     currentMaxDeviationX = 0;
@@ -277,6 +289,13 @@ public class InputController {
         return analogListener;
     }
 
+    public void initializeParamsAfterMouseEnable() {
+        prevJMEcursorPos = ClientGameAppState.getInstance().getInputManager().getCursorPosition().clone().mult(1);
+        if(cursorPositionForPlayerRotation == null) {
+            cursorPositionForPlayerRotation = new Vector2f();
+        }
+    }
+
     private boolean isHotbarName(String s) {
         return s == "1" || s == "2" || s == "3" || s == "4" || s == "5" || s == "6" || s == "7" || s == "8" || s == "9" || s == "0";
     }
@@ -287,6 +306,7 @@ public class InputController {
         inputManager.addMapping("S", new KeyTrigger(KeyInput.KEY_S)); // backward
         inputManager.addMapping("A", new KeyTrigger(KeyInput.KEY_A)); // strafe left
         inputManager.addMapping("D", new KeyTrigger(KeyInput.KEY_D)); // strafe right
+        inputManager.addMapping("Esc", new KeyTrigger(KeyInput.KEY_ESCAPE));
 
         inputManager.addMapping("Attack", new MouseButtonTrigger(MouseInput.BUTTON_LEFT)); // shoot
         inputManager.addMapping("AttackR", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); // shoot
@@ -318,6 +338,7 @@ public class InputController {
                 new MouseAxisTrigger(MouseInput.AXIS_Y, true)
         );
 
+        inputManager.addListener(actionListener,"Esc");
         inputManager.addListener(analogListener, "MouseMovedX");
         inputManager.addListener(analogListener, "MouseMovedY");
         inputManager.addListener(actionListener, "W");
@@ -347,6 +368,11 @@ public class InputController {
         inputManager.addListener(actionListener, "0");
 
     }
+
+    public static void destroyKeys(InputManager inputManager) {
+        inputManager.clearMappings();
+    }
+
 
     private void setMovingAnimationPlayer(Player p, float animSpeed) {
 //        if (p.getHandsAnimChannel() != null && !p.getHandsAnimChannel().getAnimationName().equals("Run") || p.getHandsAnimChannel().getSpeed() < animSpeed) {

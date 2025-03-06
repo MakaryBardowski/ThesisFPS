@@ -1,8 +1,7 @@
 package game.effects;
 
 import com.jme3.texture.Texture;
-import game.entities.mobs.player.Player;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.epagagames.particles.Emitter;
 import com.epagagames.particles.emittershapes.EmitterCircle;
@@ -10,7 +9,6 @@ import com.epagagames.particles.influencers.ColorInfluencer;
 import com.epagagames.particles.influencers.SizeInfluencer;
 import com.epagagames.particles.influencers.VelocityInfluencer;
 import com.epagagames.particles.valuetypes.ColorValueType;
-import com.epagagames.particles.valuetypes.Curve;
 import com.epagagames.particles.valuetypes.Gradient;
 import com.epagagames.particles.valuetypes.ValueType;
 import com.epagagames.particles.valuetypes.VectorValueType;

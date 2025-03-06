@@ -1,5 +1,12 @@
-package client;
+package client.appStates;
 
+import client.ClientGameManager;
+import client.ClientStoryGameManager;
+import client.Main;
+import client.PlayerHUD;
+import com.jme3.network.service.serializer.ClientSerializerRegistrationsService;
+import game.cameraAndInput.InputController;
+import menu.MenuStateMachine;
 import messages.messageListeners.ClientMessageListener;
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.Client;
@@ -36,18 +43,21 @@ import messages.lobby.HostJoinedLobbyMessage;
 
 public class ClientGameAppState extends AbstractAppState implements ClientStateListener {
 
-    private final SimpleApplication app;
+    @Getter
+    private Client client;
+
+    @Getter
+    private final String serverIp;
 
     @Getter
     private final AppStateManager stateManager;
 
     @Getter
+    @Setter
     private static ClientGameAppState instance;
 
     private final AppSettings applicationSettings;
 
-    @Getter
-    private Client client;
 
     @Getter
     @Setter
@@ -62,25 +72,35 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
     private Nifty nifty;
 
     @Getter
-    private final String serverIp;
-
-    @Getter
     private boolean debug;
 
     @Setter
     @Getter
     private ClientGameManager currentGamemode = new ClientStoryGameManager();
 
+    @Getter
+    private MenuStateMachine menuStateMachine;
+
+    private Picture crosshair;
+
+    @Getter
+    @Setter
+    private InputController inputController;
+
+    private Node guiNode = new Node("Client game gui node");
+
     public ClientGameAppState(Main app, String serverIp) {
         instance = this;
-        this.app = app;
         this.applicationSettings = app.getAppSettings();
         stateManager = Main.getInstance().getStateManager();
         this.serverIp = serverIp;
+        app.getGuiNode().attachChild(guiNode);
+        this.menuStateMachine = new MenuStateMachine(guiNode, applicationSettings.getWidth(),applicationSettings.getHeight());
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
+
         currentGamemode.startGame();
         connectToServer();
         currentGamemode.getLevelManager().setClient(client);
@@ -206,7 +226,7 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
     }
 
     public void drawCrosshair() {
-        Picture crosshair = new Picture("crosshair");
+        crosshair = new Picture("crosshair");
         crosshair.setImage(Main.getInstance().getAssetManager(), "Textures/GUI/crosshair.png", true);
         crosshair.setWidth(getSettings().getHeight() * 0.04f);
         crosshair.setHeight(getSettings().getHeight() * 0.04f); //0.04f
@@ -214,4 +234,23 @@ public class ClientGameAppState extends AbstractAppState implements ClientStateL
         Main.getInstance().getGuiNode().attachChild(crosshair);
     }
 
+    @Override
+    public void stateDetached(AppStateManager stateManager) {
+        super.stateDetached(stateManager);
+
+        if (ClientGameAppState.getInstance().getClient().isStarted()) {
+            ClientGameAppState.getInstance().getClient().close();
+        }
+
+        var csr = ClientGameAppState.getInstance().getClient().getServices().getService(ClientSerializerRegistrationsService.class);
+        if(csr != null) {
+            ClientGameAppState.getInstance().getClient().getServices().removeService(csr);
+        }
+
+        var hudState = stateManager.getState(PlayerHUD.class);
+        stateManager.detach(hudState);
+        crosshair.removeFromParent();
+        currentGamemode.getLevelManager().cleanup();
+        ClientGameAppState.setInstance(null);
+    }
 }

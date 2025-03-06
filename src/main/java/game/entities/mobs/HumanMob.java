@@ -10,12 +10,13 @@ import behaviorTree.composite.SequenceNode;
 import behaviorTree.context.SimpleHumanMobContext;
 import game.effects.EmitterPooler;
 import game.entities.*;
+import game.entities.factories.MobSpawnType;
 import game.items.Equippable;
 import game.items.Holdable;
 import game.items.Item;
 import game.map.collision.WorldGrid;
-import client.ClientGameAppState;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import client.appStates.ClientGameAppState;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import client.ClientSynchronizationUtils;
 import client.Main;
 import com.jme3.anim.AnimComposer;
@@ -23,19 +24,13 @@ import com.jme3.anim.ArmatureMask;
 import com.jme3.anim.SkinningControl;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.SceneGraphVisitorAdapter;
-import com.jme3.scene.debug.custom.ArmatureDebugger;
 import data.DamageReceiveData;
 import events.DamageReceivedEvent;
 import game.effects.ParticleUtils;
-
-import static game.entities.factories.MobSpawnType.HUMAN;
 
 import game.items.armor.Boots;
 import game.items.armor.Gloves;
@@ -50,8 +45,8 @@ import lombok.Getter;
 import lombok.Setter;
 import messages.DestructibleDamageReceiveMessage;
 import messages.NewMobMessage;
-import server.ServerMain;
-import static server.ServerMain.removeEntityByIdServer;
+import server.ServerGameAppState;
+import static server.ServerGameAppState.removeEntityByIdServer;
 
 public class HumanMob extends Mob {
     private static final Random RANDOM = new Random();
@@ -96,9 +91,10 @@ public class HumanMob extends Mob {
 
     private Geometry hitboxDebug;
 
-    public HumanMob(int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
-        super(id, node, name);
-
+    public HumanMob(MobSpawnType mobSpawnType,int id, Node node, String name, SkinningControl skinningControl, AnimComposer modelComposer) {
+        super(mobSpawnType,id, node, name);
+        setHealth(24);
+        setMaxHealth(24);
         armatureNode = (Node) node.getChild("Armature");
         thirdPersonHandsNode = new Node();
         armatureNode.attachChild(thirdPersonHandsNode); // attach it to the Node holding the base mesh
@@ -130,7 +126,7 @@ public class HumanMob extends Mob {
 //        node.attachChild(Circle.createCircle(20, ColorRGBA.Red));
 
         cachedSpeed = 7.5f;
-        attributes.put(SPEED_ATTRIBUTE, new FloatAttribute(cachedSpeed));
+        attributes.put(SPEED_ATTRIBUTE_KEY, new FloatAttribute(cachedSpeed));
         onInteract();
 
 //        debugSkeleton(node);
@@ -155,7 +151,7 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void move(float tpf) {
+    public void moveClient(float tpf) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -213,12 +209,12 @@ public class HumanMob extends Mob {
             onDamageReceivedEffect.applyClient(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
         var notMe = this != ClientGameAppState.getInstance().getPlayer();
         ParticleEmitter blood = EmitterPooler.getBlood();
         Vector3f bloodPos = node.getWorldTranslation().clone().add(0, 2, 0);
         blood.setLocalTranslation(bloodPos);
-        if (health <= 0) {
+        if (getHealth() <= 0) {
             if (notMe) {
                 blood.emitParticles(RANDOM.nextInt(30,50));
             }
@@ -237,8 +233,9 @@ public class HumanMob extends Mob {
             onDamageReceivedEffect.applyServer(damageData);
         }
 
-        health -= calculateDamage(damageData.getRawDamage());
-        if (health <= 0) {
+        setHealth(getHealth()-calculateDamage(damageData.getRawDamage()));
+
+        if (getHealth() <= 0) {
             destroyServer();
             onDeathServer();
             return;
@@ -254,10 +251,6 @@ public class HumanMob extends Mob {
         DestructibleDamageReceiveMessage hpUpd = new DestructibleDamageReceiveMessage(damageReceiveData);
         hpUpd.setReliable(true);
         ClientGameAppState.getInstance().getClient().send(hpUpd);
-    }
-
-    @Override
-    public void onCollision() {
     }
 
     public Holdable getEquippedRightHand() {
@@ -283,34 +276,34 @@ public class HumanMob extends Mob {
     @Override
     public void equip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.humanMobEquip(this);
+            equippableItem.humanMobEquipClient(this);
         }
     }
 
     @Override
     public void unequip(Item item) {
         if (item instanceof Equippable equippableItem) {
-            equippableItem.humanMobUnequip(this);
+            equippableItem.humanMobUnequipClient(this);
         }
     }
 
     @Override
     public void equipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerEquip(this);
+            equippableItem.serverEquip(this);
         }
     }
 
     @Override
     public void unequipServer(Item e) {
         if (e instanceof Equippable equippableItem) {
-            equippableItem.playerServerUnequip(this);
+            equippableItem.serverUnequip(this);
         }
     }
 
     @Override
     public AbstractMessage createNewEntityMessage() {
-        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), HUMAN);
+        NewMobMessage msg = new NewMobMessage(this, node.getWorldTranslation(), mobSpawnType);
         msg.setReliable(true);
         return msg;
     }
@@ -340,7 +333,7 @@ public class HumanMob extends Mob {
     }
 
     @Override
-    public void setPosition(Vector3f newPos) {
+    public void setPositionClient(Vector3f newPos) {
         setServerLocation(newPos);
         setPosInterpolationValue(1.f);
         WorldGrid grid = ClientGameAppState.getInstance().getGrid();
@@ -352,7 +345,7 @@ public class HumanMob extends Mob {
 
     @Override
     public void setPositionServer(Vector3f newPos) {
-        WorldGrid grid = ServerMain.getInstance().getGrid();
+        WorldGrid grid = ServerGameAppState.getInstance().getGrid();
         grid.remove(this);
         node.setLocalTranslation(newPos);
         grid.insert(this);
@@ -445,25 +438,26 @@ public class HumanMob extends Mob {
 
     @Override
     public void destroyServer() {
-        removeEntityByIdServer(id);
-//        System.out.println("destroying "+this);
-        var server = ServerMain.getInstance();
-        server.getGrid().remove(this);
-        if (node.getParent() != null) {
-            Main.getInstance().enqueue(() -> {
+        Main.getInstance().enqueue(() -> {
+            removeEntityByIdServer(id);
+            var server = ServerGameAppState.getInstance();
+            server.getGrid().remove(this);
+            if (node.getParent() != null) {
                 node.removeFromParent();
-            });
-        }
+            }
+        });
     }
 
     @Override
     public void destroyClient() {
-        var client = ClientGameAppState.getInstance();
-        client.getGrid().remove(this);
         Main.getInstance().enqueue(() -> {
-            node.removeFromParent();
+            removeEntityByIdClient(id);
+            var client = ClientGameAppState.getInstance();
+            client.getGrid().remove(this);
+            if(node.getParent() != null) {
+                node.removeFromParent();
+            }
         });
-        removeEntityByIdClient(id);
     }
 
     @Override

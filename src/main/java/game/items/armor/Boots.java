@@ -1,6 +1,6 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
@@ -9,7 +9,6 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
 import game.items.ItemTemplates.BootsTemplate;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewBootsMessage;
@@ -27,7 +26,7 @@ public class Boots extends Armor {
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         var verticalOffset = 0.44f;
         m.setBoots(this);
         Node r = m.getSkinningControl().getAttachmentsNode("LegR");
@@ -54,18 +53,30 @@ public class Boots extends Armor {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void humanMobUnequipClient(HumanMob m) {
+        m.getDefaultBoots().humanMobEquipClient(m);
     }
 
     @Override
-    public void playerEquip(Player m) {
-        humanMobEquip(m);
+    public void playerEquipClient(Player m) {
+        var unequippedItem = m.getBoots();
+        if(unequippedItem == this){
+            return;
+        }
+        if (unequippedItem != null) {
+            unequippedItem.playerUnequipClient(m);
+        }
+        humanMobEquipClient(m);
     }
 
     @Override
-    public void playerUnequip(Player m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void playerUnequipClient(Player p) {
+        if (p.getBoots() != this) {
+            return;
+        }
+
+        humanMobUnequipClient(p);
+        p.getDefaultBoots().playerEquipClient(p);
     }
 
     @Override
@@ -84,13 +95,15 @@ public class Boots extends Armor {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setBoots(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getBoots() == this) {
+            m.setBoots(m.getBoots());
+        }
     }
 
     @Override

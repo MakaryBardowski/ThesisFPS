@@ -1,7 +1,7 @@
 package game.items.weapons;
 
 import FirstPersonHands.FirstPersonHandAnimationData;
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -16,7 +16,7 @@ import lombok.Getter;
 import messages.GrenadeThrownMessage;
 import messages.items.MobItemInteractionMessage;
 import messages.items.NewGrenadeMessage;
-import static client.ClientGameAppState.removeEntityByIdClient;
+import static client.appStates.ClientGameAppState.removeEntityByIdClient;
 import com.jme3.anim.tween.Tween;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.anim.tween.action.Action;
@@ -24,7 +24,6 @@ import com.jme3.anim.tween.action.ClipAction;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.items.Holdable;
-import server.ServerMain;
 
 public class Grenade extends ThrowableWeapon {
 
@@ -137,17 +136,20 @@ public class Grenade extends ThrowableWeapon {
     }
 
     @Override
-    public void playerEquip(Player p) {
+    public void playerEquipClient(Player p) {
         Holdable unequippedItem = p.getEquippedRightHand();
+        if(unequippedItem == this){
+            return;
+        }
         if (unequippedItem != null) {
-            unequippedItem.playerUnequip(p);
+            unequippedItem.playerUnequipClient(p);
         }
         p.setHoldsTrigger(false);
         playerHoldInRightHand(p);
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
         if (p.getEquippedRightHand() != this) {
             return;
         }
@@ -157,13 +159,15 @@ public class Grenade extends ThrowableWeapon {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setEquippedRightHand(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        m.setEquippedRightHand(null);
+    public void serverUnequip(HumanMob m) {
+        if(m.getEquippedRightHand() == this) {
+            m.setEquippedRightHand(null);
+        }
     }
 
     private boolean playerIsMyPlayer(Player p) {
@@ -179,17 +183,17 @@ public class Grenade extends ThrowableWeapon {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
+    public void humanMobUnequipClient(HumanMob m) {
         if (m.getEquippedRightHand() == this) {
             m.setEquippedRightHand(null);
         }
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         Holdable unequippedItem = m.getEquippedRightHand();
         if (unequippedItem != null) {
-            unequippedItem.humanMobUnequip(m);
+            unequippedItem.humanMobUnequipClient(m);
         }
         m.setEquippedRightHand(this);
         humanEquipInThirdPerson(m, Main.getInstance().getAssetManager());

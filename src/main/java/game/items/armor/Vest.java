@@ -1,7 +1,7 @@
 package game.items.armor;
 
-import client.ClientGameAppState;
-import game.items.ItemTemplates;
+import client.appStates.ClientGameAppState;
+
 import static game.map.blocks.VoxelLighting.setupModelLight;
 import game.entities.mobs.player.Player;
 import client.Main;
@@ -9,12 +9,8 @@ import com.jme3.network.AbstractMessage;
 import com.jme3.scene.Node;
 import static game.entities.DestructibleUtils.setupModelShootability;
 import game.entities.mobs.HumanMob;
-import game.entities.mobs.Mob;
-import game.items.Holdable;
 import game.items.ItemTemplates.VestTemplate;
-import java.util.Arrays;
 import messages.items.MobItemInteractionMessage;
-import messages.items.NewHelmetMessage;
 import messages.items.NewVestMessage;
 
 public class Vest extends Armor {
@@ -30,7 +26,7 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void humanMobEquip(HumanMob m) {
+    public void humanMobEquipClient(HumanMob m) {
         m.setVest(this);
         Node n = m.getSkinningControl().getAttachmentsNode("Spine");
         n.detachAllChildren();
@@ -41,31 +37,38 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void humanMobUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void humanMobUnequipClient(HumanMob m) {
+        m.getDefaultVest().humanMobEquipClient(m);
     }
 
     @Override
-    public void playerEquip(Player p) {
-        Vest unequippedItem = p.getVest();
-        if (unequippedItem != null) {
-            unequippedItem.playerUnequip(p);
+    public void playerEquipClient(Player p) {
+        var unequippedItem = p.getVest();
+        if(unequippedItem == this){
+            return;
         }
-        humanMobEquip(p);
+        if (unequippedItem != null) {
+            unequippedItem.playerUnequipClient(p);
+        }
+        humanMobEquipClient(p);
     }
 
     @Override
-    public void playerUnequip(Player p) {
+    public void playerUnequipClient(Player p) {
+        if (p.getVest() != this) {
+            return;
+        }
+
+        humanMobUnequipClient(p);
+        p.getDefaultVest().playerEquipClient(p);
     }
 
     @Override
     public void onInteract() {
-
         ClientGameAppState gs = ClientGameAppState.getInstance();
         MobItemInteractionMessage imsg = new MobItemInteractionMessage(this, gs.getPlayer(), MobItemInteractionMessage.ItemInteractionType.PICK_UP);
         imsg.setReliable(true);
         gs.getClient().send(imsg);
-
     }
 
     @Override
@@ -76,19 +79,20 @@ public class Vest extends Armor {
     }
 
     @Override
-    public void playerServerEquip(HumanMob m) {
+    public void serverEquip(HumanMob m) {
         m.setVest(this);
     }
 
     @Override
-    public void playerServerUnequip(HumanMob m) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void serverUnequip(HumanMob m) {
+        if(m.getVest() == this) {
+            m.setVest(m.getDefaultVest());
+        }
     }
 
     @Override
     public String getDescription() {
         StringBuilder builder = new StringBuilder();
-        builder.append("-Worn\n");
         builder.append("Armor value: ");
         builder.append(armorValue);
         return builder.toString();

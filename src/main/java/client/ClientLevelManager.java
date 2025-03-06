@@ -2,15 +2,20 @@ package client;
 
 import static client.ClientSynchronizationUtils.interpolateGrenadePosition;
 import static client.ClientSynchronizationUtils.interpolateMobPosition;
+
+import client.appStates.ClientGameAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
+import data.jumpToLevelData.ClientJumpToLevelData;
 import game.entities.Entity;
 import game.entities.factories.AllMobFactory;
 import game.entities.factories.MobSpawnType;
@@ -27,11 +32,9 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import menu.MenuStateMachine;
-import menu.states.CardChoiceMenuState;
 import server.LevelManager;
 
-public class ClientLevelManager extends LevelManager {
+public class ClientLevelManager extends LevelManager<ClientJumpToLevelData> {
 
     private static final Main MAIN_INSTANCE = Main.getInstance();
     private final ClientGameAppState GAME_APP_STATE = ClientGameAppState.getInstance();
@@ -71,7 +74,7 @@ public class ClientLevelManager extends LevelManager {
     private final int CHUNK_SIZE = 16;
 
     @Getter
-    private final int MAP_SIZE_XZ = 39;
+    private final int MAP_SIZE_XZ = 20;
 
     @Getter
     private final int MAP_SIZE_Y = 20;
@@ -136,59 +139,76 @@ public class ClientLevelManager extends LevelManager {
     }
 
     @Override
-    public void jumpToLevel(int levelIndex) {
-
-        currentLevelIndex = levelIndex;
-
-        var levelSeed = levelSeeds[levelIndex];
-        var levelType = levelTypes[levelIndex];
-
-
-
-        var clientLevelGenerator = new ClientLevelGenerator(levelSeed,levelType,BLOCK_SIZE,CHUNK_SIZE,mapNode);
-
-        if(levelType.equals(MapType.STATIC)){
-            if(nextStaticMap != null){
-                MAIN_INSTANCE.enqueue(() -> {
-                    destroyCurrentLevel();
-                    level = clientLevelGenerator.generateFromMap(nextStaticMap);
-                    nextStaticMap = null;
-                });
-            } else {
-                Runnable awaitUntilCacheFilledAndCreateMap = () -> {
-                    while(nextStaticMap == null){
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    System.out.println("IM OUT THE LOOP!");
-
-                    MAIN_INSTANCE.enqueue(() -> {
-                        System.out.println("IM CREATING FROM THE MAP I RECEIVED!");
-                        MAIN_INSTANCE.enqueue(() -> {
-                            destroyCurrentLevel();
-                            level = clientLevelGenerator.generateFromMap(nextStaticMap);
-                            nextStaticMap = null;
-                        });
-                    });
-                };
-                Thread.ofVirtual().start(awaitUntilCacheFilledAndCreateMap);
-            }
-
-            return;
-        }
-
-        MAIN_INSTANCE.enqueue(() -> {
+    public void jumpToLevel(ClientJumpToLevelData clientJumpToLevelData) {
+        /* whole thing needs to be enqueued to main rendering thread because
+        a) some messages rely on level index being correct. e.g the posUpdateRequest and player movement is also from main rendering thread
+        b) model changes can only be ran from main rendering thread as per jme doc
+         */
+        Main.getInstance().enqueue( () -> {
             try {
+                var levelIndex = clientJumpToLevelData.getLevelIndex();
+                var newLevelSeed = clientJumpToLevelData.getLevelSeed();
+                var newLevelType = clientJumpToLevelData.getLevelType();
+                var playerSpawnpointsByPlayerId = clientJumpToLevelData.getPlayerSpawnpointsByPlayerId();
+
+                currentLevelIndex = levelIndex;
+                var clientLevelGenerator = new ClientLevelGenerator(newLevelSeed, newLevelType, BLOCK_SIZE, CHUNK_SIZE, mapNode);
+
+                if (newLevelType.equals(MapType.FILE)) {
+                    if (nextStaticMap != null) {
+                        destroyCurrentLevel();
+                        level = clientLevelGenerator.generateFromMap(nextStaticMap);
+                        nextStaticMap = null;
+
+                        for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
+                            var entity =  getMobs().get(playerSpawnpointById.getKey());
+                            if(entity instanceof Player player){
+                                player.setPositionClient(playerSpawnpointById.getValue());
+                            }
+                        }
+
+                    } else {
+                        Runnable awaitUntilCacheFilledAndCreateMap = () -> {
+                            while (nextStaticMap == null) {
+                                try {
+                                    Thread.sleep(50);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            MAIN_INSTANCE.enqueue(() -> {
+                                destroyCurrentLevel();
+                                level = clientLevelGenerator.generateFromMap(nextStaticMap);
+                                nextStaticMap = null;
+
+                                for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
+                                    var entity =  getMobs().get(playerSpawnpointById.getKey());
+                                    if(entity instanceof Player player){
+                                        player.setPositionClient(playerSpawnpointById.getValue());
+                                    }
+                                }
+                            });
+                        };
+                        Thread.ofVirtual().start(awaitUntilCacheFilledAndCreateMap);
+                    }
+
+                    return;
+                }
+
                 destroyCurrentLevel();
                 level = clientLevelGenerator.generateLevel(MAP_SIZE_XZ, MAP_SIZE_Y, MAP_SIZE_XZ);
-            } catch (IOException e) {
+
+                for(var playerSpawnpointById : playerSpawnpointsByPlayerId.entrySet()){
+                    var entity =  getMobs().get(playerSpawnpointById.getKey());
+                    if(entity instanceof Player player){
+                        player.setPositionClient(playerSpawnpointById.getValue());
+                    }
+                }
+            } catch (IOException e){
                 e.printStackTrace();
             }
         });
-
     }
 
     public Mob registerMob(Integer id, MobSpawnType spawnType) {
@@ -206,7 +226,7 @@ public class ClientLevelManager extends LevelManager {
             if(player.getPlayerHealthbar() != null){
                 player.getPlayerHealthbar().updateHealthbar(tpf);
             }
-            player.move(tpf);
+            player.moveClient(tpf);
             player.updateTemporaryEffectsClient();
             if (player.isHoldsTrigger() && player.getEquippedRightHand() != null) {
                 player.getEquippedRightHand().playerUseInRightHand(player);
@@ -257,4 +277,16 @@ public class ClientLevelManager extends LevelManager {
         }
     }
 
+    @Override
+    public void cleanup() {
+        if(player != null && player.getGunViewPort() != null){
+            player.getGunViewPort().detachScene(player.getGunNode());
+            renderManager.removeMainView(player.getGunViewPort());
+            player.getPlayerHealthbar().cleanup();
+            player.getPlayerinventoryGui().cleanup();
+        }
+        rootNode.removeFromParent();
+        Main.getInstance().getCamera().setLocation(new Vector3f(0,6,0.1f));
+        Main.getInstance().getCamera().setRotation(new Quaternion(0,1,0,0));
+    }
 }

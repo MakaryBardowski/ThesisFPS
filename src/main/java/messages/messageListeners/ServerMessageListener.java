@@ -3,7 +3,7 @@ package messages.messageListeners;
 import client.Main;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
-import server.ServerMain;
+import server.ServerGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import messages.TwoWayMessage;
@@ -11,13 +11,13 @@ import messages.TwoWayMessage;
 @Serializable
 public class ServerMessageListener implements MessageListener<HostedConnection> {
 
-    private ServerMain serverApp;
+    private ServerGameAppState serverApp;
     private static final Main MAIN_APP = Main.getInstance();
 
     public ServerMessageListener() {
     }
 
-    public ServerMessageListener(ServerMain s) {
+    public ServerMessageListener(ServerGameAppState s) {
         this.serverApp = s;
     }
 

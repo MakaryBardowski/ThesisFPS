@@ -1,23 +1,21 @@
 package messages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import client.Main;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
-import game.AttachedEntity;
 import game.entities.Collidable;
 import game.entities.mobs.player.Player;
 import game.map.collision.MovementCollisionUtils;
 import game.map.collision.WorldGrid;
 import java.util.ArrayList;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 @Serializable
 public class PlayerPosUpdateRequest extends EntityUpdateMessage {
-
+    protected int levelIndex;
     protected float x;
     protected float y;
     protected float z;
@@ -25,11 +23,12 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
     public PlayerPosUpdateRequest() {
     }
 
-    public PlayerPosUpdateRequest(int id, Vector3f pos) {
+    public PlayerPosUpdateRequest(int levelIndex, int id, Vector3f pos) {
         super(id);
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
+        this.levelIndex = levelIndex;
     }
 
     public Vector3f getPos() {
@@ -42,10 +41,16 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
     }
 
     @Override
-    public void handleServer(ServerMain server,HostedConnection hc) {
+    public void handleServer(ServerGameAppState server, HostedConnection hc) {
+        if(server.getCurrentGamemode().getLevelManager().getCurrentLevelIndex() != levelIndex){
+            return;
+        }
         if (entityExistsLocallyServer(id)) {
-            var serverApp = ServerMain.getInstance();
+            var serverApp = ServerGameAppState.getInstance();
             Player p = (Player) serverApp.getLevelManagerMobs().get(id);
+            if(!p.isAbleToMove()){
+                return;
+            }
 
             var allCollidables = serverApp.getGrid().getNearbyAtPosition(p, getPos());
             var solid = new ArrayList<Collidable>();
@@ -58,7 +63,7 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
                 grid.remove(p);
 
                 Main.getInstance().enqueue(() -> {
-                    if (!(p.isAbleToMove() && ServerMain.getInstance().containsEntityWithId(id))) {
+                    if (!ServerGameAppState.getInstance().containsEntityWithId(id)) {
                         return;
                     }
                     var newPos = getPos();
@@ -71,9 +76,7 @@ public class PlayerPosUpdateRequest extends EntityUpdateMessage {
                 });
             } else {
                 InstantEntityPosCorrectionMessage corrMsg = new InstantEntityPosCorrectionMessage(p, p.getNode().getWorldTranslation());
-                corrMsg.setReliable(true);
                 serverApp.getServer().broadcast(Filters.in(getHostedConnectionByPlayer(p)), corrMsg);
-
             }
 
         }

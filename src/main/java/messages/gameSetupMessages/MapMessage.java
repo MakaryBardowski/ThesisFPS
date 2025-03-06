@@ -1,6 +1,6 @@
 package messages.gameSetupMessages;
 
-import client.ClientGameAppState;
+import client.appStates.ClientGameAppState;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.serializing.Serializable;
 import game.map.blocks.Map;
@@ -8,7 +8,7 @@ import messages.TwoWayMessage;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
-import server.ServerMain;
+import server.ServerGameAppState;
 
 import java.io.UnsupportedEncodingException;
 
@@ -46,11 +46,10 @@ public class MapMessage extends TwoWayMessage {
 
 
     @Override
-    public void handleServer(ServerMain server, HostedConnection sender) {}
+    public void handleServer(ServerGameAppState server, HostedConnection sender) {}
 
     @Override
     public void handleClient(ClientGameAppState client) {
-        System.out.println("RECEIVED A MAP");
         client.getCurrentGamemode().getLevelManager().setNextStaticMap(getMap());
     }
 
