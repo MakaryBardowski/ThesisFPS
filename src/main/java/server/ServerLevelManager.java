@@ -130,12 +130,12 @@ public class ServerLevelManager extends LevelManager<BaseJumpToLevelData> {
             levelSeeds[i] = RANDOM.nextLong();
         }
 
-        levelTypes[0] = MapType.FILE;
-        for (int i = 1; i < levelTypes.length; i++) {
-            if (i % 6 == 0) {
-                levelTypes[i] = MapType.FILE;
-                continue;
-            }
+//        levelTypes[0] = MapType.FILE;
+        for (int i = 0; i < levelTypes.length; i++) {
+//            if (i % 6 == 0) {
+//                levelTypes[i] = MapType.FILE;
+//                continue;
+//            }
 
             var type = MapType.values()[RANDOM.nextInt(MapType.values().length)];
 

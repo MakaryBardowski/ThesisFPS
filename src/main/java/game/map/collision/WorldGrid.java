@@ -56,14 +56,16 @@ public class WorldGrid {
         corners[4] = new float[]{centerX - width, centerY - height, centerZ + depth};
         corners[5] = new float[]{centerX + width, centerY - height, centerZ + depth};
         corners[6] = new float[]{centerX - width, centerY + height, centerZ + depth};
-        corners[7] = new float[]{centerX + width, centerY + height, centerZ + depth};
+        corners[7] = new float[]{centerX + width, centerY + height, centerZ + depth};   
 
         for (float[] corner : corners) {
             Vector3f v = new Vector3f(corner[0], corner[1], corner[2]);
             var cellContents = contents.get(hash(v));
-            if (!cellContents.contains(entity)) {
-                cellContents.add(entity);
+            if(cellContents == null) {
+                System.err.println("corner "+v+ " is outside grid bounds (cell not exists)...");
+                continue;
             }
+            cellContents.add(entity);
         }
     }
 
@@ -119,9 +121,11 @@ public class WorldGrid {
         for (float[] corner : corners) {
             Vector3f v = new Vector3f(corner[0], corner[1], corner[2]);
             var cellContents = contents.get(hash(v));
-            if (cellContents.contains(entity)) {
-                cellContents.remove(entity);
+            if(cellContents == null) {
+                System.err.println("corner "+v+ " is outside grid bounds (cell not exists)...");
+                continue;
             }
+            cellContents.remove(entity);
         }
     }
 

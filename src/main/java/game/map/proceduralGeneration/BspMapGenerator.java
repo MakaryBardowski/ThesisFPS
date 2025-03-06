@@ -3,6 +3,7 @@ package game.map.proceduralGeneration;
 import Utils.Pair;
 import client.appStates.ClientGameAppState;
 import game.map.MapGenerationResult;
+import game.map.blocks.BlockType;
 import game.map.blocks.Map;
 import jme3utilities.math.Vector3i;
 
@@ -52,24 +53,24 @@ public class BspMapGenerator extends MapGenerator{
 
             if (startX <= endX) {
                 for (int x = startX; x <= endX; x++) {
-                    logicMap.setBlockIdAtPosition(x,0,startZ,(byte) 2);
+                    logicMap.setBlockIdAtPosition(x,0,startZ, BlockType.DIRT.blockId);
                     logicMap.setBlockIdAtPosition(x,1,startZ,(byte) 0);
                 }
             } else if (startX > endX) {
                 for (int x = endX; x <= startX; x++) {
-                    logicMap.setBlockIdAtPosition(x,0,startZ,(byte) 2);
+                    logicMap.setBlockIdAtPosition(x,0,startZ, BlockType.DIRT.blockId);
                     logicMap.setBlockIdAtPosition(x,1,startZ,(byte) 0);
                 }
             }
 
             if (startZ <= endZ) {
                 for (int z = startZ; z <= endZ; z++) {
-                    logicMap.setBlockIdAtPosition(endX,0,z,(byte)2);
+                    logicMap.setBlockIdAtPosition(endX,0,z,BlockType.DIRT.blockId);
                     logicMap.setBlockIdAtPosition(endX,1,z,(byte)0);
                 }
             } else if (endZ <= startZ) {
                 for (int z = endZ; z <= startZ; z++) {
-                    logicMap.setBlockIdAtPosition(endX,0,z,(byte)2);
+                    logicMap.setBlockIdAtPosition(endX,0,z,BlockType.DIRT.blockId);
                     logicMap.setBlockIdAtPosition(endX,1,z,(byte)0);
                 }
             }
@@ -84,7 +85,7 @@ public class BspMapGenerator extends MapGenerator{
                         logicMap.setBlockIdAtPosition(x, y, z, (byte) 0);
                         // hardcode dla podlogi
                         if (y == 0) {
-                            logicMap.setBlockIdAtPosition(x, y, z, (byte) 2);
+                            logicMap.setBlockIdAtPosition(x, y, z, BlockType.DIRT.blockId);
                         }
                         // hardcode dla podlogi
 
@@ -95,18 +96,18 @@ public class BspMapGenerator extends MapGenerator{
     }
 
     private BspTreeNode partitionRoom(Room room,int subdivisionLevel, int maxSubdivisionLevel){
-        if(subdivisionLevel == maxSubdivisionLevel){
+        if(subdivisionLevel == maxSubdivisionLevel || room.getSizeX() < 5 || room.getSizeZ() < 5){
             return new BspTreeNode(room);
         }
 
         var rooms = room.getSizeX()*random.nextFloat(0.8f,1.2f) > room.getSizeZ() ? splitVertical(room) : splitHorizontal(room);
-
         Room roomLeft = rooms.getFirst();
         Room roomRight = rooms.getSecond();
-
         if (roomLeft.getSizeX() < 5 || roomLeft.getSizeZ() < 5 || roomRight.getSizeX() < 5 || room.getSizeZ() < 5) {
             return new BspTreeNode(room);
         }
+
+
         return new BspTreeNode(
                 room,
                 partitionRoom(rooms.getFirst(), subdivisionLevel+1,maxSubdivisionLevel),

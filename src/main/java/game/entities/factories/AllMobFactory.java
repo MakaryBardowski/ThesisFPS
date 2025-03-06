@@ -19,11 +19,14 @@ import game.items.armor.Gloves;
 import game.items.armor.Helmet;
 import game.items.armor.Vest;
 import game.items.weapons.Knife;
+import game.items.weapons.Weapon;
 import generators.PercentageRandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import generators.RandomGenerator;
 import server.ServerGameAppState;
 import statusEffects.EffectTemplates;
 
@@ -98,6 +101,82 @@ public class AllMobFactory extends MobFactory {
             p.addAi();
             return p;
         } else if (spawnType == SOLDIER) {
+            ItemTemplate helmet = null;
+            ItemTemplate vest = null;
+            ItemTemplate boots = null;
+            ItemTemplate weapon = null;
+            var minPowerScore = 20;
+            var maxPowerScore = 30;
+            var r = new Random();
+            var powerScore = r.nextInt(minPowerScore,maxPowerScore);
+            var maxAttempts = 300;
+
+            List<RandomGenerator> generators = new ArrayList<>();
+            generators.add(helmetGenerator);
+            generators.add(vestGenerator);
+            generators.add(bootsGenerator);
+            generators.add(weaponGenerator);
+            while(powerScore != 0 && maxAttempts > 0){
+
+                ItemTemplate randomItem = (ItemTemplate) generators.get(r.nextInt(generators.size())).getRandom();
+                if(randomItem == null){
+                    continue;
+                }
+                maxAttempts--;
+                System.out.println(randomItem+ " item tpl "+powerScore);
+                int powerScoreCost = 0;
+                if(helmet == null && randomItem == ItemTemplates.TRENCH_HELMET || randomItem == ItemTemplates.GAS_MASK ) {
+                    powerScoreCost = 3;
+                    if (randomItem == ItemTemplates.TRENCH_HELMET) {
+                        powerScoreCost = 7;
+                    }
+                    if(powerScore >= powerScoreCost) {
+                        helmet = randomItem;
+                        powerScore -= powerScoreCost;
+                    }
+                }
+                if(vest == null && randomItem == ItemTemplates.VEST_TRENCH) {
+                    powerScoreCost = 18;
+                    if(powerScore >= powerScoreCost) {
+                        vest = randomItem;
+                        powerScore -= powerScoreCost;
+                    }
+                }
+                if(boots == null && randomItem == ItemTemplates.BOOTS_TRENCH) {
+                    powerScoreCost = 7;
+                    if(powerScore >= powerScoreCost) {
+                        boots = randomItem;
+                        powerScore -= powerScoreCost;
+                    }
+                }
+                if(weapon == null && randomItem instanceof  ItemTemplates.MeleeWeaponTemplate || randomItem instanceof  ItemTemplates.RangedWeaponTemplate ) {
+                    if(randomItem == ItemTemplates.RIFLE_BORYSOV) {
+                        powerScoreCost = 11;
+                    }
+                    if(randomItem == ItemTemplates.RIFLE_MANNLICHER_95) {
+                        powerScoreCost = 7;
+                    }
+                    if(randomItem == ItemTemplates.PISTOL_C96) {
+                        powerScoreCost = 4;
+                    }
+                    if(randomItem == ItemTemplates.KNIFE) {
+                        powerScoreCost = 2;
+                    }
+                    if(randomItem == ItemTemplates.LMG_HOTCHKISS) {
+                        powerScoreCost = 21;
+                    }
+                    if(randomItem == ItemTemplates.AXE) {
+                        powerScoreCost = 7;
+                    }
+                    if(powerScore >= powerScoreCost) {
+                        weapon = randomItem;
+                        powerScore -= powerScoreCost;
+                    }
+                }
+
+
+            }
+
             HumanMob p = createHumanMob(spawnType,"Soldier "+id);
             DestructibleUtils.attachDestructibleToNode(p, mobsNode, new Vector3f(10, 4, 10));
 
@@ -122,10 +201,7 @@ public class AllMobFactory extends MobFactory {
             p.equipServer(defaultGloves);
             p.equipServer(defaultBoots);
 
-            var helmet = helmetGenerator.getRandom();
-            var vest = vestGenerator.getRandom();
-            var boots = bootsGenerator.getRandom();
-            var weapon = weaponGenerator.getRandom();
+
 
             if (helmet != null) {
                 Item item = serverLevelManager.registerItemLocal(helmet, true);

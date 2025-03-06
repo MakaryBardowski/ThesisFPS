@@ -5,6 +5,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import game.map.blocks.Map;
 import game.map.proceduralGeneration.BspMapGenerator;
+import game.map.proceduralGeneration.CellularAutomataMapGenerator;
 import game.map.proceduralGeneration.RandomMapGenerator;
 
 import java.io.IOException;
@@ -40,7 +41,8 @@ public class ClientLevelGenerator {
                 return new Level(blockSize, chunkSize, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ, mapGenResult.getMap(), assetManager, mapNode);
             }
             case CELLULAR_AUTOMATA: {
-                return null;
+                var mapGenResult =  new CellularAutomataMapGenerator(levelSeed, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ).createRandomMap();
+                return new Level(blockSize, chunkSize, generatedMapSizeX,generatedMapSizeY,generatedMapSizeZ, mapGenResult.getMap(), assetManager, mapNode);
             }
             default: {
                 return null;

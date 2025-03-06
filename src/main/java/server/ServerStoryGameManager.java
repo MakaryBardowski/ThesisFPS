@@ -4,7 +4,7 @@ import data.jumpToLevelData.BaseJumpToLevelData;
 
 public class ServerStoryGameManager extends ServerGameManager {
 
-    private static final int LEVEL_COUNT = 13;
+    public static final int LEVEL_COUNT = 13;
 
     public ServerStoryGameManager() {
         gamemodeId = 1;
